@@ -1,0 +1,27 @@
+import { createRootRoute, createRoute, Navigate, Outlet } from "@tanstack/react-router";
+
+import { ClientDetailRoute } from "@/pages/client/ClientDetailRoute";
+import { ClientListRoute } from "@/pages/client/ClientListRoute";
+import { MerchantDetailRoute } from "@/pages/merchant/MerchantDetailRoute";
+import { MerchantListRoute } from "@/pages/merchant/MerchantListRoute";
+import { PlanDetailRoute } from "@/pages/plan/PlanDetailRoute";
+import { PlanSettingsRoute } from "@/pages/plan/PlanSettingsRoute";
+
+const rootRoute = createRootRoute({ component: () => <Outlet /> });
+const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <Navigate to="/client" /> });
+const clientListRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client", component: ClientListRoute });
+const clientDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId", component: ClientDetailRoute });
+const planSettingsRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId/plans/settings", component: PlanSettingsRoute });
+const planDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId/plans/$planId", component: PlanDetailRoute });
+const merchantListRoute = createRoute({ getParentRoute: () => rootRoute, path: "/merchant", component: MerchantListRoute });
+const merchantDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/merchant/$merchantId", component: MerchantDetailRoute });
+
+export const routeTree = rootRoute.addChildren([
+  indexRoute,
+  clientListRoute,
+  clientDetailRoute,
+  planSettingsRoute,
+  planDetailRoute,
+  merchantListRoute,
+  merchantDetailRoute,
+]);
