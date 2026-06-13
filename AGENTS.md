@@ -38,7 +38,10 @@ When adding a new route:
 2. Add the route component under `src/pages/<module>`.
 3. Add or update the view under `src/features/<module>/views`.
 4. Register the route in `src/app/router/routeTree.tsx`.
-5. Add route tests when metadata or behavior changes.
+5. If the route reads path params, let the route component accept optional `routeParams` from `src/app/router/RouteStack.tsx` and fall back to `useParams({ strict: false, shouldThrow: false })`.
+6. Add route tests when metadata or behavior changes.
+
+Route keep-alive is centralized in `src/app/router/RouteStack.tsx`. It stores TanStack Router's current matched route component and params by history key, then hides inactive stack entries instead of unmounting them. Do not add a separate route list or manual pathname matcher for stack rendering; `routeTree.tsx` remains the source of route registration.
 
 When adding a new server-backed query:
 

@@ -67,6 +67,8 @@ infrastructure -> domain
 
 Route metadata lives in `src/app/router/routeMeta.ts`. Route definitions live in `src/app/router/routeTree.tsx`.
 
+H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root route owns this stack so a `PUSH` navigation keeps the previous page mounted and hidden instead of unmounting it. The stack uses TanStack Router's current match, route component, route params, and history key; do not add a second manual pathname matcher or route table for keep-alive behavior.
+
 ## Development Guide
 
 - Add or change business entities in `src/domain/<module>`.
@@ -77,6 +79,7 @@ Route metadata lives in `src/app/router/routeMeta.ts`. Route definitions live in
 - Add TanStack Query keys in `src/infrastructure/query/queryKeys.ts`.
 - Add feature query/mutation hooks under `src/features/<module>/queries` or `src/features/<module>/mutations`.
 - Add route entry components in `src/pages/<module>`.
+- For route components that read path params, accept the optional `routeParams` prop from `RouteStack` first, then fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Put reusable H5 UI primitives in `src/shared/ui` only when they have no client, merchant, or plan business meaning.
 
 ## Architecture Docs
