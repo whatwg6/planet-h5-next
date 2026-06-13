@@ -18,6 +18,7 @@ The application is H5 only. It may contain operationally complex business workfl
 
 ## Technology Stack
 
+- pnpm
 - Vite
 - React 19
 - TypeScript
@@ -519,6 +520,7 @@ The highest-risk first tests are:
 ## Explicit Decisions
 
 - The project is H5 only.
+- The project uses `pnpm` as its package manager.
 - Business names are `client`, `merchant`, and `plan`.
 - Client and merchant routes are grouped by module, but there is no real permission system in the first version.
 - Repository contracts are designed up front, even if the first implementation uses mock data.
