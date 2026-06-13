@@ -1,4 +1,6 @@
-import { createRootRoute, createRoute, Navigate, Outlet } from "@tanstack/react-router";
+import { createRootRoute, createRoute } from "@tanstack/react-router";
+
+import { RouteStack } from "@/app/router/RouteStack";
 
 import { ClientDetailRoute } from "@/pages/client/ClientDetailRoute";
 import { ClientListRoute } from "@/pages/client/ClientListRoute";
@@ -7,8 +9,8 @@ import { MerchantListRoute } from "@/pages/merchant/MerchantListRoute";
 import { PlanDetailRoute } from "@/pages/plan/PlanDetailRoute";
 import { PlanSettingsRoute } from "@/pages/plan/PlanSettingsRoute";
 
-const rootRoute = createRootRoute({ component: () => <Outlet /> });
-const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: "/", component: () => <Navigate to="/client" /> });
+const rootRoute = createRootRoute({ component: RouteStack });
+const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: "/" });
 const clientListRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client", component: ClientListRoute });
 const clientDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId", component: ClientDetailRoute });
 const planSettingsRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId/plans/settings", component: PlanSettingsRoute });
