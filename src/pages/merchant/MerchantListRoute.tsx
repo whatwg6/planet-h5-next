@@ -1,3 +1,5 @@
+import { MerchantListView } from "@/features/merchant/views/MerchantListView";
+
 export function MerchantListRoute() {
-  return <div>商户列表</div>;
+  return <MerchantListView />;
 }

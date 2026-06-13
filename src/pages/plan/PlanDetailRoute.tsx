@@ -1,3 +1,8 @@
+import { useParams } from "@tanstack/react-router";
+
+import { PlanDetailView } from "@/features/plan/views/PlanDetailView";
+
 export function PlanDetailRoute() {
-  return <div>方案详情</div>;
+  const { clientId, planId } = useParams({ strict: false });
+  return <PlanDetailView clientId={clientId ?? ""} planId={planId ?? ""} />;
 }

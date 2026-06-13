@@ -1,3 +1,5 @@
+import { ClientListView } from "@/features/client/views/ClientListView";
+
 export function ClientListRoute() {
-  return <div>客户列表</div>;
+  return <ClientListView />;
 }

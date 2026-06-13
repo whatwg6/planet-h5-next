@@ -1,3 +1,8 @@
+import { useParams } from "@tanstack/react-router";
+
+import { MerchantDetailView } from "@/features/merchant/views/MerchantDetailView";
+
 export function MerchantDetailRoute() {
-  return <div>商户详情</div>;
+  const { merchantId } = useParams({ strict: false });
+  return <MerchantDetailView merchantId={merchantId ?? ""} />;
 }

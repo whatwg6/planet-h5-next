@@ -1,3 +1,8 @@
+import { useParams } from "@tanstack/react-router";
+
+import { ClientDetailView } from "@/features/client/views/ClientDetailView";
+
 export function ClientDetailRoute() {
-  return <div>客户详情</div>;
+  const { clientId } = useParams({ strict: false });
+  return <ClientDetailView clientId={clientId ?? ""} />;
 }
