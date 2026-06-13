@@ -66,6 +66,7 @@ src/
     router/
       routeTree.tsx
       routeMeta.ts
+      RouteStack.tsx
       router.ts
     providers/
       AppProviders.tsx
@@ -250,6 +251,14 @@ type RouteMeta = {
 ```
 
 Route metadata is used for page titles, analytics, future permission hooks, and H5 navigation behavior.
+
+The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` implements H5-style page stack behavior:
+
+- `PUSH` adds the current matched page to the stack and keeps previous pages mounted but hidden.
+- `POP` restores a previous page by TanStack history key and truncates entries above it.
+- `REPLACE` replaces an existing entry with the same pathname, or the current top entry.
+
+`RouteStack` must use TanStack Router's current match, route component, params, and history key as the source of truth. It must not maintain a second route table or manually match pathnames. Route entry components that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for normal direct rendering.
 
 ## Page Mapping
 
