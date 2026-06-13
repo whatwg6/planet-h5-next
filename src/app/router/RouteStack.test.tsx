@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { RouteStackFrames, getNextRouteStackEntries, type RouteStackEntry } from "./RouteStack";
+import { RouteStackFrames, getRouteStackCommitDelay, getNextRouteStackEntries, routeStackTransitionDurationMs, type RouteStackEntry } from "./RouteStack";
 
 function createEntry(id: string, pathname: string, onUnmount: () => void, label = pathname): RouteStackEntry {
   function TestPage() {
@@ -38,12 +38,35 @@ describe("getNextRouteStackEntries", () => {
     expect(getNextRouteStackEntries([routeA, routeB], routeA, "POP")).toEqual([routeA]);
   });
 
+  it("keeps the same stack reference when pop already targets the top route", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn());
+    const entries = [routeA];
+
+    expect(getNextRouteStackEntries(entries, routeA, "POP")).toBe(entries);
+  });
+
   it("replaces an existing route with the same pathname", () => {
     const routeA = createEntry("key-a", "/client", vi.fn());
     const oldRouteB = createEntry("key-b", "/client/1", vi.fn());
     const newRouteB = createEntry("key-c", "/client/1", vi.fn());
 
     expect(getNextRouteStackEntries([routeA, oldRouteB], newRouteB, "REPLACE")).toEqual([routeA, newRouteB]);
+  });
+});
+
+describe("getRouteStackCommitDelay", () => {
+  it("delays pruning popped routes so the exit animation can finish", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn());
+    const routeB = createEntry("key-b", "/client/1", vi.fn());
+
+    expect(getRouteStackCommitDelay([routeA, routeB], routeA, "POP")).toBe(routeStackTransitionDurationMs);
+  });
+
+  it("does not delay push commits", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn());
+    const routeB = createEntry("key-b", "/client/1", vi.fn());
+
+    expect(getRouteStackCommitDelay([routeA], routeB, "PUSH")).toBe(0);
   });
 });
 
@@ -54,14 +77,34 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", unmountA, "A");
     const routeB = createEntry("key-b", "/client/1", unmountB, "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} />);
+    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationType="POP" />);
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} />);
+    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationType="PUSH" />);
 
     expect(screen.getByTestId("A")).toBeInTheDocument();
-    expect(screen.getByTestId("A")).not.toBeVisible();
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByTestId("B")).toBeVisible();
     expect(unmountA).not.toHaveBeenCalled();
     expect(unmountB).not.toHaveBeenCalled();
+  });
+
+  it("marks frames with push animation states", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn(), "A");
+    const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
+
+    render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationType="PUSH" />);
+
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-frame", "push-exit");
+    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-frame", "push-enter");
+  });
+
+  it("marks frames with pop animation states", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn(), "A");
+    const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
+
+    render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA, routeB]} navigationType="POP" />);
+
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-frame", "pop-enter");
+    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-frame", "pop-exit");
   });
 });

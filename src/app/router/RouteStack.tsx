@@ -16,6 +16,10 @@ export type RouteStackEntry = {
   element: ReactNode;
 };
 
+type RouteStackFrameState = "active" | "hidden" | "push-enter" | "push-exit" | "pop-enter" | "pop-exit";
+
+export const routeStackTransitionDurationMs = 260;
+
 type RouteStackLocationState = {
   key?: string;
   __TSR_key?: string;
@@ -48,6 +52,10 @@ export function getNextRouteStackEntries(entries: RouteStackEntry[], currentEntr
         return [currentEntry];
       }
 
+      if (currentIndex === entries.length - 1) {
+        return entries;
+      }
+
       return entries.slice(0, currentIndex + 1);
     }
 
@@ -69,6 +77,24 @@ export function getNextRouteStackEntries(entries: RouteStackEntry[], currentEntr
       return [...entries.slice(0, -1), currentEntry];
     }
   }
+}
+
+export function getRouteStackCommitDelay(
+  entries: RouteStackEntry[],
+  currentEntry: RouteStackEntry,
+  navigationType: RouteStackNavigationType,
+) {
+  if (navigationType !== "POP") {
+    return 0;
+  }
+
+  const currentIndex = entries.findIndex((entry) => entry.id === currentEntry.id);
+
+  if (currentIndex === -1 || currentIndex === entries.length - 1) {
+    return 0;
+  }
+
+  return routeStackTransitionDurationMs;
 }
 
 function getLocationKey(location: { href: string; state: RouteStackLocationState }) {
@@ -96,24 +122,67 @@ function useRouteStackNavigationType() {
   return navigationType;
 }
 
-export function RouteStackFrames({ entries, activeEntryId }: { entries: RouteStackEntry[]; activeEntryId: string }) {
+function getRouteStackFrameState(
+  entryIndex: number,
+  activeIndex: number,
+  entriesLength: number,
+  navigationType: RouteStackNavigationType,
+): RouteStackFrameState {
+  if (entryIndex === activeIndex) {
+    if (navigationType === "PUSH" && activeIndex > 0) {
+      return "push-enter";
+    }
+
+    if (navigationType === "POP" && activeIndex < entriesLength - 1) {
+      return "pop-enter";
+    }
+
+    return "active";
+  }
+
+  if (navigationType === "PUSH" && entryIndex === activeIndex - 1) {
+    return "push-exit";
+  }
+
+  if (navigationType === "POP" && entryIndex === activeIndex + 1) {
+    return "pop-exit";
+  }
+
+  return "hidden";
+}
+
+export function RouteStackFrames({
+  entries,
+  activeEntryId,
+  navigationType,
+}: {
+  entries: RouteStackEntry[];
+  activeEntryId: string;
+  navigationType: RouteStackNavigationType;
+}) {
+  const activeIndex = entries.findIndex((entry) => entry.id === activeEntryId);
+
   return (
-    <>
-      {entries.map((entry) => {
+    <div className="route-stack">
+      {entries.map((entry, entryIndex) => {
         const isActive = entry.id === activeEntryId;
+        const frameState = activeIndex === -1 ? "hidden" : getRouteStackFrameState(entryIndex, activeIndex, entries.length, navigationType);
+        const isVisibleFrame = frameState !== "hidden";
 
         return (
           <div
             aria-hidden={!isActive}
+            className="route-stack__frame"
             key={entry.id}
-            style={{ display: isActive ? "block" : "none" }}
+            style={{ display: isVisibleFrame ? "block" : "none" }}
+            data-route-stack-frame={frameState}
             data-route-pathname={entry.pathname}
           >
             {entry.element}
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
 
@@ -150,8 +219,25 @@ export function RouteStack() {
       return;
     }
 
-    setEntries((currentEntries) => getNextRouteStackEntries(currentEntries, currentEntry, navigationType));
-  }, [currentEntry, navigationType]);
+    const nextEntries = getNextRouteStackEntries(entries, currentEntry, navigationType);
+    const commitDelay = getRouteStackCommitDelay(entries, currentEntry, navigationType);
+
+    if (commitDelay === 0) {
+      if (nextEntries !== entries) {
+        setEntries(nextEntries);
+      }
+
+      return;
+    }
+
+    const commitTimer = window.setTimeout(() => {
+      setEntries(nextEntries);
+    }, commitDelay);
+
+    return () => {
+      window.clearTimeout(commitTimer);
+    };
+  }, [currentEntry, entries, navigationType]);
 
   if (location.pathname === "/") {
     return <Navigate to="/client" />;
@@ -161,5 +247,5 @@ export function RouteStack() {
     return null;
   }
 
-  return <RouteStackFrames activeEntryId={currentEntry.id} entries={visibleEntries} />;
+  return <RouteStackFrames activeEntryId={currentEntry.id} entries={visibleEntries} navigationType={navigationType} />;
 }
