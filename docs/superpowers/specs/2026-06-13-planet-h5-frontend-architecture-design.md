@@ -72,8 +72,6 @@ src/
       AppProviders.tsx
     bootstrap/
       queryClient.ts
-      repositories.ts
-      useCases.ts
 
   pages/
     client/
@@ -485,17 +483,23 @@ Repository interfaces are defined in `domain`.
 
 HTTP and mock implementations live in `infrastructure`.
 
-The active implementation is selected in `app/bootstrap/repositories.ts`, for example:
+Feature hooks import repository implementations directly from `infrastructure/repositories/<module>` and pass them into application use case functions. No central DI container.
+
+For example:
 
 ```ts
-export const repositories = {
-  clientRepository,
-  planRepository,
-  merchantRepository,
-};
+import { getClientList } from "@/application/client/getClientList";
+import { clientRepositoryMock } from "@/infrastructure/repositories/client/clientRepository.mock";
+
+export function useClientListQuery(params: ClientListParams) {
+  return useQuery({
+    queryKey: queryKeys.clients.list(params),
+    queryFn: () => getClientList(clientRepositoryMock, params),
+  });
+}
 ```
 
-This keeps the UI stable when switching from mock data to real APIs.
+To switch from mock data to real APIs, change the repository import in each hook from `*Repository.mock` to `*Repository.http`.
 
 DTO-to-domain mapping lives in `clientMapper.ts`, `planMapper.ts`, and `merchantMapper.ts`. This prevents backend response shapes from leaking into feature views.
 

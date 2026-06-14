@@ -17,7 +17,7 @@
 - `vite.config.ts`, `tsconfig.json`, `tsconfig.node.json`, `tailwind.config.ts`, `postcss.config.js`: build, test, TypeScript, and Tailwind configuration.
 - `src/app/router/*`: route tree, router instance, and route metadata.
 - `src/app/providers/AppProviders.tsx`: QueryClient and Router providers.
-- `src/app/bootstrap/*`: query client, repository selection, and use case composition.
+- `src/app/bootstrap/queryClient.ts`: TanStack Query client configuration.
 - `src/domain/{client,merchant,plan}/*`: entity types, repository contracts, and neutral rule-boundary helpers.
 - `src/application/{client,merchant,plan}/*`: use cases that validate required identifiers and delegate to repositories.
 - `src/infrastructure/http/*`: Axios client and HTTP error normalization.
@@ -1228,8 +1228,6 @@ git commit -m "feat: add infrastructure repositories"
 
 **Files:**
 - Create: `src/app/bootstrap/queryClient.ts`
-- Create: `src/app/bootstrap/repositories.ts`
-- Create: `src/app/bootstrap/useCases.ts`
 - Create: `src/app/providers/AppProviders.tsx`
 - Create: `src/app/router/routeMeta.ts`
 - Create: `src/app/router/routeMeta.test.ts`
@@ -1286,44 +1284,6 @@ import { QueryClient } from "@tanstack/react-query";
 export function createQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } });
 }
-```
-
-Write `src/app/bootstrap/repositories.ts`:
-
-```ts
-import { clientRepositoryMock } from "@/infrastructure/repositories/client/clientRepository.mock";
-import { merchantRepositoryMock } from "@/infrastructure/repositories/merchant/merchantRepository.mock";
-import { planRepositoryMock } from "@/infrastructure/repositories/plan/planRepository.mock";
-
-export const repositories = {
-  clientRepository: clientRepositoryMock,
-  merchantRepository: merchantRepositoryMock,
-  planRepository: planRepositoryMock,
-};
-```
-
-Write `src/app/bootstrap/useCases.ts`:
-
-```ts
-import { getClientDetail } from "@/application/client/getClientDetail";
-import { getClientList } from "@/application/client/getClientList";
-import { updateClient } from "@/application/client/updateClient";
-import { getMerchantDetail } from "@/application/merchant/getMerchantDetail";
-import { getMerchantList } from "@/application/merchant/getMerchantList";
-import { getPlanDetail } from "@/application/plan/getPlanDetail";
-import { savePlanSettings } from "@/application/plan/savePlanSettings";
-
-import { repositories } from "./repositories";
-
-export const useCases = {
-  getClientList: (params: Parameters<typeof getClientList>[1]) => getClientList(repositories.clientRepository, params),
-  getClientDetail: (clientId: string) => getClientDetail(repositories.clientRepository, clientId),
-  updateClient: (input: Parameters<typeof updateClient>[1]) => updateClient(repositories.clientRepository, input),
-  getMerchantList: (params: Parameters<typeof getMerchantList>[1]) => getMerchantList(repositories.merchantRepository, params),
-  getMerchantDetail: (merchantId: string) => getMerchantDetail(repositories.merchantRepository, merchantId),
-  getPlanDetail: (clientId: string, planId: string) => getPlanDetail(repositories.planRepository, clientId, planId),
-  savePlanSettings: (input: Parameters<typeof savePlanSettings>[1]) => savePlanSettings(repositories.planRepository, input),
-};
 ```
 
 Write `src/app/router/routeMeta.ts`:
@@ -1672,7 +1632,7 @@ Expected: FAIL because feature files do not exist.
 
 - [ ] **Step 3: Implement stores, query hooks, and mutation hooks**
 
-Create Zustand stores for list keyword state, client detail edit mode, unsaved-change flag, confirm dialog visibility, and plan save message. Create query hooks that call `useCases` and use `queryKeys`. Create mutations that call use cases and invalidate related query keys. Do not add status filtering, risk logic, plan publishing logic, or merchant visibility logic.
+Create Zustand stores for list keyword state, client detail edit mode, unsaved-change flag, confirm dialog visibility, and plan save message. Create query hooks that import application use case functions and repository mocks directly, passing the repository as the first argument. Use `queryKeys` for cache keys. Create mutations that call use cases and invalidate related query keys. Do not add status filtering, risk logic, plan publishing logic, or merchant visibility logic.
 
 Use this client detail store:
 

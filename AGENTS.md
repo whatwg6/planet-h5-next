@@ -9,7 +9,7 @@ Before making code changes, inspect the relevant files and keep these anchors in
 - `README.md` for project overview and commands.
 - `docs/superpowers/specs/2026-06-13-planet-h5-frontend-architecture-design.md` for architecture intent.
 - `src/app/router/routeTree.tsx` and `src/app/router/routeMeta.ts` for route structure.
-- `src/app/bootstrap/repositories.ts` and `src/app/bootstrap/useCases.ts` for dependency composition.
+- `src/app/bootstrap/queryClient.ts` for TanStack Query client configuration.
 - `src/infrastructure/query/queryKeys.ts` for TanStack Query key conventions.
 
 ## Architecture Rules
@@ -49,8 +49,7 @@ When adding a new server-backed query:
 2. Add a use case in `src/application/<module>`.
 3. Add DTO, mapper, and repository implementation in `src/infrastructure/repositories/<module>`.
 4. Add a stable key in `src/infrastructure/query/queryKeys.ts`.
-5. Add a feature hook in `src/features/<module>/queries`.
-6. Wire the use case in `src/app/bootstrap/useCases.ts`.
+5. Add a feature hook in `src/features/<module>/queries` that imports the use case and repository directly.
 
 When adding a mutation:
 

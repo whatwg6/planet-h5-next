@@ -36,7 +36,7 @@ GitHub Pages 构建由 `.github/workflows/deploy-github-pages.yml` 执行，并�
 
 ```txt
 src/
-  app/              App bootstrap, providers, router, repository/use-case composition
+  app/              App bootstrap, providers, router
   pages/            TanStack Router route entry components
   features/         Feature views, query hooks, mutation hooks, UI state, feature components
   application/      Use cases that coordinate repository calls
@@ -75,8 +75,7 @@ H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root 
 - Add or change business entities in `src/domain/<module>`.
 - Add business actions in `src/application/<module>`.
 - Add repository implementations, DTOs, and mappers in `src/infrastructure/repositories/<module>`.
-- Compose repositories in `src/app/bootstrap/repositories.ts`.
-- Compose use cases in `src/app/bootstrap/useCases.ts`.
+- Import use case functions directly from `src/application/<module>` and repository implementations directly from `src/infrastructure/repositories/<module>` in feature hooks. No central DI container.
 - Add TanStack Query keys in `src/infrastructure/query/queryKeys.ts`.
 - Add feature query/mutation hooks under `src/features/<module>/queries` or `src/features/<module>/mutations`.
 - Add route entry components in `src/pages/<module>`.
