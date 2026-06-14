@@ -7,8 +7,7 @@ import { Field } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
 export function ClientListView() {
-  const keyword = useClientListStore((state) => state.keyword);
-  const setKeyword = useClientListStore((state) => state.setKeyword);
+  const { keyword, setKeyword } = useClientListStore();
   const query = useClientListQuery({ keyword });
 
   return (
