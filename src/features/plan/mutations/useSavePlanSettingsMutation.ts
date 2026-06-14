@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useCases } from "@/app/bootstrap/useCases";
+import { savePlanSettings } from "@/app/bootstrap/useCases";
 import type { SavePlanSettingsInput } from "@/domain/plan/Plan";
 import { queryKeys } from "@/infrastructure/query/queryKeys";
 
@@ -11,7 +11,7 @@ export function useSavePlanSettingsMutation() {
   const setSaveMessage = usePlanDraftStore((state) => state.setSaveMessage);
 
   return useMutation({
-    mutationFn: (input: SavePlanSettingsInput) => useCases.savePlanSettings(input),
+    mutationFn: (input: SavePlanSettingsInput) => savePlanSettings(input),
     onSuccess: (plan) => {
       setSaveMessage("已保存");
       queryClient.invalidateQueries({ queryKey: queryKeys.plans.all });

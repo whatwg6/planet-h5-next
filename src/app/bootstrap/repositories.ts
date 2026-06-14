@@ -2,8 +2,6 @@ import { clientRepositoryMock } from "@/infrastructure/repositories/client/clien
 import { merchantRepositoryMock } from "@/infrastructure/repositories/merchant/merchantRepository.mock";
 import { planRepositoryMock } from "@/infrastructure/repositories/plan/planRepository.mock";
 
-export const repositories = {
-  clientRepository: clientRepositoryMock,
-  merchantRepository: merchantRepositoryMock,
-  planRepository: planRepositoryMock,
-};
+export const clientRepository = clientRepositoryMock;
+export const merchantRepository = merchantRepositoryMock;
+export const planRepository = planRepositoryMock;
