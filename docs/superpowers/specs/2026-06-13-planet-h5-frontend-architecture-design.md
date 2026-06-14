@@ -221,7 +221,7 @@ The H5 route map is:
 
 /client/$clientId
   Client detail
-  Client detail edit mode is internal state and is not exposed as a URL.
+  Client detail edit mode is represented by route history state and is not exposed as a URL.
 
 /client/$clientId/plans/settings
   Plan settings
@@ -238,7 +238,7 @@ The H5 route map is:
 
 There is no `/client/$clientId/edit` route.
 
-Client editing is controlled by page state or Zustand inside the client detail page. If editing requires unsaved-change checks, back interception, shared action bars, or draft reset, it belongs in `features/client/store/clientDetailUiStore.ts`.
+Client editing is entered by pushing the same detail route with edit state in TanStack Router history state. The route state controls whether the detail page renders readonly or editing content, while `features/client/store/clientDetailUiStore.ts` owns edit-only UI state such as dirty tracking, discard confirmation, shared action bars, or draft reset.
 
 Each route should have route metadata:
 
