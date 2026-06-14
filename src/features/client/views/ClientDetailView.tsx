@@ -1,18 +1,42 @@
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
 import { useUpdateClientMutation } from "@/features/client/mutations/useUpdateClientMutation";
 import { useClientDetailQuery } from "@/features/client/queries/useClientDetailQuery";
-import { useClientDetailUiStore } from "@/features/client/store/clientDetailUiStore";
 import { InfoRow } from "@/shared/ui/DataDisplay";
 import { ConfirmDialog, ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Button, Field } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
 export function ClientDetailView({ clientId }: { clientId: string }) {
+  const router = useRouter();
+  const location = useRouterState({ select: (s) => s.location });
+  const mode = ((location.state as unknown) as Record<string, unknown> | undefined)?.mode === "editing" ? "editing" : "readonly";
+
   const query = useClientDetailQuery(clientId);
   const mutation = useUpdateClientMutation();
-  const { mode, isDirty, confirmDiscardOpen, enterEdit, exitEdit, setDirty, requestCancel, closeConfirm } = useClientDetailUiStore();
   const [name, setName] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
+
+  const enterEdit = () => {
+    setName(query.data?.name ?? "");
+    setIsDirty(false);
+    setConfirmDiscardOpen(false);
+    router.navigate({ to: "/client/$clientId", params: { clientId }, state: { mode: "editing" } as any });
+  };
+
+  const exitEdit = () => {
+    router.history.back();
+  };
+
+  const handleCancel = () => {
+    if (isDirty) {
+      setConfirmDiscardOpen(true);
+    } else {
+      exitEdit();
+    }
+  };
 
   if (query.isLoading) return <Page title="客户详情"><LoadingState /></Page>;
   if (query.isError || !query.data) return <Page title="客户详情"><ErrorState title="加载失败" onRetry={() => query.refetch()} /></Page>;
@@ -26,7 +50,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
       footer={
         mode === "editing" ? (
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="secondary" onClick={requestCancel}>取消</Button>
+            <Button variant="secondary" onClick={handleCancel}>取消</Button>
             <Button
               disabled={mutation.isPending}
               onClick={() => mutation.mutate({ clientId, values: { ...client.fields, name: currentName } }, { onSuccess: exitEdit })}
@@ -35,7 +59,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             </Button>
           </div>
         ) : (
-          <Button className="w-full" onClick={() => { setName(client.name); enterEdit(); }}>编辑</Button>
+          <Button className="w-full" onClick={enterEdit}>编辑</Button>
         )
       }
     >
@@ -46,7 +70,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
             value={currentName}
             onChange={(event) => {
               setName(event.target.value);
-              if (!isDirty) setDirty(true);
+              if (!isDirty) setIsDirty(true);
             }}
           />
         ) : (
@@ -57,7 +81,12 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
           </div>
         )}
       </div>
-      <ConfirmDialog open={confirmDiscardOpen} title="确认放弃更改？" onCancel={closeConfirm} onConfirm={exitEdit} />
+      <ConfirmDialog
+        open={confirmDiscardOpen}
+        title="确认放弃更改？"
+        onCancel={() => setConfirmDiscardOpen(false)}
+        onConfirm={exitEdit}
+      />
     </Page>
   );
 }
