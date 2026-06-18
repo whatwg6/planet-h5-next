@@ -23,12 +23,12 @@ infrastructure -> domain
 
 - `domain` contains entities, repository contracts, and pure business rules. Do not import React, TanStack Query, Axios, or browser APIs here.
 - `application` contains use cases. Use cases receive repository contracts and coordinate business operations.
-- `infrastructure` implements repositories, HTTP, DTOs, mappers, mock data, and query keys.
+- `infrastructure` implements repositories, HTTP, mock data, and query keys.
 - `features` owns React views, hooks, local UI state, and business-facing components for one module.
 - `pages` are thin TanStack Router entry components.
 - `shared/ui` is for H5 UI primitives without client, merchant, or plan business meaning.
 
-Do not bypass use cases from feature code when the behavior is business-level. Do not place DTO mapping or HTTP details in views.
+Do not bypass use cases from feature code when the behavior is business-level. Do not place HTTP details in views.
 
 ## Common Change Paths
 
@@ -47,7 +47,7 @@ When adding a new server-backed query:
 
 1. Add or extend the domain repository contract in `src/domain/<module>`.
 2. Add a use case in `src/application/<module>`.
-3. Add DTO, mapper, and repository implementation in `src/infrastructure/repositories/<module>`.
+3. Add the repository implementation in `src/infrastructure/repositories/<module>`.
 4. Add a stable key in `src/infrastructure/query/queryKeys.ts`.
 5. Add a feature hook in `src/features/<module>/queries` that imports the use case and repository directly.
 
@@ -72,7 +72,7 @@ Use the narrowest useful test for the change:
 
 - Domain rules: colocated `*.test.ts` beside the rule file.
 - Use cases: `src/application/<module>/*UseCases.test.ts`.
-- DTO/mappers/repositories: tests under `src/infrastructure/repositories/<module>`.
+- Repository implementations: tests under `src/infrastructure/repositories/<module>`.
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
 - Route metadata: `src/app/router/routeMeta.test.ts`.
 

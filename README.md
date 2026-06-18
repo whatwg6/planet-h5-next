@@ -41,7 +41,7 @@ src/
   features/         Feature views, query hooks, mutation hooks, UI state, feature components
   application/      Use cases that coordinate repository calls
   domain/           Entities, repository contracts, pure business rules
-  infrastructure/   HTTP clients, repositories, DTO/mappers, mock data, query keys
+  infrastructure/   HTTP clients, repositories, mock data, query keys
   shared/           Business-agnostic shared UI and utilities
   test/             Vitest/MSW test setup
 ```
@@ -74,7 +74,7 @@ H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root 
 
 - Add or change business entities in `src/domain/<module>`.
 - Add business actions in `src/application/<module>`.
-- Add repository implementations, DTOs, and mappers in `src/infrastructure/repositories/<module>`.
+- Add repository implementations in `src/infrastructure/repositories/<module>`.
 - Import use case functions directly from `src/application/<module>` and repository implementations directly from `src/infrastructure/repositories/<module>` in feature hooks. No central DI container.
 - Add TanStack Query keys in `src/infrastructure/query/queryKeys.ts`.
 - Add feature query/mutation hooks under `src/features/<module>/queries` or `src/features/<module>/mutations`.

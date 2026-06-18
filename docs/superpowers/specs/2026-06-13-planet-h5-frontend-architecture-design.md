@@ -53,7 +53,7 @@ Rules:
 
 - `domain` contains business entities, repository contracts, and pure business rules.
 - `application` contains use cases and coordinates business actions.
-- `infrastructure` contains Axios, mock data, DTOs, mappers, and repository implementations.
+- `infrastructure` contains Axios, mock data, and repository implementations.
 - `features` contains React views, feature queries, mutations, stores, and business components.
 - `pages` contains TanStack Router route entry components.
 - `shared/ui` contains H5 base components without client, merchant, or plan business meaning.
@@ -178,18 +178,12 @@ src/
       client/
         clientRepository.http.ts
         clientRepository.mock.ts
-        clientDto.ts
-        clientMapper.ts
       plan/
         planRepository.http.ts
         planRepository.mock.ts
-        planDto.ts
-        planMapper.ts
       merchant/
         merchantRepository.http.ts
         merchantRepository.mock.ts
-        merchantDto.ts
-        merchantMapper.ts
     mock/
       clientMockData.ts
       planMockData.ts
@@ -501,7 +495,7 @@ export function useClientListQuery(params: ClientListParams) {
 
 To switch from mock data to real APIs, change the repository import in each hook from `*Repository.mock` to `*Repository.http`.
 
-DTO-to-domain mapping lives in `clientMapper.ts`, `planMapper.ts`, and `merchantMapper.ts`. This prevents backend response shapes from leaking into feature views.
+Repository implementations return domain entities directly. Backend response shapes should not leak into feature views.
 
 ## Testing Strategy
 
@@ -509,7 +503,7 @@ Unit tests:
 
 - Domain rules
 - Application use cases
-- DTO mappers
+- Repository implementations
 
 Component tests:
 

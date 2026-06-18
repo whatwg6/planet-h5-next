@@ -4,7 +4,7 @@
 
 **Goal:** Build the initial mobile H5 React frontend architecture for client, merchant, and plan pages without inventing business rules not present in the spec.
 
-**Architecture:** Use the spec's lightweight Clean Architecture: pages render route entries, features own React views and local interaction state, application use cases coordinate repository calls, domain defines entities and repository contracts, and infrastructure implements mock/http repositories plus DTO mappers. Domain rule files are created as explicit boundary modules, but they only expose neutral helpers until real business rules are specified.
+**Architecture:** Use the spec's lightweight Clean Architecture: pages render route entries, features own React views and local interaction state, application use cases coordinate repository calls, domain defines entities and repository contracts, and infrastructure implements mock/http repositories. Domain rule files are created as explicit boundary modules, but they only expose neutral helpers until real business rules are specified.
 
 **Tech Stack:** pnpm, Vite, React 19, TypeScript, TanStack Router, TanStack Query, Zustand, React Hook Form, Zod, Axios, Tailwind CSS, Vitest, React Testing Library, MSW.
 
@@ -21,7 +21,7 @@
 - `src/domain/{client,merchant,plan}/*`: entity types, repository contracts, and neutral rule-boundary helpers.
 - `src/application/{client,merchant,plan}/*`: use cases that validate required identifiers and delegate to repositories.
 - `src/infrastructure/http/*`: Axios client and HTTP error normalization.
-- `src/infrastructure/repositories/*`: DTOs, mappers, mock repositories, and HTTP repositories.
+- `src/infrastructure/repositories/*`: mock repositories and HTTP repositories.
 - `src/infrastructure/mock/*`: deterministic mock data for smoke tests only.
 - `src/infrastructure/query/queryKeys.ts`: typed TanStack Query keys.
 - `src/shared/ui/*`: generic H5 UI primitives with no client, merchant, or plan business meaning.
@@ -746,7 +746,7 @@ git add src/application
 git commit -m "feat: add application use cases"
 ```
 
-## Task 4: Infrastructure Repositories and DTO Mappers
+## Task 4: Infrastructure Repositories
 
 **Files:**
 - Create: `src/infrastructure/http/axiosClient.ts`
@@ -755,474 +755,38 @@ git commit -m "feat: add application use cases"
 - Create: `src/infrastructure/mock/clientMockData.ts`
 - Create: `src/infrastructure/mock/merchantMockData.ts`
 - Create: `src/infrastructure/mock/planMockData.ts`
-- Create: `src/infrastructure/repositories/client/clientDto.ts`
-- Create: `src/infrastructure/repositories/client/clientMapper.ts`
-- Create: `src/infrastructure/repositories/client/clientMapper.test.ts`
 - Create: `src/infrastructure/repositories/client/clientRepository.mock.ts`
 - Create: `src/infrastructure/repositories/client/clientRepository.http.ts`
-- Create: `src/infrastructure/repositories/merchant/merchantDto.ts`
-- Create: `src/infrastructure/repositories/merchant/merchantMapper.ts`
-- Create: `src/infrastructure/repositories/merchant/merchantMapper.test.ts`
 - Create: `src/infrastructure/repositories/merchant/merchantRepository.mock.ts`
 - Create: `src/infrastructure/repositories/merchant/merchantRepository.http.ts`
-- Create: `src/infrastructure/repositories/plan/planDto.ts`
-- Create: `src/infrastructure/repositories/plan/planMapper.ts`
-- Create: `src/infrastructure/repositories/plan/planMapper.test.ts`
 - Create: `src/infrastructure/repositories/plan/planRepository.mock.ts`
 - Create: `src/infrastructure/repositories/plan/planRepository.http.ts`
 
-- [ ] **Step 1: Write mapper tests**
+- [ ] **Step 1: Add HTTP client and query keys**
 
-Write `src/infrastructure/repositories/client/clientMapper.test.ts`:
+Create the shared Axios client, HTTP error normalization, and typed TanStack Query key factory. Keep query keys centralized in `src/infrastructure/query/queryKeys.ts`.
 
-```ts
-import { describe, expect, it } from "vitest";
+- [ ] **Step 2: Add domain-shaped mock data**
 
-import { mapClientDetailDto, mapClientSummaryDto } from "./clientMapper";
+Mock data should import domain entity types from `src/domain/*` and use the same field names returned to features, such as `updatedAt`, `planIds`, and `clientId`.
 
-describe("clientMapper", () => {
-  it("maps DTO names without adding business meaning", () => {
-    expect(mapClientSummaryDto({ id: "c1", name: "客户 A", phone: "13800000000", updated_at: "2026-06-13" })).toEqual({
-      id: "c1",
-      name: "客户 A",
-      phone: "13800000000",
-      updatedAt: "2026-06-13",
-    });
-  });
+- [ ] **Step 3: Add mock repositories**
 
-  it("maps detail fields as a generic record", () => {
-    expect(mapClientDetailDto({ id: "c1", name: "客户 A", phone: "", updated_at: "", fields: { owner: "张三" }, plan_ids: ["p1"] })).toEqual({
-      id: "c1",
-      name: "客户 A",
-      phone: "",
-      updatedAt: "",
-      fields: { owner: "张三" },
-      planIds: ["p1"],
-    });
-  });
-});
-```
+Mock repositories implement the domain repository contracts directly. List methods return summary objects by selecting summary fields from mock detail records, and detail or mutation methods return domain entities without an extra transport model or mapping layer.
 
-Write `src/infrastructure/repositories/merchant/merchantMapper.test.ts`:
+- [ ] **Step 4: Add HTTP repositories**
 
-```ts
-import { describe, expect, it } from "vitest";
+HTTP repositories type Axios responses with domain types and return `response.data` directly. Do not create extra transport-model files, mapping files, or mapping-only tests for this project.
 
-import { mapMerchantDetailDto, mapMerchantSummaryDto } from "./merchantMapper";
+- [ ] **Step 5: Verify infrastructure**
 
-describe("merchantMapper", () => {
-  it("maps summary and detail DTOs without filtering by business state", () => {
-    expect(mapMerchantSummaryDto({ id: "m1", name: "商户 A", city: "上海" })).toEqual({
-      id: "m1",
-      name: "商户 A",
-      city: "上海",
-    });
-    expect(mapMerchantDetailDto({ id: "m1", name: "商户 A", city: "上海", fields: { contact: "李四" } })).toEqual({
-      id: "m1",
-      name: "商户 A",
-      city: "上海",
-      fields: { contact: "李四" },
-    });
-  });
-});
-```
+Run `pnpm test -- src/infrastructure/repositories` and `pnpm lint`.
 
-Write `src/infrastructure/repositories/plan/planMapper.test.ts`:
+Expected: repository tests PASS and TypeScript exits `0`.
 
-```ts
-import { describe, expect, it } from "vitest";
+- [ ] **Step 6: Commit**
 
-import { mapPlanDetailDto } from "./planMapper";
-
-describe("planMapper", () => {
-  it("maps plan DTOs and preserves rule values as data", () => {
-    expect(
-      mapPlanDetailDto({
-        id: "p1",
-        client_id: "c1",
-        name: "方案 A",
-        fields: { owner: "运营" },
-        rules: [{ id: "r1", label: "规则 A", values: { value: "1" } }],
-        updated_at: "2026-06-13",
-      }),
-    ).toEqual({
-      id: "p1",
-      clientId: "c1",
-      name: "方案 A",
-      fields: { owner: "运营" },
-      rules: [{ id: "r1", label: "规则 A", values: { value: "1" } }],
-      updatedAt: "2026-06-13",
-    });
-  });
-});
-```
-
-- [ ] **Step 2: Run mapper tests to verify failure**
-
-Run:
-
-```bash
-pnpm test -- src/infrastructure/repositories
-```
-
-Expected: FAIL with missing mapper modules.
-
-- [ ] **Step 3: Add HTTP client, query keys, DTOs, and mappers**
-
-Write `src/infrastructure/http/axiosClient.ts`:
-
-```ts
-import axios from "axios";
-
-export const axiosClient = axios.create({
-  baseURL: "/api",
-  timeout: 12_000,
-});
-```
-
-Write `src/infrastructure/http/httpError.ts`:
-
-```ts
-import axios from "axios";
-
-export type HttpError = {
-  message: string;
-  status?: number;
-};
-
-export function toHttpError(error: unknown): HttpError {
-  if (axios.isAxiosError(error)) {
-    return { message: error.response?.data?.message ?? error.message, status: error.response?.status };
-  }
-  return error instanceof Error ? { message: error.message } : { message: "Unknown network error" };
-}
-```
-
-Write `src/infrastructure/query/queryKeys.ts`:
-
-```ts
-import type { ClientListParams } from "@/domain/client/Client";
-import type { MerchantListParams } from "@/domain/merchant/Merchant";
-
-export const queryKeys = {
-  clients: {
-    all: ["clients"] as const,
-    list: (params: ClientListParams) => ["clients", "list", params] as const,
-    detail: (clientId: string) => ["clients", "detail", clientId] as const,
-  },
-  merchants: {
-    all: ["merchants"] as const,
-    list: (params: MerchantListParams) => ["merchants", "list", params] as const,
-    detail: (merchantId: string) => ["merchants", "detail", merchantId] as const,
-  },
-  plans: {
-    all: ["plans"] as const,
-    detail: (clientId: string, planId: string) => ["plans", "detail", clientId, planId] as const,
-  },
-};
-```
-
-Write `src/infrastructure/repositories/client/clientDto.ts`:
-
-```ts
-export type ClientSummaryDto = {
-  id: string;
-  name: string;
-  phone?: string;
-  updated_at?: string;
-};
-
-export type ClientDetailDto = ClientSummaryDto & {
-  fields: Record<string, string>;
-  plan_ids: string[];
-};
-```
-
-Write `src/infrastructure/repositories/client/clientMapper.ts`:
-
-```ts
-import type { ClientDetail, ClientSummary } from "@/domain/client/Client";
-
-import type { ClientDetailDto, ClientSummaryDto } from "./clientDto";
-
-export function mapClientSummaryDto(dto: ClientSummaryDto): ClientSummary {
-  return { id: dto.id, name: dto.name, phone: dto.phone, updatedAt: dto.updated_at };
-}
-
-export function mapClientDetailDto(dto: ClientDetailDto): ClientDetail {
-  return { ...mapClientSummaryDto(dto), fields: dto.fields, planIds: dto.plan_ids };
-}
-```
-
-Write `src/infrastructure/repositories/merchant/merchantDto.ts`:
-
-```ts
-export type MerchantSummaryDto = {
-  id: string;
-  name: string;
-  city?: string;
-};
-
-export type MerchantDetailDto = MerchantSummaryDto & {
-  fields: Record<string, string>;
-};
-```
-
-Write `src/infrastructure/repositories/merchant/merchantMapper.ts`:
-
-```ts
-import type { MerchantDetail, MerchantSummary } from "@/domain/merchant/Merchant";
-
-import type { MerchantDetailDto, MerchantSummaryDto } from "./merchantDto";
-
-export function mapMerchantSummaryDto(dto: MerchantSummaryDto): MerchantSummary {
-  return { id: dto.id, name: dto.name, city: dto.city };
-}
-
-export function mapMerchantDetailDto(dto: MerchantDetailDto): MerchantDetail {
-  return { ...mapMerchantSummaryDto(dto), fields: dto.fields };
-}
-```
-
-Write `src/infrastructure/repositories/plan/planDto.ts`:
-
-```ts
-export type PlanRuleDto = {
-  id: string;
-  label: string;
-  values: Record<string, string>;
-};
-
-export type PlanDetailDto = {
-  id: string;
-  client_id: string;
-  name: string;
-  fields: Record<string, string>;
-  rules: PlanRuleDto[];
-  updated_at?: string;
-};
-```
-
-Write `src/infrastructure/repositories/plan/planMapper.ts`:
-
-```ts
-import type { PlanDetail } from "@/domain/plan/Plan";
-
-import type { PlanDetailDto } from "./planDto";
-
-export function mapPlanDetailDto(dto: PlanDetailDto): PlanDetail {
-  return {
-    id: dto.id,
-    clientId: dto.client_id,
-    name: dto.name,
-    fields: dto.fields,
-    rules: dto.rules,
-    updatedAt: dto.updated_at,
-  };
-}
-```
-
-- [ ] **Step 4: Add mock data and repositories**
-
-Write mock data with neutral records:
-
-```ts
-// src/infrastructure/mock/clientMockData.ts
-import type { ClientDetailDto } from "@/infrastructure/repositories/client/clientDto";
-
-export const clientMockData: ClientDetailDto[] = [
-  { id: "c1", name: "客户 A", phone: "13800000000", updated_at: "2026-06-13", fields: { owner: "负责人 A" }, plan_ids: ["p1"] },
-  { id: "c2", name: "客户 B", phone: "13900000000", updated_at: "2026-06-12", fields: { owner: "负责人 B" }, plan_ids: ["p2"] },
-];
-```
-
-```ts
-// src/infrastructure/mock/merchantMockData.ts
-import type { MerchantDetailDto } from "@/infrastructure/repositories/merchant/merchantDto";
-
-export const merchantMockData: MerchantDetailDto[] = [
-  { id: "m1", name: "商户 A", city: "上海", fields: { contact: "联系人 A" } },
-  { id: "m2", name: "商户 B", city: "杭州", fields: { contact: "联系人 B" } },
-];
-```
-
-```ts
-// src/infrastructure/mock/planMockData.ts
-import type { PlanDetailDto } from "@/infrastructure/repositories/plan/planDto";
-
-export const planMockData: PlanDetailDto[] = [
-  { id: "p1", client_id: "c1", name: "方案 A", fields: { owner: "运营 A" }, rules: [{ id: "r1", label: "规则 A", values: {} }], updated_at: "2026-06-13" },
-  { id: "p2", client_id: "c2", name: "方案 B", fields: { owner: "运营 B" }, rules: [{ id: "r2", label: "规则 B", values: {} }], updated_at: "2026-06-12" },
-];
-```
-
-Write mock repositories that filter only by keyword text and do not apply business state decisions:
-
-```ts
-// src/infrastructure/repositories/client/clientRepository.mock.ts
-import type { ClientRepository } from "@/domain/client/ClientRepository";
-import { clientMockData } from "@/infrastructure/mock/clientMockData";
-
-import { mapClientDetailDto, mapClientSummaryDto } from "./clientMapper";
-
-export const clientRepositoryMock: ClientRepository = {
-  async listClients(params) {
-    return clientMockData
-      .map(mapClientSummaryDto)
-      .filter((client) => !params.keyword || client.name.includes(params.keyword) || client.phone?.includes(params.keyword));
-  },
-  async getClientDetail(clientId) {
-    const client = clientMockData.find((item) => item.id === clientId);
-    if (!client) throw new Error("Client not found");
-    return mapClientDetailDto(client);
-  },
-  async updateClient(input) {
-    const client = clientMockData.find((item) => item.id === input.clientId);
-    if (!client) throw new Error("Client not found");
-    client.fields = input.values;
-    client.name = input.values.name ?? client.name;
-    return mapClientDetailDto(client);
-  },
-};
-```
-
-```ts
-// src/infrastructure/repositories/merchant/merchantRepository.mock.ts
-import type { MerchantRepository } from "@/domain/merchant/MerchantRepository";
-import { merchantMockData } from "@/infrastructure/mock/merchantMockData";
-
-import { mapMerchantDetailDto, mapMerchantSummaryDto } from "./merchantMapper";
-
-export const merchantRepositoryMock: MerchantRepository = {
-  async listMerchants(params) {
-    return merchantMockData
-      .map(mapMerchantSummaryDto)
-      .filter((merchant) => !params.keyword || merchant.name.includes(params.keyword) || merchant.city?.includes(params.keyword));
-  },
-  async getMerchantDetail(merchantId) {
-    const merchant = merchantMockData.find((item) => item.id === merchantId);
-    if (!merchant) throw new Error("Merchant not found");
-    return mapMerchantDetailDto(merchant);
-  },
-};
-```
-
-```ts
-// src/infrastructure/repositories/plan/planRepository.mock.ts
-import type { PlanRepository } from "@/domain/plan/PlanRepository";
-import { planMockData } from "@/infrastructure/mock/planMockData";
-
-import { mapPlanDetailDto } from "./planMapper";
-
-export const planRepositoryMock: PlanRepository = {
-  async getPlanDetail(clientId, planId) {
-    const plan = planMockData.find((item) => item.client_id === clientId && item.id === planId);
-    if (!plan) throw new Error("Plan not found");
-    return mapPlanDetailDto(plan);
-  },
-  async savePlanSettings(input) {
-    const next = {
-      id: input.planId ?? `p${planMockData.length + 1}`,
-      client_id: input.clientId,
-      name: input.name,
-      fields: input.fields,
-      rules: input.rules,
-      updated_at: new Date().toISOString(),
-    };
-    const index = planMockData.findIndex((item) => item.id === next.id);
-    if (index >= 0) planMockData[index] = next;
-    else planMockData.push(next);
-    return mapPlanDetailDto(next);
-  },
-};
-```
-
-- [ ] **Step 5: Add HTTP repositories**
-
-Write `src/infrastructure/repositories/client/clientRepository.http.ts`:
-
-```ts
-import type { ClientRepository } from "@/domain/client/ClientRepository";
-import { axiosClient } from "@/infrastructure/http/axiosClient";
-
-import type { ClientDetailDto, ClientSummaryDto } from "./clientDto";
-import { mapClientDetailDto, mapClientSummaryDto } from "./clientMapper";
-
-export const clientRepositoryHttp: ClientRepository = {
-  async listClients(params) {
-    const response = await axiosClient.get<ClientSummaryDto[]>("/clients", { params });
-    return response.data.map(mapClientSummaryDto);
-  },
-  async getClientDetail(clientId) {
-    const response = await axiosClient.get<ClientDetailDto>(`/clients/${clientId}`);
-    return mapClientDetailDto(response.data);
-  },
-  async updateClient(input) {
-    const response = await axiosClient.patch<ClientDetailDto>(`/clients/${input.clientId}`, input);
-    return mapClientDetailDto(response.data);
-  },
-};
-```
-
-Write `src/infrastructure/repositories/merchant/merchantRepository.http.ts`:
-
-```ts
-import type { MerchantRepository } from "@/domain/merchant/MerchantRepository";
-import { axiosClient } from "@/infrastructure/http/axiosClient";
-
-import type { MerchantDetailDto, MerchantSummaryDto } from "./merchantDto";
-import { mapMerchantDetailDto, mapMerchantSummaryDto } from "./merchantMapper";
-
-export const merchantRepositoryHttp: MerchantRepository = {
-  async listMerchants(params) {
-    const response = await axiosClient.get<MerchantSummaryDto[]>("/merchants", { params });
-    return response.data.map(mapMerchantSummaryDto);
-  },
-  async getMerchantDetail(merchantId) {
-    const response = await axiosClient.get<MerchantDetailDto>(`/merchants/${merchantId}`);
-    return mapMerchantDetailDto(response.data);
-  },
-};
-```
-
-Write `src/infrastructure/repositories/plan/planRepository.http.ts`:
-
-```ts
-import type { PlanRepository } from "@/domain/plan/PlanRepository";
-import { axiosClient } from "@/infrastructure/http/axiosClient";
-
-import type { PlanDetailDto } from "./planDto";
-import { mapPlanDetailDto } from "./planMapper";
-
-export const planRepositoryHttp: PlanRepository = {
-  async getPlanDetail(clientId, planId) {
-    const response = await axiosClient.get<PlanDetailDto>(`/clients/${clientId}/plans/${planId}`);
-    return mapPlanDetailDto(response.data);
-  },
-  async savePlanSettings(input) {
-    const response = await axiosClient.post<PlanDetailDto>(`/clients/${input.clientId}/plans`, input);
-    return mapPlanDetailDto(response.data);
-  },
-};
-```
-
-- [ ] **Step 6: Verify infrastructure**
-
-Run:
-
-```bash
-pnpm test -- src/infrastructure/repositories
-pnpm lint
-```
-
-Expected: mapper tests PASS and TypeScript exits `0`.
-
-- [ ] **Step 7: Commit**
-
-```bash
-git add src/infrastructure
-git commit -m "feat: add infrastructure repositories"
-```
+Run `git add src/infrastructure` and commit with `feat: add infrastructure repositories`.
 
 ## Task 5: Bootstrap, Providers, and Routes
 
@@ -1847,7 +1411,7 @@ import { http, HttpResponse } from "msw";
 
 export const handlers = [
   http.get("/api/clients", () =>
-    HttpResponse.json([{ id: "c-http-1", name: "HTTP 客户", phone: "13800000000", updated_at: "2026-06-13" }]),
+    HttpResponse.json([{ id: "c-http-1", name: "HTTP 客户", phone: "13800000000", updatedAt: "2026-06-13" }]),
   ),
 ];
 ```
@@ -1906,7 +1470,7 @@ git commit -m "test: add integration coverage"
 
 ## Self-Review
 
-- Spec coverage: The revised plan covers the H5-only scope, all six routes, route metadata, page-to-feature mapping, Clean Architecture dependency direction, repository/mock strategy, DTO mappers, TanStack Query ownership, Zustand local UI state, React Hook Form/Zod form boundary, shared UI boundary, setting-rule capability boundary, and the specified highest-risk flows.
+- Spec coverage: The revised plan covers the H5-only scope, all six routes, route metadata, page-to-feature mapping, Clean Architecture dependency direction, repository/mock strategy, TanStack Query ownership, Zustand local UI state, React Hook Form/Zod form boundary, shared UI boundary, setting-rule capability boundary, and the specified highest-risk flows.
 - Business-rule discipline: The plan does not define client status semantics, merchant filtering rules, risk scoring, plan publish conditions, budget calculations, reward thresholds, or domain-specific validation not present in the spec. Mock records and labels are only UI smoke data.
 - Red-flag scan: The plan avoids deferred implementation markers, undefined future function names, and broad instructions to add unspecified error handling or unspecified validation.
 - Type consistency: Domain types are introduced before use cases, repositories, hooks, and views. Query key names, route params, repository method names, and use case names match across tasks.

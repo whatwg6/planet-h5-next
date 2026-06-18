@@ -1,16 +1,14 @@
+import type { MerchantDetail, MerchantSummary } from "@/domain/merchant/Merchant";
 import type { MerchantRepository } from "@/domain/merchant/MerchantRepository";
 import { axiosClient } from "@/infrastructure/http/axiosClient";
 
-import type { MerchantDetailDto, MerchantSummaryDto } from "./merchantDto";
-import { mapMerchantDetailDto, mapMerchantSummaryDto } from "./merchantMapper";
-
 export const merchantRepositoryHttp: MerchantRepository = {
   async listMerchants(params) {
-    const response = await axiosClient.get<MerchantSummaryDto[]>("/merchants", { params });
-    return response.data.map(mapMerchantSummaryDto);
+    const response = await axiosClient.get<MerchantSummary[]>("/merchants", { params });
+    return response.data;
   },
   async getMerchantDetail(merchantId) {
-    const response = await axiosClient.get<MerchantDetailDto>(`/merchants/${merchantId}`);
-    return mapMerchantDetailDto(response.data);
+    const response = await axiosClient.get<MerchantDetail>(`/merchants/${merchantId}`);
+    return response.data;
   },
 };
