@@ -4,6 +4,8 @@
 
 This document defines the frontend architecture for `planet-h5`, a mobile H5 business application.
 
+This document is the source of truth for architectural intent and boundaries. `AGENTS.md` turns these constraints into an operational guide for agents and contributors making code changes.
+
 The first business scope includes:
 
 - Client list

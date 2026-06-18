@@ -2,12 +2,15 @@
 
 This file is the working guide for AI coding agents in this repository.
 
+`docs/architecture-design.md` is the source of truth for architectural intent and boundaries.
+`AGENTS.md` is the operational guide for agents and contributors making code changes under those constraints.
+
 ## First Read
 
 Before making code changes, inspect the relevant files and keep these anchors in mind:
 
 - `README.md` for project overview and commands.
-- `docs/superpowers/specs/2026-06-13-planet-h5-frontend-architecture-design.md` for architecture intent.
+- `docs/architecture-design.md` for architecture intent.
 - `src/app/router/routeTree.tsx` and `src/app/router/routeMeta.ts` for route structure.
 - `src/app/bootstrap/queryClient.ts` for TanStack Query client configuration.
 - `src/infrastructure/query/queryKeys.ts` for TanStack Query key conventions.

@@ -84,7 +84,8 @@ H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root 
 
 ## Architecture Docs
 
-- Design: `docs/superpowers/specs/2026-06-13-planet-h5-frontend-architecture-design.md`
-- Implementation plan: `docs/superpowers/plans/2026-06-13-planet-h5-frontend-architecture.md`
+- Design: `docs/architecture-design.md`
+
+`docs/architecture-design.md` defines the architecture intent and boundaries. `AGENTS.md` defines how agents and contributors should make code changes within those constraints.
 
 For AI coding agents, also read `AGENTS.md` before editing.
