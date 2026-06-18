@@ -12,12 +12,12 @@ export function PlanDetailView({ clientId, planId }: { clientId: string; planId:
   return (
     <Page title="方案详情">
       <div className="space-y-4">
-        <div className="rounded-md bg-white px-3">
+        <div className="rounded-md border border-border-solid-line-2 bg-background-primary-container px-3 shadow-card">
           <InfoRow label="名称" value={query.data.name} />
           {Object.entries(query.data.fields).map(([key, value]) => <InfoRow key={key} label={key} value={value} />)}
         </div>
         <div className="space-y-2">
-          {query.data.rules.map((rule) => <div key={rule.id} className="rounded-md border border-line bg-white p-3 text-sm">{rule.label}</div>)}
+          {query.data.rules.map((rule) => <div key={rule.id} className="rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 text-sm shadow-card">{rule.label}</div>)}
         </div>
       </div>
     </Page>

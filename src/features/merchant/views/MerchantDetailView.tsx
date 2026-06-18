@@ -11,7 +11,7 @@ export function MerchantDetailView({ merchantId }: { merchantId: string }) {
 
   return (
     <Page title="商户详情">
-      <div className="rounded-md bg-white px-3">
+      <div className="rounded-md border border-border-solid-line-2 bg-background-primary-container px-3 shadow-card">
         <InfoRow label="名称" value={query.data.name} />
         {query.data.city ? <InfoRow label="城市" value={query.data.city} /> : null}
         {Object.entries(query.data.fields).map(([key, value]) => <InfoRow key={key} label={key} value={value} />)}

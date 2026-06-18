@@ -3,11 +3,81 @@
 @tailwind utilities;
 
 :root {
-  color: #17202a;
-  background: #f7f8fa;
+  color-scheme: dark;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #f5f5f5b3;
+  --color-text-tertiary: #f5f5f566;
+  --color-text-quaternary: #f5f5f533;
+
+  --color-brand-foreground: #fff;
+
+  --color-background-base: #141414;
+  --color-background-primary-container: #222324;
+  --color-background-components: #2c2d2e;
+  --color-background-popup-components: #313233;
+  --color-background-mask: #00000099;
+  --color-background-table-zebra-striping: #ffffff03;
+
+  --color-border-solid-line-1: #ffffff08;
+  --color-border-solid-line-2: #ffffff0d;
+  --color-border-components-line: #ffffff0a;
+  --color-border-container-line: #ffffff05;
+
+  --color-gray-transparent: #f6f6f514;
+  --color-gray-stroke: #f5f5f566;
+  --color-gray-1: #19191a;
+  --color-gray-2: #1d1e1f;
+  --color-gray-3: #222324;
+  --color-gray-4: #272829;
+  --color-gray-5: #2c2d2e;
+  --color-gray-6: #313233;
+  --color-gray-7: #363738;
+  --color-gray-8: #38393b;
+  --color-gray-9: #404142;
+  --color-gray-10: #454647;
+
+  --color-functional-brand-foreground: #a7cd45;
+  --color-functional-brand-background: #809e32;
+  --color-functional-brand-transparent: #a7cd451a;
+  --color-functional-brand-foreground-solid: #435516;
+
+  --color-functional-blue-foreground: #3395ff;
+  --color-functional-blue-background: #004fe8;
+  --color-functional-blue-transparent: #3395ff1a;
+
+  --color-functional-success-foreground: #2ad175;
+  --color-functional-success-background: #1aa156;
+  --color-functional-success-transparent: #2ad1751a;
+
+  --color-functional-yellow-foreground: #ffd900;
+  --color-functional-yellow-background: #735c00;
+  --color-functional-yellow-transparent: #ffd90033;
+
+  --color-functional-warning-foreground: #ff9500;
+  --color-functional-warning-background: #e07500;
+  --color-functional-warning-transparent: #ff95001a;
+
+  --color-functional-error-foreground: #ff5b5e;
+  --color-functional-error-background: #cc293b;
+  --color-functional-error-transparent: #cc293b4d;
+
+  /* active: hex 转成 hsb 后 b * 1.2 */
+  --color-background-primary-container--active: #292a2b;
+  --color-background-components--active: #353637;
+  --color-gray-2--active: #232425;
+  --color-gray-5--active: #2f3031;
+  --color-gray-8--active: #434447;
+  --color-functional-error-background--active: #f53147;
+  --color-functional-brand-background--active: #9abe3c;
+  --color-functional-error-transparent--active: #f5314d4d;
+
+  min-height: 100%;
+  color: var(--color-text-primary);
+  background: var(--color-background-base);
 }
 
 * {
@@ -15,6 +85,7 @@
 }
 
 body {
+  background: var(--color-background-base);
   margin: 0;
 }
 
@@ -31,7 +102,7 @@ body,
 }
 
 .route-stack__frame {
-  background: #f7f8fa;
+  background: var(--color-background-base);
   inset: 0;
   min-height: 100vh;
   overflow-y: auto;
@@ -50,7 +121,7 @@ body,
 
 .route-stack__frame[data-route-stack-frame="push-enter"],
 .route-stack__frame[data-route-stack-frame="pop-exit"] {
-  box-shadow: -12px 0 24px rgb(23 32 42 / 12%);
+  box-shadow: -12px 0 24px rgb(0 0 0 / 28%);
   z-index: 2;
 }
 

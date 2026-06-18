@@ -33,7 +33,7 @@ export function PlanSettingsView({ clientId }: { clientId: string }) {
         onSubmit={handleSubmit((values) => mutation.mutate({ clientId, name: values.name, fields: values.fields, rules: [] }))}
       >
         <Field label="名称" {...register("name")} error={formState.errors.name?.message} />
-        {saveMessage ? <p className="text-sm text-brand">{saveMessage}</p> : null}
+        {saveMessage ? <p className="text-sm text-functional-brand-foreground">{saveMessage}</p> : null}
       </form>
     </Page>
   );

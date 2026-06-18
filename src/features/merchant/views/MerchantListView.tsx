@@ -20,9 +20,14 @@ export function MerchantListView() {
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}
         <div className="space-y-2">
           {query.data?.map((merchant) => (
-            <Link key={merchant.id} to="/merchant/$merchantId" params={{ merchantId: merchant.id }} className="block rounded-md border border-line bg-white p-3">
+            <Link
+              key={merchant.id}
+              to="/merchant/$merchantId"
+              params={{ merchantId: merchant.id }}
+              className="block rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 shadow-card transition active:bg-background-primary-container--active"
+            >
               <div className="font-medium">{merchant.name}</div>
-              <div className="mt-1 text-sm text-muted">{merchant.city}</div>
+              <div className="mt-1 text-sm text-text-secondary">{merchant.city}</div>
             </Link>
           ))}
         </div>

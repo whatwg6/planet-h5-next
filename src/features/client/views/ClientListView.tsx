@@ -19,9 +19,14 @@ export function ClientListView() {
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}
         <div className="space-y-2">
           {query.data?.map((client) => (
-            <Link key={client.id} to="/client/$clientId" params={{ clientId: client.id }} className="block rounded-md border border-line bg-white p-3">
+            <Link
+              key={client.id}
+              to="/client/$clientId"
+              params={{ clientId: client.id }}
+              className="block rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 shadow-card transition active:bg-background-primary-container--active"
+            >
               <div className="font-medium">{client.name}</div>
-              <div className="mt-1 text-sm text-muted">{client.phone}</div>
+              <div className="mt-1 text-sm text-text-secondary">{client.phone}</div>
             </Link>
           ))}
         </div>

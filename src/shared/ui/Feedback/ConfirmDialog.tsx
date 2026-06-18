@@ -14,8 +14,8 @@ export function ConfirmDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-20 flex items-end justify-center bg-black/30 px-4 pb-4">
-      <div className="w-full max-w-[448px] rounded-md bg-white p-4 shadow-lg">
+    <div className="fixed inset-0 z-20 flex items-end justify-center bg-background-mask px-4 pb-4">
+      <div className="w-full max-w-[448px] rounded-md bg-background-popup-components p-4 shadow-lift">
         <p className="text-sm font-medium">{title}</p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           <Button variant="secondary" onClick={onCancel}>
