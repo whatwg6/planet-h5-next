@@ -1,6 +1,7 @@
 import { Navigate, useRouter, useRouterState } from "@tanstack/react-router";
-import type { ComponentType, ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import type { ComponentType, ReactNode, RefObject } from "react";
+import { createRef, useEffect, useMemo, useRef, useState } from "react";
+import { CSSTransition } from "react-transition-group";
 
 export type RouteStackParams = Record<string, string>;
 
@@ -16,9 +17,42 @@ export type RouteStackEntry = {
   element: ReactNode;
 };
 
-type RouteStackFrameState = "active" | "hidden" | "push-enter" | "push-exit" | "pop-enter" | "pop-exit";
+export const routeStackTransitionDurationMs = 300;
 
-export const routeStackTransitionDurationMs = 260;
+type RouteStackTransitionClassNames = Partial<{
+  appear: string;
+  appearActive: string;
+  appearDone: string;
+  enter: string;
+  enterActive: string;
+  enterDone: string;
+  exit: string;
+  exitActive: string;
+}>;
+
+const routeStackTransitionClassNames: Record<RouteStackNavigationType, RouteStackTransitionClassNames> = {
+  PUSH: {
+    appear: "route-stack__frame--visible route-stack__frame--top translate-x-full",
+    appearActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    appearDone: "route-stack__frame--visible route-stack__frame--top !translate-x-0",
+    enter: "route-stack__frame--visible route-stack__frame--top translate-x-full",
+    enterActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    enterDone: "route-stack__frame--visible route-stack__frame--top !translate-x-0",
+    exit: "route-stack__frame--visible route-stack__frame--base translate-x-0",
+    exitActive: "!-translate-x-[24%] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  },
+  POP: {
+    appear: "route-stack__frame--visible route-stack__frame--base -translate-x-[24%]",
+    appearActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    appearDone: "route-stack__frame--visible route-stack__frame--base !translate-x-0",
+    enter: "route-stack__frame--visible route-stack__frame--base -translate-x-[24%]",
+    enterActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+    enterDone: "route-stack__frame--visible route-stack__frame--base !translate-x-0",
+    exit: "route-stack__frame--visible route-stack__frame--top translate-x-0",
+    exitActive: "!translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  },
+  REPLACE: {},
+};
 
 type RouteStackLocationState = {
   key?: string;
@@ -122,33 +156,23 @@ function useRouteStackNavigationType() {
   return navigationType;
 }
 
-function getRouteStackFrameState(
+function shouldAnimateActiveFrame(
   entryIndex: number,
   activeIndex: number,
   entriesLength: number,
   navigationType: RouteStackNavigationType,
-): RouteStackFrameState {
+) {
   if (entryIndex === activeIndex) {
     if (navigationType === "PUSH" && activeIndex > 0) {
-      return "push-enter";
+      return true;
     }
 
     if (navigationType === "POP" && activeIndex < entriesLength - 1) {
-      return "pop-enter";
+      return true;
     }
-
-    return "active";
   }
 
-  if (navigationType === "PUSH" && entryIndex === activeIndex - 1) {
-    return "push-exit";
-  }
-
-  if (navigationType === "POP" && entryIndex === activeIndex + 1) {
-    return "pop-exit";
-  }
-
-  return "hidden";
+  return false;
 }
 
 export function RouteStackFrames({
@@ -161,25 +185,56 @@ export function RouteStackFrames({
   navigationType: RouteStackNavigationType;
 }) {
   const activeIndex = entries.findIndex((entry) => entry.id === activeEntryId);
+  const frameRefs = useRef(new Map<string, RefObject<HTMLDivElement | null>>());
+
+  useEffect(() => {
+    const entryIds = new Set(entries.map((entry) => entry.id));
+
+    frameRefs.current.forEach((_, entryId) => {
+      if (!entryIds.has(entryId)) {
+        frameRefs.current.delete(entryId);
+      }
+    });
+  }, [entries]);
+
+  const getFrameRef = (entryId: string) => {
+    const existingRef = frameRefs.current.get(entryId);
+
+    if (existingRef) {
+      return existingRef;
+    }
+
+    const frameRef = createRef<HTMLDivElement>();
+    frameRefs.current.set(entryId, frameRef);
+    return frameRef;
+  };
 
   return (
     <div className="route-stack">
       {entries.map((entry, entryIndex) => {
         const isActive = entry.id === activeEntryId;
-        const frameState = activeIndex === -1 ? "hidden" : getRouteStackFrameState(entryIndex, activeIndex, entries.length, navigationType);
-        const isVisibleFrame = frameState !== "hidden";
+        const frameRef = getFrameRef(entry.id);
+        const shouldAppear = activeIndex !== -1 && shouldAnimateActiveFrame(entryIndex, activeIndex, entries.length, navigationType);
 
         return (
-          <div
-            aria-hidden={!isActive}
-            className="route-stack__frame"
+          <CSSTransition
+            appear={shouldAppear}
+            classNames={routeStackTransitionClassNames[navigationType]}
+            in={isActive}
             key={entry.id}
-            style={{ display: isVisibleFrame ? "block" : "none" }}
-            data-route-stack-frame={frameState}
-            data-route-pathname={entry.pathname}
+            nodeRef={frameRef}
+            timeout={routeStackTransitionDurationMs}
           >
-            {entry.element}
-          </div>
+            <div
+              aria-hidden={!isActive}
+              className="route-stack__frame"
+              data-route-stack-active={isActive}
+              data-route-pathname={entry.pathname}
+              ref={frameRef}
+            >
+              {entry.element}
+            </div>
+          </CSSTransition>
         );
       })}
     </div>

@@ -103,11 +103,11 @@ body,
 
 .route-stack__frame {
   background: var(--color-background-base);
+  display: none;
   inset: 0;
   min-height: 100vh;
   overflow-y: auto;
   position: fixed;
-  transform: translateX(0);
   will-change: transform;
 }
 
@@ -115,79 +115,26 @@ body,
   pointer-events: none;
 }
 
-.route-stack__frame[data-route-stack-frame="active"] {
+.route-stack__frame[data-route-stack-active="true"],
+.route-stack__frame--visible {
+  display: block;
+}
+
+.route-stack__frame[data-route-stack-active="true"] {
   z-index: 1;
 }
 
-.route-stack__frame[data-route-stack-frame="push-enter"],
-.route-stack__frame[data-route-stack-frame="pop-exit"] {
+.route-stack__frame--top {
   box-shadow: -12px 0 24px rgb(0 0 0 / 28%);
   z-index: 2;
 }
 
-.route-stack__frame[data-route-stack-frame="push-exit"],
-.route-stack__frame[data-route-stack-frame="pop-enter"] {
+.route-stack__frame--base {
   z-index: 1;
 }
 
-.route-stack__frame[data-route-stack-frame="push-enter"] {
-  animation: route-stack-push-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.route-stack__frame[data-route-stack-frame="push-exit"] {
-  animation: route-stack-push-exit 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.route-stack__frame[data-route-stack-frame="pop-enter"] {
-  animation: route-stack-pop-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.route-stack__frame[data-route-stack-frame="pop-exit"] {
-  animation: route-stack-pop-exit 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes route-stack-push-enter {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes route-stack-push-exit {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-24%);
-  }
-}
-
-@keyframes route-stack-pop-enter {
-  from {
-    transform: translateX(-24%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes route-stack-pop-exit {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(100%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .route-stack__frame[data-route-stack-frame] {
-    animation-duration: 1ms;
+  .route-stack__frame {
+    transition-duration: 1ms;
   }
 }
