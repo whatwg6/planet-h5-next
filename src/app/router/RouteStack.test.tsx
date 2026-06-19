@@ -88,23 +88,31 @@ describe("RouteStackFrames", () => {
     expect(unmountB).not.toHaveBeenCalled();
   });
 
-  it("marks frames with push animation states", () => {
+  it("marks frames with push transition classes", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationType="PUSH" />);
+    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationType="POP" />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-frame", "push-exit");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-frame", "push-enter");
+    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationType="PUSH" />);
+
+    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--base", "translate-x-0");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "false");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top", "translate-x-full");
+    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-active", "true");
   });
 
-  it("marks frames with pop animation states", () => {
+  it("marks frames with pop transition classes", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA, routeB]} navigationType="POP" />);
+    const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationType="PUSH" />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-frame", "pop-enter");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-frame", "pop-exit");
+    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA, routeB]} navigationType="POP" />);
+
+    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--base", "-translate-x-[24%]");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "true");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top", "translate-x-0");
+    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-active", "false");
   });
 });
