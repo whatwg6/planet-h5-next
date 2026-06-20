@@ -30,6 +30,7 @@ infrastructure -> domain
 - `features` owns React views, hooks, local UI state, and business-facing components for one module.
 - `pages` are thin TanStack Router entry components.
 - `shared/ui` is for H5 UI primitives without client, merchant, or plan business meaning.
+- `shared/assets` is for business-agnostic icons, images, and brand assets.
 
 Do not bypass use cases from feature code when the behavior is business-level. Do not place HTTP details in views.
 
@@ -68,6 +69,12 @@ When adding UI:
 - Keep H5 mobile layout constraints in mind.
 - Keep route components thin; put page composition in feature views.
 - Avoid adding shared components until at least two feature areas need the same business-agnostic primitive.
+
+When adding SVG assets:
+
+- Put reusable icon SVG files in `src/shared/assets/icons` and export them from `src/shared/assets/icons/index.ts` with the `?react` suffix.
+- Put brand SVGs in `src/shared/assets/brand` and illustration/image SVGs in `src/shared/assets/images`; import these without `?react` when they should render as image URLs.
+- Keep icon `viewBox` values, use kebab-case filenames, and rely on the SVGR pipeline to remove fixed fill/stroke attributes and inject `fill="currentColor"`.
 
 ## Testing Expectations
 

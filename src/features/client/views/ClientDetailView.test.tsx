@@ -58,4 +58,22 @@ describe("ClientDetailView", () => {
     await user.click(screen.getByRole("button", { name: "取消" }));
     await waitFor(() => expect(historyBackMock).toHaveBeenCalledTimes(1));
   });
+
+  it("uses the discard confirmation when the navigation bar back button leaves dirty edit mode", async () => {
+    const user = userEvent.setup();
+    routeState = { clientDetailMode: "editing" };
+
+    renderWithQuery(<ClientDetailView clientId="c1" />);
+
+    const nameField = await screen.findByLabelText("名称");
+    await user.clear(nameField);
+    await user.type(nameField, "客户 A+");
+    await user.click(screen.getByRole("button", { name: "返回" }));
+
+    expect(screen.getByText("确认放弃更改？")).toBeInTheDocument();
+    expect(historyBackMock).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "确认" }));
+    await waitFor(() => expect(historyBackMock).toHaveBeenCalledTimes(1));
+  });
 });

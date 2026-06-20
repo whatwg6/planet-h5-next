@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -15,6 +16,7 @@ const planSettingsSchema = z.object({
 type PlanSettingsValues = z.infer<typeof planSettingsSchema>;
 
 export function PlanSettingsView({ clientId }: { clientId: string }) {
+  const router = useRouter();
   const mutation = useSavePlanSettingsMutation();
   const saveMessage = usePlanDraftStore((state) => state.saveMessage);
   const { register, handleSubmit, formState } = useForm<PlanSettingsValues>({
@@ -25,6 +27,7 @@ export function PlanSettingsView({ clientId }: { clientId: string }) {
   return (
     <Page
       title="方案设置"
+      onBack={() => router.history.back()}
       footer={<Button className="w-full" type="submit" form="plan-settings-form" disabled={mutation.isPending}>保存</Button>}
     >
       <form

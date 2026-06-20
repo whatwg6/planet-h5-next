@@ -31,6 +31,7 @@ The application is H5 only. It may contain operationally complex business workfl
 - Zod
 - Axios
 - Tailwind CSS
+- vite-plugin-svgr
 - Vitest
 - React Testing Library
 - MSW
@@ -59,6 +60,7 @@ Rules:
 - `features` contains React views, feature queries, mutations, stores, and business components.
 - `pages` contains TanStack Router route entry components.
 - `shared/ui` contains H5 base components without client, merchant, or plan business meaning.
+- `shared/assets` contains business-agnostic icon, image, and brand assets.
 
 ## Directory Structure
 
@@ -194,6 +196,10 @@ src/
       queryKeys.ts
 
   shared/
+    assets/
+      icons/
+      images/
+      brand/
     ui/
       Page/
       Navigation/
@@ -414,6 +420,8 @@ It must not include business-specific names or logic such as client status, merc
 
 Business components live under `features/*/components`.
 
+`shared/assets` is the project's business-agnostic asset layer. Reusable icon SVG files belong in `shared/assets/icons`; brand assets belong in `shared/assets/brand`; image and illustration assets belong in `shared/assets/images`.
+
 Examples:
 
 ```txt
@@ -426,6 +434,15 @@ features/client/components/ClientStatusTag
 shared/ui/ClientCard
   Not allowed: client is business-specific
 ```
+
+## SVG Asset Boundary
+
+SVG files have two import modes:
+
+- Component icons: place reusable icon SVG files in `src/shared/assets/icons`, export them from `src/shared/assets/icons/index.ts`, and import them with the `?react` suffix.
+- Static assets: place brand SVGs in `src/shared/assets/brand` and illustration/image SVGs in `src/shared/assets/images`, then import them without `?react` to get a URL.
+
+Icon SVG files should keep their `viewBox` and use kebab-case filenames. The SVGR pipeline removes fixed fill/stroke attributes and injects `fill="currentColor"` for component-style icon imports, so callers can style icon color through CSS or Tailwind text color utilities.
 
 ## Cross-Page Business Components
 

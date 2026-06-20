@@ -24,8 +24,8 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
     router.history.back();
   };
 
-  if (query.isLoading) return <Page title="客户详情"><LoadingState /></Page>;
-  if (query.isError || !query.data) return <Page title="客户详情"><ErrorState title="加载失败" onRetry={() => query.refetch()} /></Page>;
+  if (query.isLoading) return <Page title="客户详情" onBack={() => router.history.back()}><LoadingState /></Page>;
+  if (query.isError || !query.data) return <Page title="客户详情" onBack={() => router.history.back()}><ErrorState title="加载失败" onRetry={() => query.refetch()} /></Page>;
 
   const client = query.data;
   const currentName = name || client.name;
@@ -50,6 +50,7 @@ export function ClientDetailView({ clientId }: { clientId: string }) {
   return (
     <Page
       title="客户详情"
+      onBack={mode === "editing" ? cancelEdit : () => router.history.back()}
       footer={
         mode === "editing" ? (
           <div className="grid grid-cols-2 gap-2">

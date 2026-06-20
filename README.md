@@ -43,6 +43,7 @@ src/
   domain/           Entities, repository contracts, pure business rules
   infrastructure/   HTTP clients, repositories, mock data, query keys
   shared/           Business-agnostic shared UI and utilities
+    assets/          Business-agnostic icons, images, and brand assets
   test/             Vitest/MSW test setup
 ```
 
@@ -81,6 +82,20 @@ H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root 
 - Add route entry components in `src/pages/<module>`.
 - For route components that read path params, accept the optional `routeParams` prop from `RouteStack` first, then fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Put reusable H5 UI primitives in `src/shared/ui` only when they have no client, merchant, or plan business meaning.
+
+## SVG Assets
+
+SVG files have two supported import modes:
+
+- Component icons: place reusable icon SVG files in `src/shared/assets/icons`, export them from `src/shared/assets/icons/index.ts`, and import them with the `?react` suffix.
+
+  ```tsx
+  export { default as ArrowLeftIcon } from "./arrow-left.svg?react";
+  ```
+
+- Static assets: place brand SVGs in `src/shared/assets/brand` and illustration/image SVGs in `src/shared/assets/images`, then import them without `?react` to get a URL for `<img src={...} />`.
+
+Icon SVGs should keep their `viewBox` and use kebab-case filenames such as `arrow-left.svg`. The SVGR pipeline removes fixed fill/stroke attributes and injects `fill="currentColor"` for component-style icon imports.
 
 ## Architecture Docs
 
