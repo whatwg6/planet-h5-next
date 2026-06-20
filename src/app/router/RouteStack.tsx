@@ -3,6 +3,7 @@ import { memo } from "react";
 
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
+import { RouteStackEntryLocationProvider } from "@/app/router/RouteStackEntryLocationProvider";
 import {
   getRouteStackTransitionDirectionFromEntries,
   routeStackTransitionDurationMs,
@@ -80,7 +81,9 @@ const RouteStackFrame = memo(function RouteStackFrame({
       className="route-stack__frame"
       ref={entry.nodeRef}
     >
-      {entry.element}
+      <RouteStackEntryLocationProvider location={entry.location}>
+        {entry.element}
+      </RouteStackEntryLocationProvider>
     </div>
   );
 });

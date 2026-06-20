@@ -21,6 +21,7 @@ export type RouteStackTransitionDirection = "forward" | "back" | "replace";
 
 export type RouteStackEntry = {
   id: string;
+  location: unknown;
   pathname: string;
   historyIndex?: number;
   element: ReactNode;

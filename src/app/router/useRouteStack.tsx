@@ -44,6 +44,13 @@ function getLocationHistoryIndex(location: { state: RouteStackLocationState }) {
   return location.state.__TSR_index;
 }
 
+function snapshotRouteStackLocation(location: RouteStackLocation) {
+  return {
+    ...location,
+    state: { ...location.state },
+  };
+}
+
 function useRouteStackNavigationAction() {
   const router = useRouter();
   const [navigationAction, setNavigationAction] = useState<RouteStackNavigationAction>({ type: "BACK" });
@@ -78,6 +85,7 @@ function createRouteStackEntry({
 
   return {
     id: getLocationKey(location),
+    location: snapshotRouteStackLocation(location),
     pathname: location.pathname,
     historyIndex: getLocationHistoryIndex(location),
     element: <Page routeParams={childMatch.params} />,

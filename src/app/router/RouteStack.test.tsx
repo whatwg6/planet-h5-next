@@ -1,8 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { createRef, useEffect } from "react";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { RouteStackFrames, getNextRouteStackEntries, type RouteStackEntry } from "./RouteStack";
+
+vi.mock("./RouteStackEntryLocationProvider", () => ({
+  RouteStackEntryLocationProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
+}));
 
 function createEntry(id: string, pathname: string, onUnmount: () => void, label = pathname, onRender?: () => void, historyIndex?: number): RouteStackEntry {
   function TestPage() {
@@ -13,6 +18,7 @@ function createEntry(id: string, pathname: string, onUnmount: () => void, label 
 
   return {
     id,
+    location: { pathname, state: {} },
     pathname,
     historyIndex,
     element: <TestPage />,
