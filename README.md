@@ -30,7 +30,7 @@ pnpm lint
 ```
 
 `pnpm dev` 启动 Vite H5 开发服务。`pnpm lint` 当前执行 TypeScript no-emit 检查。
-GitHub Pages 构建由 `.github/workflows/deploy-github-pages.yml` 执行，并通过 `VITE_BASE_PATH=/planet-h5-next/` 生成适配仓库子路径的静态资源。
+GitHub Pages workflow 由 `.github/workflows/deploy-github-pages.yml` 执行，先运行 `pnpm test`，再通过 `VITE_BASE_PATH=/planet-h5-next/` 构建适配仓库子路径的静态资源。
 
 ## Project Shape
 
