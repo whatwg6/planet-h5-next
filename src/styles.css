@@ -75,9 +75,23 @@
   --color-functional-brand-background--active: #9abe3c;
   --color-functional-error-transparent--active: #f5314d4d;
 
+  --app-viewport-height: 100%;
+
   min-height: 100%;
   color: var(--color-text-primary);
   background: var(--color-background-base);
+}
+
+@supports (height: -webkit-fill-available) {
+  :root {
+    --app-viewport-height: -webkit-fill-available;
+  }
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-viewport-height: 100dvh;
+  }
 }
 
 * {
@@ -96,7 +110,7 @@ body,
 }
 
 .route-stack {
-  min-height: 100vh;
+  min-height: var(--app-viewport-height);
   overflow: hidden;
   position: relative;
 }
@@ -104,7 +118,7 @@ body,
 .route-stack__frame {
   background: var(--color-background-base);
   inset: 0;
-  min-height: 100vh;
+  min-height: var(--app-viewport-height);
   overflow-y: auto;
   position: fixed;
   will-change: transform;
