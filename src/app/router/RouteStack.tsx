@@ -1,6 +1,6 @@
 import { Navigate } from "@tanstack/react-router";
 import { memo } from "react";
-import type { TransitionEventHandler } from "react";
+
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 import {
@@ -8,8 +8,6 @@ import {
   routeStackTransitionDurationMs,
   type RouteStackEntry,
   type RouteStackNavigationAction,
-  type RouteStackPageProps,
-  type RouteStackParams,
 } from "@/app/router/routeStackModel";
 import { useRouteStack } from "@/app/router/useRouteStack";
 
@@ -80,19 +78,12 @@ const RouteStackFrame = memo(function RouteStackFrame({
     <div
       aria-hidden={!isActive}
       className="route-stack__frame"
-      onTransitionEnd={stopNestedTransitionPropagation}
       ref={entry.nodeRef}
     >
       {entry.element}
     </div>
   );
 });
-
-const stopNestedTransitionPropagation: TransitionEventHandler<HTMLDivElement> = (event) => {
-  if (event.currentTarget !== event.target) {
-    event.stopPropagation();
-  }
-};
 
 export function RouteStack() {
   const { activeEntryId, entries, locationPathname, navigationAction } = useRouteStack();
