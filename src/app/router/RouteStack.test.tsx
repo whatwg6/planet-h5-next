@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { useEffect } from "react";
+import { createRef, useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { RouteStackFrames, getRouteStackCommitDelay, getNextRouteStackEntries, routeStackTransitionDurationMs, type RouteStackEntry } from "./RouteStack";
+import { RouteStackFrames, getNextRouteStackEntries, type RouteStackEntry } from "./RouteStack";
 
 function createEntry(id: string, pathname: string, onUnmount: () => void, label = pathname, onRender?: () => void, historyIndex?: number): RouteStackEntry {
   function TestPage() {
@@ -16,6 +16,7 @@ function createEntry(id: string, pathname: string, onUnmount: () => void, label 
     pathname,
     historyIndex,
     element: <TestPage />,
+    nodeRef: createRef<HTMLDivElement>(),
   };
 }
 
@@ -63,29 +64,6 @@ describe("getNextRouteStackEntries", () => {
   });
 });
 
-describe("getRouteStackCommitDelay", () => {
-  it("delays pruning popped routes so the exit animation can finish", () => {
-    const routeA = createEntry("key-a", "/client", vi.fn());
-    const routeB = createEntry("key-b", "/client/1", vi.fn());
-
-    expect(getRouteStackCommitDelay([routeA, routeB], routeA, { type: "BACK" })).toBe(routeStackTransitionDurationMs);
-  });
-
-  it("delays pruning by stack position even when the navigation action is stale", () => {
-    const routeA = createEntry("key-a", "/client", vi.fn());
-    const routeB = createEntry("key-b", "/client/1", vi.fn());
-
-    expect(getRouteStackCommitDelay([routeA, routeB], routeA, { type: "PUSH" })).toBe(routeStackTransitionDurationMs);
-  });
-
-  it("does not delay push commits", () => {
-    const routeA = createEntry("key-a", "/client", vi.fn());
-    const routeB = createEntry("key-b", "/client/1", vi.fn());
-
-    expect(getRouteStackCommitDelay([routeA], routeB, { type: "PUSH" })).toBe(0);
-  });
-});
-
 describe("RouteStackFrames", () => {
   it("keeps the previous route mounted when a new route becomes active", () => {
     const unmountA = vi.fn();
@@ -104,7 +82,7 @@ describe("RouteStackFrames", () => {
     expect(unmountB).not.toHaveBeenCalled();
   });
 
-  it("marks frames with push transition classes", () => {
+  it("marks frames with push transition classes", async () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
@@ -112,11 +90,14 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--base", "translate-x-0");
-    expect(screen.getByTestId("A").parentElement).not.toHaveClass("-translate-x-[24%]", "!-translate-x-[24%]", "transition-transform");
+    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--base");
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "false");
-    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top", "translate-x-full");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top");
     expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-active", "true");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-enter-active");
+    });
   });
 
   it("only animates the exiting top frame when navigating back", async () => {
@@ -125,18 +106,15 @@ describe("RouteStackFrames", () => {
 
     const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
-    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA, routeB]} navigationAction={{ type: "BACK" }} />);
+    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
 
-    expect(screen.getByTestId("A").parentElement).not.toHaveClass("-translate-x-[24%]", "!-translate-x-[24%]", "transition-transform");
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "true");
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-transition", "static");
-    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top", "translate-x-0");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-active", "false");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top");
     expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-transition", "exiting");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).not.toHaveClass("translate-x-0");
-      expect(screen.getByTestId("B").parentElement).toHaveClass("translate-x-full", "transition-transform");
+      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-exit-active");
     });
   });
 
@@ -146,14 +124,13 @@ describe("RouteStackFrames", () => {
 
     const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
-    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "PUSH" }} />);
 
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-transition", "static");
     expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-transition", "exiting");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).not.toHaveClass("translate-x-0");
-      expect(screen.getByTestId("B").parentElement).toHaveClass("translate-x-full", "transition-transform");
+      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-exit-active");
     });
   });
 
