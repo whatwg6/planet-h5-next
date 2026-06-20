@@ -90,13 +90,13 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--base");
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "false");
-    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-active", "true");
+    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame");
+    expect(screen.getByTestId("B").parentElement).toHaveAttribute("aria-hidden", "false");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-enter-active");
+      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-0", "transition-transform", "duration-300");
     });
   });
 
@@ -108,13 +108,11 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-active", "true");
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-transition", "static");
-    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame--visible", "route-stack__frame--top");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-transition", "exiting");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "false");
+    expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-exit-active");
+      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-full", "transition-transform", "duration-300");
     });
   });
 
@@ -126,11 +124,10 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "PUSH" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("data-route-stack-transition", "static");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("data-route-stack-transition", "exiting");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "false");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack-slide-exit-active");
+      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-full", "transition-transform", "duration-300");
     });
   });
 
@@ -149,6 +146,24 @@ describe("RouteStackFrames", () => {
     rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB, routeC]} navigationAction={{ type: "BACK" }} />);
 
     expect(renderA).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not add active route animation classes to deep inactive frames", () => {
+    const routeA = createEntry("key-a", "/client", vi.fn(), "A");
+    const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
+    const routeC = createEntry("key-c", "/client/1/plans/settings", vi.fn(), "C");
+
+    const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+
+    rerender(<RouteStackFrames activeEntryId={routeC.id} entries={[routeA, routeB, routeC]} navigationAction={{ type: "PUSH" }} />);
+
+    expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame");
+    expect(screen.getByTestId("A").parentElement).not.toHaveClass(
+      "translate-x-full",
+      "!translate-x-0",
+      "!translate-x-full",
+      "transition-transform",
+    );
   });
 
   it("does not rerender the previous page content when pushing a new route", () => {

@@ -2,7 +2,6 @@ import { Navigate } from "@tanstack/react-router";
 import { memo } from "react";
 import type { TransitionEventHandler } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import type { TransitionStatus } from "react-transition-group/Transition";
 
 import {
   getRouteStackTransitionDirectionFromEntries,
@@ -29,43 +28,42 @@ export {
   routeStackTransitionDurationMs,
 } from "@/app/router/routeStackModel";
 
-type RouteStackFrameTransitionPhase = "entering" | "exiting" | "static";
-
 type RouteStackFrameProps = {
   activeEntryId: string;
-  entries: RouteStackEntry[];
   entry: RouteStackEntry;
-  transitionState: TransitionStatus;
+};
+
+type RouteStackFramesProps = {
+  activeEntryId: string;
+  entries: RouteStackEntry[];
+  navigationAction: RouteStackNavigationAction;
+};
+
+const routeStackSlideClassNames = {
+  enter: "translate-x-full",
+  enterActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  exit: "translate-x-0",
+  exitActive: "!translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
 };
 
 export function RouteStackFrames({
   entries,
   activeEntryId,
   navigationAction,
-}: {
-  entries: RouteStackEntry[];
-  activeEntryId: string;
-  navigationAction: RouteStackNavigationAction;
-}) {
+}: RouteStackFramesProps) {
   const transitionDirection = getRouteStackTransitionDirectionFromEntries(entries, activeEntryId, navigationAction);
+  const shouldAnimate = transitionDirection !== "replace";
 
   return (
-    <TransitionGroup className="route-stack" component="div">
+    <TransitionGroup className="route-stack">
       {entries.map((entry) => (
         <CSSTransition
-          classNames={transitionDirection === "replace" ? undefined : "route-stack-slide"}
+          classNames={shouldAnimate ? routeStackSlideClassNames : undefined}
           key={entry.id}
           nodeRef={entry.nodeRef}
-          timeout={transitionDirection === "replace" ? 0 : routeStackTransitionDurationMs}
+          timeout={shouldAnimate ? routeStackTransitionDurationMs : 0}
         >
-          {(transitionState: TransitionStatus) => (
-            <RouteStackFrame
-              activeEntryId={activeEntryId}
-              entries={entries}
-              entry={entry}
-              transitionState={transitionState}
-            />
-          )}
+          <RouteStackFrame activeEntryId={activeEntryId} entry={entry} />
         </CSSTransition>
       ))}
     </TransitionGroup>
@@ -74,28 +72,14 @@ export function RouteStackFrames({
 
 const RouteStackFrame = memo(function RouteStackFrame({
   activeEntryId,
-  entries,
   entry,
-  transitionState,
 }: RouteStackFrameProps) {
-  const activeIndex = entries.findIndex((stackEntry) => stackEntry.id === activeEntryId);
-  const entryIndex = entries.findIndex((stackEntry) => stackEntry.id === entry.id);
   const isActive = entry.id === activeEntryId;
-  const transitionPhase = getRouteStackFrameTransitionPhase(transitionState);
-  const isTransitioning = transitionPhase !== "static";
-  const isPreviousFrame = activeIndex !== -1 && entryIndex === activeIndex - 1;
-  const isVisible = isActive || isPreviousFrame || isTransitioning;
-  const layerClassName = isTransitioning || isActive ? "route-stack__frame--top" : isVisible ? "route-stack__frame--base" : "";
 
   return (
     <div
       aria-hidden={!isActive}
-      className={["route-stack__frame", isVisible ? "route-stack__frame--visible" : "", layerClassName]
-        .filter(Boolean)
-        .join(" ")}
-      data-route-pathname={entry.pathname}
-      data-route-stack-active={isActive}
-      data-route-stack-transition={transitionPhase}
+      className="route-stack__frame"
       onTransitionEnd={stopNestedTransitionPropagation}
       ref={entry.nodeRef}
     >
@@ -103,18 +87,6 @@ const RouteStackFrame = memo(function RouteStackFrame({
     </div>
   );
 });
-
-function getRouteStackFrameTransitionPhase(transitionState: TransitionStatus): RouteStackFrameTransitionPhase {
-  if (transitionState === "entering") {
-    return "entering";
-  }
-
-  if (transitionState === "exiting") {
-    return "exiting";
-  }
-
-  return "static";
-}
 
 const stopNestedTransitionPropagation: TransitionEventHandler<HTMLDivElement> = (event) => {
   if (event.currentTarget !== event.target) {

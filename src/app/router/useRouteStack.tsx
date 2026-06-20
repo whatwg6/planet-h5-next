@@ -30,6 +30,12 @@ type RouteStackComponentRoute = {
   };
 };
 
+type RouteStackLocation = {
+  href: string;
+  pathname: string;
+  state: RouteStackLocationState;
+};
+
 function getLocationKey(location: { href: string; state: RouteStackLocationState }) {
   return location.state.__TSR_key ?? location.state.key ?? location.href;
 }
@@ -51,35 +57,45 @@ function useRouteStackNavigationAction() {
   return navigationAction;
 }
 
+function createRouteStackEntry({
+  childMatch,
+  location,
+  routesById,
+}: {
+  childMatch?: RouteStackMatch;
+  location: RouteStackLocation;
+  routesById: Record<string, RouteStackComponentRoute>;
+}): RouteStackEntry | null {
+  if (!childMatch || childMatch.pathname !== location.pathname) {
+    return null;
+  }
+
+  const Page = routesById[childMatch.routeId]?.options.component;
+
+  if (!Page) {
+    return null;
+  }
+
+  return {
+    id: getLocationKey(location),
+    pathname: location.pathname,
+    historyIndex: getLocationHistoryIndex(location),
+    element: <Page routeParams={childMatch.params} />,
+    nodeRef: createRef<HTMLDivElement>(),
+  };
+}
+
 export function useRouteStack() {
   const router = useRouter();
   const location = useRouterState({ select: (state) => state.location });
-  const locationKey = getLocationKey(location);
-  const locationPathname = location.pathname;
   const childMatch = useRouterState({
     select: (state) => state.matches[1] as RouteStackMatch | undefined,
   });
   const navigationAction = useRouteStackNavigationAction();
+  const routesById = router.routesById as Record<string, RouteStackComponentRoute>;
   const currentEntry = useMemo<RouteStackEntry | null>(() => {
-    if (!childMatch || childMatch.pathname !== locationPathname) {
-      return null;
-    }
-
-    const routesById = router.routesById as Record<string, RouteStackComponentRoute>;
-    const Page = routesById[childMatch.routeId]?.options.component;
-
-    if (!Page) {
-      return null;
-    }
-
-    return {
-      id: locationKey,
-      pathname: locationPathname,
-      historyIndex: getLocationHistoryIndex(location),
-      element: <Page routeParams={childMatch.params} />,
-      nodeRef: createRef<HTMLDivElement>(),
-    };
-  }, [childMatch, location, locationKey, locationPathname, router.routesById]);
+    return createRouteStackEntry({ childMatch, location, routesById });
+  }, [childMatch, location, routesById]);
   const [entries, setEntries] = useState<RouteStackEntry[]>(() => (currentEntry ? [currentEntry] : []));
   const stackCurrentEntry = useMemo(() => getRouteStackCurrentEntry(entries, currentEntry), [currentEntry, entries]);
   const [activeEntryId, setActiveEntryId] = useState(() => currentEntry?.id ?? null);
@@ -101,7 +117,7 @@ export function useRouteStack() {
   return {
     activeEntryId: stackCurrentEntry?.id ?? activeEntryId,
     entries,
-    locationPathname,
+    locationPathname: location.pathname,
     navigationAction,
   };
 }
