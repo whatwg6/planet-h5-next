@@ -102,11 +102,11 @@ Mock repositories may mutate in-memory mock data for edit flows. Keep mutations 
 The new project may keep development-friendly routes such as `/client`, but migrated production business routes should preserve the legacy URL shape when the route is migrated:
 
 ```txt
-/ops/client-next
-/ops/client-next/$clientId
-/ops/client-next/$clientId/plan/$planId
-/ops/client-next/$clientId/plan/$planId/setting
-/ops/client-next/$clientId/plan/$planId/order/$orderParams
+/ops/client
+/ops/client/$clientId
+/ops/client/$clientId/plan/$planId
+/ops/client/$clientId/plan/$planId/setting
+/ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
 Route metadata belongs in `src/app/router/routeMeta.ts`.
@@ -320,10 +320,10 @@ Use this checklist for each migrated business slice:
 The first milestone should deliver this complete mock-backed flow:
 
 ```txt
-/ops/client-next
-  -> /ops/client-next/$clientId
-  -> /ops/client-next/$clientId/plan/$planId
-  -> /ops/client-next/$clientId/plan/$planId/setting
+/ops/client
+  -> /ops/client/$clientId
+  -> /ops/client/$clientId/plan/$planId
+  -> /ops/client/$clientId/plan/$planId/setting
 ```
 
 This milestone proves that routing, H5 stack behavior, mock repositories, query keys, feature views, and page composition are working together before the long tail of settings pages is migrated.

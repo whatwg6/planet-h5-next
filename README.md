@@ -65,6 +65,9 @@ infrastructure -> domain
 /client/$clientId
 /client/$clientId/plans/settings
 /client/$clientId/plans/$planId
+/ops/client
+/ops/client/$clientId
+/ops/client/$clientId/plan/$planId
 /merchant
 /merchant/$merchantId
 ```

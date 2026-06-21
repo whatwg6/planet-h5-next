@@ -142,7 +142,7 @@ Only migrate a legacy base UI component when the current business slice cannot b
 The legacy production route is:
 
 ```txt
-/ops/client-next
+/ops/client
 ```
 
 For the migrated production route, add or confirm:
@@ -534,13 +534,13 @@ Create these feature components only if they make the view easier to read. They 
 The legacy production detail route is:
 
 ```txt
-/ops/client-next/:id
+/ops/client/:id
 ```
 
 The migrated TanStack Router route should use:
 
 ```txt
-/ops/client-next/$clientId
+/ops/client/$clientId
 ```
 
 Update or confirm:
@@ -781,7 +781,7 @@ Test cases:
 - Throws for an unknown client id.
 - Preserves `isDeveloperTest` on detail.
 - Query hook returns client detail for a valid id.
-- Detail route metadata includes `/ops/client-next/$clientId`.
+- Detail route metadata includes `/ops/client/$clientId`.
 
 Add view tests if meaningful:
 
@@ -814,9 +814,9 @@ pnpm build
 
 Manual verification checklist:
 
-- Open `/ops/client-next`.
+- Open `/ops/client`.
 - Tap a client card.
-- Confirm navigation to `/ops/client-next/$clientId`.
+- Confirm navigation to `/ops/client/$clientId`.
 - Confirm the client name is visible.
 - Confirm developer test clients show a test notice.
 - Confirm normal clients do not show a test notice.
@@ -938,7 +938,7 @@ src/features/client/components/ClientSettingRow.tsx
 
 ### Completion Criteria
 
-- Settings list is reachable from `/ops/client-next/$clientId` through route state.
+- Settings list is reachable from `/ops/client/$clientId` through route state.
 - Feature views do not read `location.state`.
 - Setting summaries come from mock-backed client detail data or a client settings query.
 - Unmigrated setting rows do not crash.
@@ -997,7 +997,7 @@ src/app/router/routeMeta.ts
 5. Navigate to the production-shaped plan detail route:
 
 ```txt
-/ops/client-next/$clientId/plan/$planId
+/ops/client/$clientId/plan/$planId
 ```
 
 6. Add route metadata and route tests when adding the production-shaped route.
@@ -1068,7 +1068,7 @@ src/app/router/routeMeta.ts
 1. Add or confirm:
 
 ```txt
-/ops/client-next/$clientId/plan/$planId
+/ops/client/$clientId/plan/$planId
 ```
 
 2. Keep `PlanDetailRoute` responsible for params and navigation callbacks only.
@@ -1082,7 +1082,7 @@ src/app/router/routeMeta.ts
 
 - Plan detail is reachable from the client meal plans list.
 - Plan detail data comes from `planRepositoryMock`.
-- The settings entry navigates to `/ops/client-next/$clientId/plan/$planId/setting`.
+- The settings entry navigates to `/ops/client/$clientId/plan/$planId/setting`.
 - No legacy API client is imported.
 - `pnpm lint` and `pnpm test` pass.
 
@@ -1135,7 +1135,7 @@ src/app/router/routeMeta.ts
 1. Add or confirm:
 
 ```txt
-/ops/client-next/$clientId/plan/$planId/setting
+/ops/client/$clientId/plan/$planId/setting
 ```
 
 2. Map legacy setting entries to stable plan setting summary ids.
@@ -1428,7 +1428,7 @@ src/app/router/routeMeta.ts
 1. Add the route:
 
 ```txt
-/ops/client-next/$clientId/plan/$planId/order/$orderParams
+/ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
 2. Parse `orderParams` at the page or application boundary.
@@ -1495,12 +1495,12 @@ Use matching capabilities under:
 After the remaining slices are complete, verify the main mock-backed production flow:
 
 ```txt
-/ops/client-next
-  -> /ops/client-next/$clientId
+/ops/client
+  -> /ops/client/$clientId
   -> same URL with meal plans mode
-  -> /ops/client-next/$clientId/plan/$planId
-  -> /ops/client-next/$clientId/plan/$planId/setting
-  -> /ops/client-next/$clientId/plan/$planId/order/$orderParams
+  -> /ops/client/$clientId/plan/$planId
+  -> /ops/client/$clientId/plan/$planId/setting
+  -> /ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
 Run:

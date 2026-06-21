@@ -106,7 +106,7 @@ export function RouteStack() {
   const { activeEntryId, entries, locationPathname, navigationAction } = useRouteStack();
 
   if (locationPathname === "/") {
-    return <Navigate to="/client" />;
+    return <Navigate to="/ops/client" />;
   }
 
   if (!activeEntryId || entries.length === 0) {

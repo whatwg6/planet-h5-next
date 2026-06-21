@@ -27,7 +27,7 @@ export function ClientListView() {
           {query.data?.map((client) => (
             <Link
               key={client.id}
-              to="/ops/client-next/$clientId"
+              to="/ops/client/$clientId"
               params={{ clientId: client.id }}
               className="block text-text-primary"
             >

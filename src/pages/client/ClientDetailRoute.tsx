@@ -34,8 +34,8 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
     );
 
   const enterMode = (mode: string) => {
-    const detailPath = pathname.startsWith("/ops/client-next")
-      ? "/ops/client-next/$clientId"
+    const detailPath = pathname.startsWith("/ops/client")
+      ? "/ops/client/$clientId"
       : "/client/$clientId";
 
     void navigate({
@@ -46,8 +46,8 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
   };
 
   const openPlan = (planId: string) => {
-    const planPath = pathname.startsWith("/ops/client-next")
-      ? "/ops/client-next/$clientId/plan/$planId"
+    const planPath = pathname.startsWith("/ops/client")
+      ? "/ops/client/$clientId/plan/$planId"
       : "/client/$clientId/plans/$planId";
 
     void navigate({

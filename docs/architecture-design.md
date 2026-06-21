@@ -233,6 +233,15 @@ The H5 route map is:
 /client/$clientId/plans/$planId
   Plan detail
 
+/ops/client
+  Production client list
+
+/ops/client/$clientId
+  Production client detail
+
+/ops/client/$clientId/plan/$planId
+  Production plan detail
+
 /merchant
   Merchant list
 

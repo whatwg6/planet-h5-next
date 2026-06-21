@@ -18,7 +18,7 @@ vi.mock("@tanstack/react-router", () => ({
     select,
   }: {
     select: (state: { location: { pathname: string; state: Record<string, unknown> } }) => T;
-  }) => select({ location: { pathname: "/ops/client-next/c1", state: routeState } }),
+  }) => select({ location: { pathname: "/ops/client/c1", state: routeState } }),
 }));
 
 function renderWithQuery(ui: ReactNode) {
@@ -42,7 +42,7 @@ describe("ClientDetailRoute", () => {
     await user.click(screen.getByRole("button", { name: /客户设置/ }));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: "/ops/client-next/$clientId",
+      to: "/ops/client/$clientId",
       params: { clientId: "c1" },
       state: expect.any(Function),
     });
@@ -61,7 +61,7 @@ describe("ClientDetailRoute", () => {
     await user.click(await screen.findByRole("button", { name: /名称与备注/ }));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: "/ops/client-next/$clientId",
+      to: "/ops/client/$clientId",
       params: { clientId: "c1" },
       state: expect.any(Function),
     });
@@ -79,7 +79,7 @@ describe("ClientDetailRoute", () => {
     await user.click(await screen.findByRole("button", { name: /方案 A/ }));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: "/ops/client-next/$clientId/plan/$planId",
+      to: "/ops/client/$clientId/plan/$planId",
       params: { clientId: "c1", planId: "p1" },
     });
   });
