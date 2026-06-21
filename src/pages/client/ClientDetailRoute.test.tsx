@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ClientDetailView } from "./ClientDetailView";
+import { ClientDetailRoute } from "./ClientDetailRoute";
 
 const navigateMock = vi.fn();
 const historyBackMock = vi.fn();
@@ -12,6 +12,7 @@ let routeState: Record<string, unknown> = {};
 
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
+  useParams: () => ({ clientId: "c1" }),
   useRouter: () => ({ history: { back: historyBackMock } }),
   useRouterState: <T,>({ select }: { select: (state: { location: { state: Record<string, unknown> } }) => T }) =>
     select({ location: { state: routeState } }),
@@ -22,7 +23,7 @@ function renderWithQuery(ui: ReactNode) {
   return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
 }
 
-describe("ClientDetailView", () => {
+describe("ClientDetailRoute", () => {
   beforeEach(() => {
     navigateMock.mockReset();
     historyBackMock.mockReset();
@@ -31,7 +32,7 @@ describe("ClientDetailView", () => {
 
   it("pushes edit mode into route state instead of editing the current route frame", async () => {
     const user = userEvent.setup();
-    renderWithQuery(<ClientDetailView clientId="c1" />);
+    renderWithQuery(<ClientDetailRoute />);
 
     expect(await screen.findByText("客户 A")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "编辑" }));
@@ -43,15 +44,15 @@ describe("ClientDetailView", () => {
     });
 
     const editState = navigateMock.mock.calls[0][0].state({ __TSR_index: 0 });
-    expect(editState).toMatchObject({ clientDetailMode: "editing" });
+    expect(editState).toMatchObject({ routeMode: "edit" });
     expect(screen.queryByRole("button", { name: "保存" })).not.toBeInTheDocument();
   });
 
   it("renders edit mode from route state and pops the pushed route on clean cancel", async () => {
     const user = userEvent.setup();
-    routeState = { clientDetailMode: "editing" };
+    routeState = { routeMode: "edit" };
 
-    renderWithQuery(<ClientDetailView clientId="c1" />);
+    renderWithQuery(<ClientDetailRoute />);
 
     expect(await screen.findByRole("button", { name: "保存" })).toBeInTheDocument();
 
@@ -61,9 +62,9 @@ describe("ClientDetailView", () => {
 
   it("uses the discard confirmation when the navigation bar back button leaves dirty edit mode", async () => {
     const user = userEvent.setup();
-    routeState = { clientDetailMode: "editing" };
+    routeState = { routeMode: "edit" };
 
-    renderWithQuery(<ClientDetailView clientId="c1" />);
+    renderWithQuery(<ClientDetailRoute />);
 
     const nameField = await screen.findByLabelText("名称");
     await user.clear(nameField);

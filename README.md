@@ -36,7 +36,7 @@ GitHub Pages workflow 由 `.github/workflows/deploy-github-pages.yml` 执行，�
 
 ```txt
 src/
-  app/              App bootstrap, providers, router
+  app/              App bootstrap, providers, router and route-state helpers
   pages/            TanStack Router route entry components
   features/         Feature views, query hooks, mutation hooks, UI state, feature components
   application/      Use cases that coordinate repository calls
@@ -71,6 +71,8 @@ Route metadata lives in `src/app/router/routeMeta.ts`. Route definitions live in
 
 H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root route owns this stack so a `PUSH` navigation keeps the previous page mounted and hidden instead of unmounting it. The stack uses TanStack Router's current match, route component, route params, and history key; do not add a second manual pathname matcher or route table for keep-alive behavior.
 
+Same-URL page modes are represented with TanStack Router history state, not separate URL paths. Use `routeModeState(mode)` from `src/app/router/historyState.ts` when pushing a mode, and wrap route entry rendering with `RouteModeSwitch` from `src/app/router/RouteModeSwitch.tsx`. The normal page goes in `fallback`; additional states such as `edit`, `preview`, or future workflow states go in `modes`. Feature views should receive ordinary props and remain unaware of `location.state`.
+
 ## Development Guide
 
 - Add or change business entities in `src/domain/<module>`.
@@ -81,6 +83,7 @@ H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root 
 - Add feature query/mutation hooks under `src/features/<module>/queries` or `src/features/<module>/mutations`.
 - Add route entry components in `src/pages/<module>`.
 - For route components that read path params, accept the optional `routeParams` prop from `RouteStack` first, then fall back to `useParams({ strict: false, shouldThrow: false })`.
+- Route entry components should render through `RouteModeSwitch`; put the normal page in `fallback`, add mode branches in `modes`, and do not read `location.state` from feature views.
 - Put reusable H5 UI primitives in `src/shared/ui` only when they have no client, merchant, or plan business meaning.
 
 ## SVG Assets

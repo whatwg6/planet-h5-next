@@ -43,9 +43,12 @@ When adding a new route:
 3. Add or update the view under `src/features/<module>/views`.
 4. Register the route in `src/app/router/routeTree.tsx`.
 5. If the route reads path params, let the route component accept optional `routeParams` from `src/app/router/RouteStack.tsx` and fall back to `useParams({ strict: false, shouldThrow: false })`.
-6. Add route tests when metadata or behavior changes.
+6. Render route entry content through `RouteModeSwitch` from `src/app/router/RouteModeSwitch.tsx`; put the normal page in `fallback`, and add same-URL page modes in `modes` when needed.
+7. Add route tests when metadata or behavior changes.
 
 Route keep-alive is centralized in `src/app/router/RouteStack.tsx`. It stores TanStack Router's current matched route component and params by history key, then hides inactive stack entries instead of unmounting them. Do not add a separate route list or manual pathname matcher for stack rendering; `routeTree.tsx` remains the source of route registration.
+
+Route state based page modes are resolved by router helpers and used from `pages`, not `features`. Use `src/app/router/historyState.ts` for the `location.state.routeMode` protocol and `src/app/router/RouteModeSwitch.tsx` for every route entry's mode dispatch. Keep feature views unaware of `location.state`.
 
 When adding a new server-backed query:
 
@@ -85,6 +88,7 @@ Use the narrowest useful test for the change:
 - Repository implementations: tests under `src/infrastructure/repositories/<module>`.
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
 - Route metadata: `src/app/router/routeMeta.test.ts`.
+- Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
 
 Before handing work back, run at least:
 
