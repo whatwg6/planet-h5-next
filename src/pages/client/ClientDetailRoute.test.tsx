@@ -14,8 +14,11 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
   useParams: () => ({ clientId: "c1" }),
   useRouter: () => ({ history: { back: historyBackMock } }),
-  useRouterState: <T,>({ select }: { select: (state: { location: { state: Record<string, unknown> } }) => T }) =>
-    select({ location: { state: routeState } }),
+  useRouterState: <T,>({
+    select,
+  }: {
+    select: (state: { location: { state: Record<string, unknown> } }) => T;
+  }) => select({ location: { state: routeState } }),
 }));
 
 function renderWithQuery(ui: ReactNode) {

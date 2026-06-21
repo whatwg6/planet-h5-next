@@ -28,15 +28,28 @@ export function PlanSettingsView({ clientId }: { clientId: string }) {
     <Page
       title="方案设置"
       onBack={() => router.history.back()}
-      footer={<Button className="w-full" type="submit" form="plan-settings-form" disabled={mutation.isPending}>保存</Button>}
+      footer={
+        <Button
+          className="w-full"
+          type="submit"
+          form="plan-settings-form"
+          disabled={mutation.isPending}
+        >
+          保存
+        </Button>
+      }
     >
       <form
         id="plan-settings-form"
         className="space-y-4"
-        onSubmit={handleSubmit((values) => mutation.mutate({ clientId, name: values.name, fields: values.fields, rules: [] }))}
+        onSubmit={handleSubmit((values) =>
+          mutation.mutate({ clientId, name: values.name, fields: values.fields, rules: [] }),
+        )}
       >
         <Field label="名称" {...register("name")} error={formState.errors.name?.message} />
-        {saveMessage ? <p className="text-sm text-functional-brand-foreground">{saveMessage}</p> : null}
+        {saveMessage ? (
+          <p className="text-sm text-functional-brand-foreground">{saveMessage}</p>
+        ) : null}
       </form>
     </Page>
   );

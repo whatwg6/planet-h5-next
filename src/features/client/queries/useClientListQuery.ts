@@ -6,5 +6,8 @@ import type { ClientListParams } from "@/domain/client/Client";
 import { queryKeys } from "@/infrastructure/query/queryKeys";
 
 export function useClientListQuery(params: ClientListParams) {
-  return useQuery({ queryKey: queryKeys.clients.list(params), queryFn: () => getClientList(clientRepositoryMock, params) });
+  return useQuery({
+    queryKey: queryKeys.clients.list(params),
+    queryFn: () => getClientList(clientRepositoryMock, params),
+  });
 }

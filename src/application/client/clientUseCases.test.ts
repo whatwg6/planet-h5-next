@@ -24,6 +24,9 @@ describe("client use cases", () => {
 
   it("passes update values through without applying business decisions", async () => {
     await updateClient(repository, { clientId: "c1", values: { name: "客户 A" } });
-    expect(repository.updateClient).toHaveBeenCalledWith({ clientId: "c1", values: { name: "客户 A" } });
+    expect(repository.updateClient).toHaveBeenCalledWith({
+      clientId: "c1",
+      values: { name: "客户 A" },
+    });
   });
 });

@@ -27,10 +27,12 @@ pnpm build
 pnpm test
 pnpm test:watch
 pnpm lint
+pnpm format
+pnpm format:check
 ```
 
-`pnpm dev` 启动 Vite H5 开发服务。`pnpm lint` 当前执行 TypeScript no-emit 检查。
-GitHub Pages workflow 由 `.github/workflows/deploy-github-pages.yml` 执行，先运行 `pnpm test`，再通过 `VITE_BASE_PATH=/planet-h5-next/` 构建适配仓库子路径的静态资源。
+`pnpm dev` 启动 Vite H5 开发服务。`pnpm lint` 当前执行 TypeScript no-emit 检查。`pnpm format` 使用 Prettier 格式化项目文件，`pnpm format:check` 只检查格式。
+GitHub Pages workflow 由 `.github/workflows/deploy-github-pages.yml` 执行，先运行 `pnpm lint`、`pnpm format:check` 和 `pnpm test`，再通过 `VITE_BASE_PATH=/planet-h5-next/` 构建适配仓库子路径的静态资源。
 
 ## Project Shape
 

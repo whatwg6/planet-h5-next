@@ -1,4 +1,9 @@
-import { RouterContextProvider, useLocation, useRouter, useRouterState } from "@tanstack/react-router";
+import {
+  RouterContextProvider,
+  useLocation,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";

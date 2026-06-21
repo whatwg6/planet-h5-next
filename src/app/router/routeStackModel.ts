@@ -65,7 +65,11 @@ export function getNextRouteStackEntries(
   currentEntry: RouteStackEntry,
   navigationAction: RouteStackNavigationAction,
 ) {
-  const transitionDirection = getRouteStackTransitionDirectionFromEntries(entries, currentEntry.id, navigationAction);
+  const transitionDirection = getRouteStackTransitionDirectionFromEntries(
+    entries,
+    currentEntry.id,
+    navigationAction,
+  );
 
   switch (transitionDirection) {
     case "back": {
@@ -106,14 +110,20 @@ export function getNextRouteStackEntries(
   }
 }
 
-export function getRouteStackCurrentEntry(entries: RouteStackEntry[], currentEntry: RouteStackEntry | null) {
+export function getRouteStackCurrentEntry(
+  entries: RouteStackEntry[],
+  currentEntry: RouteStackEntry | null,
+) {
   if (!currentEntry) {
     return null;
   }
 
   return (
     entries.find((entry) => entry.id === currentEntry.id) ??
-    entries.find((entry) => currentEntry.historyIndex !== undefined && entry.historyIndex === currentEntry.historyIndex) ??
+    entries.find(
+      (entry) =>
+        currentEntry.historyIndex !== undefined && entry.historyIndex === currentEntry.historyIndex,
+    ) ??
     currentEntry
   );
 }

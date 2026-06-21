@@ -7,7 +7,12 @@ export function routeModeState<TMode extends RouteMode>(mode: TMode) {
 }
 
 export function getRouteMode(state: unknown, fallback: RouteMode = defaultRouteMode): RouteMode {
-  if (typeof state === "object" && state !== null && "routeMode" in state && typeof state.routeMode === "string") {
+  if (
+    typeof state === "object" &&
+    state !== null &&
+    "routeMode" in state &&
+    typeof state.routeMode === "string"
+  ) {
     return state.routeMode;
   }
 

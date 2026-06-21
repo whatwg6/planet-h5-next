@@ -17,7 +17,11 @@ export function ClientDetailView({
     <Page
       title="客户详情"
       onBack={onBack}
-      footer={<Button className="w-full" onClick={onEdit}>编辑</Button>}
+      footer={
+        <Button className="w-full" onClick={onEdit}>
+          编辑
+        </Button>
+      }
     >
       <div className="space-y-4">
         <ClientDetailReadView client={client} />

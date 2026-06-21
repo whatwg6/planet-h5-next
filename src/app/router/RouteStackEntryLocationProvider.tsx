@@ -15,10 +15,14 @@ function createSnapshotStore<TStore extends { get: () => unknown }>(
 }
 
 function createRouterStateStore(store: RouterStore, location: unknown): RouterStore {
-  return createSnapshotStore(store, () => ({
-    ...store.get(),
-    location,
-  }) as ReturnType<RouterStore["get"]>);
+  return createSnapshotStore(
+    store,
+    () =>
+      ({
+        ...store.get(),
+        location,
+      }) as ReturnType<RouterStore["get"]>,
+  );
 }
 
 function createLocationStore(store: LocationStore, location: unknown): LocationStore {
@@ -60,11 +64,10 @@ export function RouteStackEntryLocationProvider({
   location: unknown;
 }) {
   const router = useRouter();
-  const entryRouter = useMemo(() => createRouteStackEntryRouter(router, location), [router, location]);
-
-  return (
-    <RouterContextProvider router={entryRouter}>
-      {children}
-    </RouterContextProvider>
+  const entryRouter = useMemo(
+    () => createRouteStackEntryRouter(router, location),
+    [router, location],
   );
+
+  return <RouterContextProvider router={entryRouter}>{children}</RouterContextProvider>;
 }

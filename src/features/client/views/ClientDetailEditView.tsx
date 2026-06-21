@@ -23,7 +23,8 @@ function useClientDetailEditController(
   { onClose }: { onClose: () => void },
 ): ClientDetailEditController {
   const mutation = useUpdateClientMutation();
-  const { isDirty, confirmDiscardOpen, resetEditState, setDirty, requestCancel, closeConfirm } = useClientDetailUiStore();
+  const { isDirty, confirmDiscardOpen, resetEditState, setDirty, requestCancel, closeConfirm } =
+    useClientDetailUiStore();
   const [name, setNameState] = useState(client.name);
 
   useEffect(() => {
@@ -50,7 +51,10 @@ function useClientDetailEditController(
   };
 
   const save = () => {
-    mutation.mutate({ clientId: client.id, values: { ...client.fields, name } }, { onSuccess: closeEdit });
+    mutation.mutate(
+      { clientId: client.id, values: { ...client.fields, name } },
+      { onSuccess: closeEdit },
+    );
   };
 
   return {
@@ -100,8 +104,12 @@ export function ClientDetailEditView({
 function ClientDetailEditFooter({ controller }: { controller: ClientDetailEditController }) {
   return (
     <div className="grid grid-cols-2 gap-2">
-      <Button variant="secondary" onClick={controller.cancelEdit}>取消</Button>
-      <Button disabled={controller.isSaving} onClick={controller.save}>保存</Button>
+      <Button variant="secondary" onClick={controller.cancelEdit}>
+        取消
+      </Button>
+      <Button disabled={controller.isSaving} onClick={controller.save}>
+        保存
+      </Button>
     </div>
   );
 }

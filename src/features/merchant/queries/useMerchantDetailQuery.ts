@@ -5,5 +5,8 @@ import { merchantRepositoryMock } from "@/infrastructure/repositories/merchant/m
 import { queryKeys } from "@/infrastructure/query/queryKeys";
 
 export function useMerchantDetailQuery(merchantId: string) {
-  return useQuery({ queryKey: queryKeys.merchants.detail(merchantId), queryFn: () => getMerchantDetail(merchantRepositoryMock, merchantId) });
+  return useQuery({
+    queryKey: queryKeys.merchants.detail(merchantId),
+    queryFn: () => getMerchantDetail(merchantRepositoryMock, merchantId),
+  });
 }

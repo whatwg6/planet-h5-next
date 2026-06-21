@@ -17,8 +17,18 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
   const query = useClientDetailQuery(clientId);
   const back = () => router.history.back();
 
-  if (query.isLoading) return <Page title="客户详情" onBack={back}><LoadingState /></Page>;
-  if (query.isError || !query.data) return <Page title="客户详情" onBack={back}><ErrorState title="加载失败" onRetry={() => query.refetch()} /></Page>;
+  if (query.isLoading)
+    return (
+      <Page title="客户详情" onBack={back}>
+        <LoadingState />
+      </Page>
+    );
+  if (query.isError || !query.data)
+    return (
+      <Page title="客户详情" onBack={back}>
+        <ErrorState title="加载失败" onRetry={() => query.refetch()} />
+      </Page>
+    );
 
   const enterEdit = () => {
     void navigate({

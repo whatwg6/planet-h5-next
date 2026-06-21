@@ -8,7 +8,9 @@ import { useClientListQuery } from "./useClientListQuery";
 describe("useClientListQuery", () => {
   it("returns repository data through the feature query hook", async () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
     const { result } = renderHook(() => useClientListQuery({ keyword: "客户" }), { wrapper });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
