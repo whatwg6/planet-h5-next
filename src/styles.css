@@ -124,7 +124,7 @@ body,
   will-change: transform;
 }
 
-.route-stack__frame[aria-hidden="true"] {
+.route-stack__frame[inert] {
   pointer-events: none;
 }
 

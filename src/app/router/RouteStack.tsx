@@ -1,5 +1,5 @@
 import { Navigate } from "@tanstack/react-router";
-import { memo } from "react";
+import { memo, useLayoutEffect } from "react";
 
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
@@ -75,10 +75,22 @@ const RouteStackFrame = memo(function RouteStackFrame({
 }: RouteStackFrameProps) {
   const isActive = entry.id === activeEntryId;
 
+  useLayoutEffect(() => {
+    const frameElement = entry.nodeRef.current;
+
+    if (isActive || !frameElement?.contains(document.activeElement)) {
+      return;
+    }
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }, [entry.nodeRef, isActive]);
+
   return (
     <div
-      aria-hidden={!isActive}
       className="route-stack__frame"
+      inert={!isActive}
       ref={entry.nodeRef}
     >
       <RouteStackEntryLocationProvider location={entry.location}>

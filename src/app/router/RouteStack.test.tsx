@@ -26,6 +26,16 @@ function createEntry(id: string, pathname: string, onUnmount: () => void, label 
   };
 }
 
+function createFocusableEntry(id: string, pathname: string, label: string): RouteStackEntry {
+  return {
+    id,
+    location: { pathname, state: {} },
+    pathname,
+    element: <button data-testid={label}>{label}</button>,
+    nodeRef: createRef<HTMLDivElement>(),
+  };
+}
+
 describe("getNextRouteStackEntries", () => {
   it("pushes a new route onto the stack", () => {
     const routeA = createEntry("key-a", "/client", vi.fn());
@@ -82,10 +92,25 @@ describe("RouteStackFrames", () => {
     rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
     expect(screen.getByTestId("A")).toBeInTheDocument();
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
     expect(screen.getByTestId("B")).toBeVisible();
     expect(unmountA).not.toHaveBeenCalled();
     expect(unmountB).not.toHaveBeenCalled();
+  });
+
+  it("removes focus from a frame before it becomes inactive", () => {
+    const routeA = createFocusableEntry("key-a", "/client", "A");
+    const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
+
+    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    screen.getByTestId("A").focus();
+
+    expect(screen.getByTestId("A")).toHaveFocus();
+
+    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+
+    expect(screen.getByTestId("A")).not.toHaveFocus();
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
   });
 
   it("marks frames with push transition classes", async () => {
@@ -97,9 +122,9 @@ describe("RouteStackFrames", () => {
     rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
 
     expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame");
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
     expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame");
-    expect(screen.getByTestId("B").parentElement).toHaveAttribute("aria-hidden", "false");
+    expect(screen.getByTestId("B").parentElement).not.toHaveAttribute("inert");
 
     await waitFor(() => {
       expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-0", "transition-transform", "duration-300");
@@ -114,7 +139,7 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "false");
+    expect(screen.getByTestId("A").parentElement).not.toHaveAttribute("inert");
     expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame");
 
     await waitFor(() => {
@@ -130,7 +155,7 @@ describe("RouteStackFrames", () => {
 
     rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "PUSH" }} />);
 
-    expect(screen.getByTestId("A").parentElement).toHaveAttribute("aria-hidden", "false");
+    expect(screen.getByTestId("A").parentElement).not.toHaveAttribute("inert");
 
     await waitFor(() => {
       expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-full", "transition-transform", "duration-300");
