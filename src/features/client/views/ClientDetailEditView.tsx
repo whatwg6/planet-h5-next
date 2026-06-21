@@ -11,11 +11,13 @@ type ClientDetailEditController = {
   confirmDiscardOpen: boolean;
   isSaving: boolean;
   name: string;
+  remark: string;
   cancelEdit: () => void;
   closeConfirm: () => void;
   confirmCancel: () => void;
   save: () => void;
   setName: (name: string) => void;
+  setRemark: (remark: string) => void;
 };
 
 function useClientDetailEditController(
@@ -26,10 +28,12 @@ function useClientDetailEditController(
   const { isDirty, confirmDiscardOpen, resetEditState, setDirty, requestCancel, closeConfirm } =
     useClientDetailUiStore();
   const [name, setNameState] = useState(client.name);
+  const [remark, setRemarkState] = useState(client.remark ?? "");
 
   useEffect(() => {
     setNameState(client.name);
-  }, [client.id, client.name]);
+    setRemarkState(client.remark ?? "");
+  }, [client.id, client.name, client.remark]);
 
   const closeEdit = () => {
     resetEditState();
@@ -50,9 +54,14 @@ function useClientDetailEditController(
     if (!isDirty) setDirty(true);
   };
 
+  const setRemark = (nextRemark: string) => {
+    setRemarkState(nextRemark);
+    if (!isDirty) setDirty(true);
+  };
+
   const save = () => {
     mutation.mutate(
-      { clientId: client.id, values: { ...client.fields, name } },
+      { clientId: client.id, values: { name, remark } },
       { onSuccess: closeEdit },
     );
   };
@@ -61,11 +70,13 @@ function useClientDetailEditController(
     confirmDiscardOpen,
     isSaving: mutation.isPending,
     name,
+    remark,
     cancelEdit,
     closeConfirm,
     confirmCancel: closeEdit,
     save,
     setName,
+    setRemark,
   };
 }
 
@@ -80,7 +91,7 @@ export function ClientDetailEditView({
 
   return (
     <Page
-      title="客户详情"
+      title="编辑名称与备注"
       onBack={controller.cancelEdit}
       footer={<ClientDetailEditFooter controller={controller} />}
     >
@@ -89,6 +100,12 @@ export function ClientDetailEditView({
           label="名称"
           value={controller.name}
           onChange={(event) => controller.setName(event.target.value)}
+        />
+        <Field
+          label="备注"
+          value={controller.remark}
+          onChange={(event) => controller.setRemark(event.target.value)}
+          placeholder="请输入备注"
         />
       </div>
       <ConfirmDialog

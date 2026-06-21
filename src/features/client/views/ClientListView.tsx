@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
+import { ClientCard } from "@/features/client/components/ClientCard";
 import { useClientListQuery } from "@/features/client/queries/useClientListQuery";
 import { useClientListStore } from "@/features/client/store/clientListStore";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
@@ -11,7 +12,7 @@ export function ClientListView() {
   const query = useClientListQuery({ keyword });
 
   return (
-    <Page title="客户列表">
+    <Page title="4.0 客户">
       <div className="space-y-4">
         <Field
           label="搜索"
@@ -22,16 +23,19 @@ export function ClientListView() {
         {query.isLoading ? <LoadingState /> : null}
         {query.isError ? <ErrorState title="加载失败" onRetry={() => query.refetch()} /> : null}
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {query.data?.map((client) => (
             <Link
               key={client.id}
-              to="/client/$clientId"
+              to="/ops/client-next/$clientId"
               params={{ clientId: client.id }}
-              className="block rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 shadow-card transition active:bg-background-primary-container--active"
+              className="block text-text-primary"
             >
-              <div className="font-medium">{client.name}</div>
-              <div className="mt-1 text-sm text-text-secondary">{client.phone}</div>
+              <ClientCard
+                name={client.name}
+                phone={client.phone}
+                isDeveloperTest={client.isDeveloperTest}
+              />
             </Link>
           ))}
         </div>

@@ -16,9 +16,19 @@ const clientListRoute = createRoute({
   path: "/client",
   component: ClientListRoute,
 });
+const opsClientListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ops/client-next",
+  component: ClientListRoute,
+});
 const clientDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/client/$clientId",
+  component: ClientDetailRoute,
+});
+const opsClientDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ops/client-next/$clientId",
   component: ClientDetailRoute,
 });
 const planSettingsRoute = createRoute({
@@ -29,6 +39,11 @@ const planSettingsRoute = createRoute({
 const planDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/client/$clientId/plans/$planId",
+  component: PlanDetailRoute,
+});
+const opsPlanDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ops/client-next/$clientId/plan/$planId",
   component: PlanDetailRoute,
 });
 const merchantListRoute = createRoute({
@@ -45,9 +60,12 @@ const merchantDetailRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   clientListRoute,
+  opsClientListRoute,
   clientDetailRoute,
+  opsClientDetailRoute,
   planSettingsRoute,
   planDetailRoute,
+  opsPlanDetailRoute,
   merchantListRoute,
   merchantDetailRoute,
 ]);

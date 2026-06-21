@@ -14,6 +14,8 @@ describe("useClientListQuery", () => {
     const { result } = renderHook(() => useClientListQuery({ keyword: "客户" }), { wrapper });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.[0]).toEqual(expect.objectContaining({ id: "c1" }));
+    expect(result.current.data?.[0]).toEqual(
+      expect.objectContaining({ id: "c1", isDeveloperTest: true }),
+    );
   });
 });

@@ -11,6 +11,9 @@ describe("routeMeta", () => {
       "/client/$clientId/plans/settings",
       "/merchant",
       "/merchant/$merchantId",
+      "/ops/client-next",
+      "/ops/client-next/$clientId",
+      "/ops/client-next/$clientId/plan/$planId",
     ]);
   });
 });

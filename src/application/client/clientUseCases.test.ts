@@ -8,8 +8,20 @@ import { updateClient } from "./updateClient";
 
 const repository: ClientRepository = {
   listClients: vi.fn().mockResolvedValue([{ id: "c1", name: "客户 A" }]),
-  getClientDetail: vi.fn().mockResolvedValue({ id: "c1", name: "客户 A", fields: {}, planIds: [] }),
-  updateClient: vi.fn().mockResolvedValue({ id: "c1", name: "客户 A", fields: {}, planIds: [] }),
+  getClientDetail: vi.fn().mockResolvedValue({
+    id: "c1",
+    name: "客户 A",
+    fields: {},
+    mealPlans: [],
+    settings: [],
+  }),
+  updateClient: vi.fn().mockResolvedValue({
+    id: "c1",
+    name: "客户 A",
+    fields: {},
+    mealPlans: [],
+    settings: [],
+  }),
 };
 
 describe("client use cases", () => {

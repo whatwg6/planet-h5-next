@@ -1,4 +1,22 @@
-import type { ClientDetail } from "@/domain/client/Client";
+import type { ClientDetail, ClientSettingSummary } from "@/domain/client/Client";
+
+const baseSettings: ClientSettingSummary[] = [
+  { id: "nameAndRemark", title: "名称与备注", group: "basic", mode: "edit" },
+  { id: "notification", title: "企业公告", group: "basic", value: "2 条", disabled: true },
+  { id: "mealType", title: "餐次卡片", group: "basic", disabled: true },
+  { id: "mealGroup", title: "用餐组", group: "basic", disabled: true },
+  { id: "loginSetting", title: "登录方式", group: "account", value: "手机号", disabled: true },
+  { id: "fieldSetting", title: "字段设置", group: "account", disabled: true },
+  { id: "passwordSetting", title: "密码策略设置", group: "account", value: "已开启", disabled: true },
+  { id: "department", title: "部门", group: "account", value: "4 个", disabled: true },
+  { id: "costCenter", title: "成本中心", group: "account", value: "3 个", disabled: true },
+  { id: "paymentMethod", title: "客户支付方式", group: "payment", value: "2 个", disabled: true },
+  { id: "mealPoint", title: "餐点使用模式", group: "payment", value: "已关闭", disabled: true },
+  { id: "address", title: "企业地址及目的地配置", group: "address", disabled: true },
+  { id: "manager", title: "管理权限", group: "advanced", value: "2 人", disabled: true },
+  { id: "support", title: "客户支持", group: "advanced", value: "专属客服", disabled: true },
+  { id: "appVersion", title: "客户端最低版本", group: "advanced", value: "4.38.0", disabled: true },
+];
 
 export const clientMockData: ClientDetail[] = [
   {
@@ -6,16 +24,45 @@ export const clientMockData: ClientDetail[] = [
     name: "客户 A",
     phone: "13800000000",
     updatedAt: "2026-06-13",
+    isDeveloperTest: true,
+    remark: "总部试点客户，优先验证 4.0 客户详情流程。",
     fields: { owner: "负责人 A", status: "跟进中", source: "线索池", city: "上海" },
-    planIds: ["p1"],
+    mealPlans: [
+      {
+        id: "p1",
+        name: "方案 A",
+        businessType: "groupDelivery",
+        updatedAt: "2026-06-13",
+      },
+    ],
+    settings: [
+      ...baseSettings,
+      {
+        id: "testClientNotify",
+        title: "用餐人员接收邮件和短信",
+        group: "advanced",
+        value: "当前不允许",
+        description: "测试客户专属配置",
+        disabled: true,
+      },
+    ],
   },
   {
     id: "c2",
     name: "客户 B",
     phone: "13900000000",
     updatedAt: "2026-06-12",
+    remark: "稳定运行客户。",
     fields: { owner: "负责人 B", status: "已成交", source: "老客转介绍", city: "杭州" },
-    planIds: ["p2"],
+    mealPlans: [
+      {
+        id: "p2",
+        name: "方案 B",
+        businessType: "dineIn",
+        updatedAt: "2026-06-12",
+      },
+    ],
+    settings: baseSettings,
   },
   {
     id: "c3",
@@ -29,7 +76,8 @@ export const clientMockData: ClientDetail[] = [
       city: "深圳",
       industry: "零售便利",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c4",
@@ -43,7 +91,8 @@ export const clientMockData: ClientDetail[] = [
       city: "广州",
       industry: "餐饮",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c5",
@@ -57,7 +106,8 @@ export const clientMockData: ClientDetail[] = [
       city: "宁波",
       industry: "生鲜超市",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c6",
@@ -71,7 +121,8 @@ export const clientMockData: ClientDetail[] = [
       city: "成都",
       industry: "健身服务",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c7",
@@ -85,13 +136,15 @@ export const clientMockData: ClientDetail[] = [
       city: "苏州",
       industry: "亲子娱乐",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c8",
     name: "墨色书店",
     phone: "13212880006",
     updatedAt: "2026-06-06",
+    isDeveloperTest: true,
     fields: {
       owner: "林雪",
       status: "暂停跟进",
@@ -99,7 +152,8 @@ export const clientMockData: ClientDetail[] = [
       city: "南京",
       industry: "文化零售",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c9",
@@ -113,7 +167,8 @@ export const clientMockData: ClientDetail[] = [
       city: "厦门",
       industry: "住宿服务",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c10",
@@ -121,7 +176,8 @@ export const clientMockData: ClientDetail[] = [
     phone: "13012880008",
     updatedAt: "2026-06-04",
     fields: { owner: "何佳", status: "试用中", source: "朋友推荐", city: "武汉", industry: "餐饮" },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c11",
@@ -135,7 +191,8 @@ export const clientMockData: ClientDetail[] = [
       city: "北京",
       industry: "美业",
     },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
   {
     id: "c12",
@@ -143,6 +200,7 @@ export const clientMockData: ClientDetail[] = [
     phone: "15512880010",
     updatedAt: "2026-06-02",
     fields: { owner: "孙可", status: "已流失", source: "社群活动", city: "长沙", industry: "烘焙" },
-    planIds: [],
+    mealPlans: [],
+    settings: baseSettings,
   },
 ];

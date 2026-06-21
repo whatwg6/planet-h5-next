@@ -17,8 +17,8 @@ vi.mock("@tanstack/react-router", () => ({
   useRouterState: <T,>({
     select,
   }: {
-    select: (state: { location: { state: Record<string, unknown> } }) => T;
-  }) => select({ location: { state: routeState } }),
+    select: (state: { location: { pathname: string; state: Record<string, unknown> } }) => T;
+  }) => select({ location: { pathname: "/ops/client-next/c1", state: routeState } }),
 }));
 
 function renderWithQuery(ui: ReactNode) {
@@ -33,22 +33,55 @@ describe("ClientDetailRoute", () => {
     routeState = {};
   });
 
-  it("pushes edit mode into route state instead of editing the current route frame", async () => {
+  it("pushes settings mode into route state from the detail home page", async () => {
     const user = userEvent.setup();
     renderWithQuery(<ClientDetailRoute />);
 
     expect(await screen.findByText("客户 A")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "编辑" }));
+    expect(screen.getByText("测试客户")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /客户设置/ }));
 
     expect(navigateMock).toHaveBeenCalledWith({
-      to: "/client/$clientId",
+      to: "/ops/client-next/$clientId",
+      params: { clientId: "c1" },
+      state: expect.any(Function),
+    });
+
+    const settingsState = navigateMock.mock.calls[0][0].state({ __TSR_index: 0 });
+    expect(settingsState).toMatchObject({ routeMode: "setting" });
+    expect(screen.queryByRole("button", { name: "保存" })).not.toBeInTheDocument();
+  });
+
+  it("pushes edit mode from the settings page name and remark row", async () => {
+    const user = userEvent.setup();
+    routeState = { routeMode: "setting" };
+
+    renderWithQuery(<ClientDetailRoute />);
+
+    await user.click(await screen.findByRole("button", { name: /名称与备注/ }));
+
+    expect(navigateMock).toHaveBeenCalledWith({
+      to: "/ops/client-next/$clientId",
       params: { clientId: "c1" },
       state: expect.any(Function),
     });
 
     const editState = navigateMock.mock.calls[0][0].state({ __TSR_index: 0 });
     expect(editState).toMatchObject({ routeMode: "edit" });
-    expect(screen.queryByRole("button", { name: "保存" })).not.toBeInTheDocument();
+  });
+
+  it("opens plan details from the meal plans mode", async () => {
+    const user = userEvent.setup();
+    routeState = { routeMode: "plan" };
+
+    renderWithQuery(<ClientDetailRoute />);
+
+    await user.click(await screen.findByRole("button", { name: /方案 A/ }));
+
+    expect(navigateMock).toHaveBeenCalledWith({
+      to: "/ops/client-next/$clientId/plan/$planId",
+      params: { clientId: "c1", planId: "p1" },
+    });
   });
 
   it("renders edit mode from route state and pops the pushed route on clean cancel", async () => {
