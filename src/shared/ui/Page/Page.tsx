@@ -16,7 +16,7 @@ export function Page({
   onBack?: () => void;
 }) {
   return (
-    <main className="mx-auto flex min-h-[var(--app-viewport-height)] w-full max-w-[480px] flex-col bg-background-base text-text-primary">
+    <main className="mx-auto flex min-h-[var(--app-viewport-height)] w-full  flex-col bg-background-base text-text-primary">
       <NavigationBar title={title} onBack={onBack} right={navigationRight} />
       <section className="flex-1 px-4 py-4">{children}</section>
       {footer ? (
