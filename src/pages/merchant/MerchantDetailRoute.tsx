@@ -8,7 +8,7 @@ export function MerchantDetailRoute({ routeParams }: RouteStackPageProps) {
   const params = useParams({ strict: false, shouldThrow: false });
   return (
     <RouteModeSwitch
-      fallback={
+      defaultPage={
         <MerchantDetailView merchantId={routeParams?.merchantId ?? params?.merchantId ?? ""} />
       }
     />

@@ -242,7 +242,7 @@ The H5 route map is:
 
 There is no `/client/$clientId/edit` route.
 
-Same-route page modes are entered by pushing the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`. Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `fallback`, and additional states such as `edit`, `preview`, or future workflow states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
+Same-route page modes are entered by pushing the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`. Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `defaultPage`, and additional states such as `edit`, `preview`, or future workflow states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
 
 Client editing is one concrete mode: `/client/$clientId` is pushed with `routeMode: "edit"`. The route switches between detail and edit feature views, while `features/client/store/clientDetailUiStore.ts` owns edit-only UI state such as dirty tracking, discard confirmation, action state, or draft reset.
 

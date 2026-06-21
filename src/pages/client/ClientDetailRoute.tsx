@@ -40,7 +40,7 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
 
   return (
     <RouteModeSwitch
-      fallback={<ClientDetailView client={query.data} onBack={back} onEdit={enterEdit} />}
+      defaultPage={<ClientDetailView client={query.data} onBack={back} onEdit={enterEdit} />}
       modes={{
         edit: <ClientDetailEditView client={query.data} onClose={back} />,
       }}

@@ -8,7 +8,7 @@ export function PlanDetailRoute({ routeParams }: RouteStackPageProps) {
   const params = useParams({ strict: false, shouldThrow: false });
   return (
     <RouteModeSwitch
-      fallback={
+      defaultPage={
         <PlanDetailView
           clientId={routeParams?.clientId ?? params?.clientId ?? ""}
           planId={routeParams?.planId ?? params?.planId ?? ""}

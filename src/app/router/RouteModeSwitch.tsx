@@ -3,18 +3,18 @@ import type { ReactNode } from "react";
 
 import { getRouteMode } from "@/app/router/historyState";
 
-export function useRouteMode(fallback?: string) {
-  return useRouterState({ select: (state) => getRouteMode(state.location.state, fallback) });
+export function useRouteMode(defaultMode?: string) {
+  return useRouterState({ select: (state) => getRouteMode(state.location.state, defaultMode) });
 }
 
 export function RouteModeSwitch<TMode extends string>({
-  fallback,
+  defaultPage,
   modes = {},
 }: {
-  fallback: ReactNode;
+  defaultPage: ReactNode;
   modes?: Partial<Record<TMode, ReactNode>>;
 }) {
   const mode = useRouteMode();
 
-  return <>{modes[mode as TMode] ?? fallback}</>;
+  return <>{modes[mode as TMode] ?? defaultPage}</>;
 }

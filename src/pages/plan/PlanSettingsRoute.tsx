@@ -8,7 +8,7 @@ export function PlanSettingsRoute({ routeParams }: RouteStackPageProps) {
   const params = useParams({ strict: false, shouldThrow: false });
   return (
     <RouteModeSwitch
-      fallback={<PlanSettingsView clientId={routeParams?.clientId ?? params?.clientId ?? ""} />}
+      defaultPage={<PlanSettingsView clientId={routeParams?.clientId ?? params?.clientId ?? ""} />}
     />
   );
 }
