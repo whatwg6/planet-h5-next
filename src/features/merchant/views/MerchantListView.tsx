@@ -14,7 +14,12 @@ export function MerchantListView() {
   return (
     <Page title="商户列表">
       <div className="space-y-4">
-        <Field label="搜索" value={keyword} onChange={(event) => setKeyword(event.target.value)} placeholder="输入名称或城市" />
+        <Field
+          label="搜索"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+          placeholder="输入名称或城市"
+        />
         {query.isLoading ? <LoadingState /> : null}
         {query.isError ? <ErrorState title="加载失败" onRetry={() => query.refetch()} /> : null}
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}

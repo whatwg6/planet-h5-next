@@ -9,7 +9,14 @@ vi.mock("./RouteStackEntryLocationProvider", () => ({
   RouteStackEntryLocationProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
-function createEntry(id: string, pathname: string, onUnmount: () => void, label = pathname, onRender?: () => void, historyIndex?: number): RouteStackEntry {
+function createEntry(
+  id: string,
+  pathname: string,
+  onUnmount: () => void,
+  label = pathname,
+  onRender?: () => void,
+  historyIndex?: number,
+): RouteStackEntry {
   function TestPage() {
     onRender?.();
     useEffect(() => onUnmount, [onUnmount]);
@@ -76,7 +83,10 @@ describe("getNextRouteStackEntries", () => {
     const oldRouteB = createEntry("key-b", "/client/1", vi.fn());
     const newRouteB = createEntry("key-c", "/client/1", vi.fn());
 
-    expect(getNextRouteStackEntries([routeA, oldRouteB], newRouteB, { type: "REPLACE" })).toEqual([routeA, newRouteB]);
+    expect(getNextRouteStackEntries([routeA, oldRouteB], newRouteB, { type: "REPLACE" })).toEqual([
+      routeA,
+      newRouteB,
+    ]);
   });
 });
 
@@ -87,9 +97,21 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", unmountA, "A");
     const routeB = createEntry("key-b", "/client/1", unmountB, "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(screen.getByTestId("A")).toBeInTheDocument();
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
@@ -102,12 +124,24 @@ describe("RouteStackFrames", () => {
     const routeA = createFocusableEntry("key-a", "/client", "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
     screen.getByTestId("A").focus();
 
     expect(screen.getByTestId("A")).toHaveFocus();
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(screen.getByTestId("A")).not.toHaveFocus();
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
@@ -117,9 +151,21 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame");
     expect(screen.getByTestId("A").parentElement).toHaveAttribute("inert");
@@ -127,7 +173,11 @@ describe("RouteStackFrames", () => {
     expect(screen.getByTestId("B").parentElement).not.toHaveAttribute("inert");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-0", "transition-transform", "duration-300");
+      expect(screen.getByTestId("B").parentElement).toHaveClass(
+        "!translate-x-0",
+        "transition-transform",
+        "duration-300",
+      );
     });
   });
 
@@ -135,15 +185,31 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
-    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
 
     expect(screen.getByTestId("A").parentElement).not.toHaveAttribute("inert");
     expect(screen.getByTestId("B").parentElement).toHaveClass("route-stack__frame");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-full", "transition-transform", "duration-300");
+      expect(screen.getByTestId("B").parentElement).toHaveClass(
+        "!translate-x-full",
+        "transition-transform",
+        "duration-300",
+      );
     });
   });
 
@@ -151,14 +217,30 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A");
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
-    rerender(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(screen.getByTestId("A").parentElement).not.toHaveAttribute("inert");
 
     await waitFor(() => {
-      expect(screen.getByTestId("B").parentElement).toHaveClass("!translate-x-full", "transition-transform", "duration-300");
+      expect(screen.getByTestId("B").parentElement).toHaveClass(
+        "!translate-x-full",
+        "transition-transform",
+        "duration-300",
+      );
     });
   });
 
@@ -169,12 +251,22 @@ describe("RouteStackFrames", () => {
     const routeC = createEntry("key-c", "/client/1/plans/settings", vi.fn(), "C");
 
     const { rerender } = render(
-      <RouteStackFrames activeEntryId={routeC.id} entries={[routeA, routeB, routeC]} navigationAction={{ type: "PUSH" }} />,
+      <RouteStackFrames
+        activeEntryId={routeC.id}
+        entries={[routeA, routeB, routeC]}
+        navigationAction={{ type: "PUSH" }}
+      />,
     );
 
     expect(renderA).toHaveBeenCalledTimes(1);
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB, routeC]} navigationAction={{ type: "BACK" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB, routeC]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
 
     expect(renderA).toHaveBeenCalledTimes(1);
   });
@@ -184,9 +276,21 @@ describe("RouteStackFrames", () => {
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
     const routeC = createEntry("key-c", "/client/1/plans/settings", vi.fn(), "C");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
-    rerender(<RouteStackFrames activeEntryId={routeC.id} entries={[routeA, routeB, routeC]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeC.id}
+        entries={[routeA, routeB, routeC]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(screen.getByTestId("A").parentElement).toHaveClass("route-stack__frame");
     expect(screen.getByTestId("A").parentElement).not.toHaveClass(
@@ -202,11 +306,23 @@ describe("RouteStackFrames", () => {
     const routeA = createEntry("key-a", "/client", vi.fn(), "A", renderA);
     const routeB = createEntry("key-b", "/client/1", vi.fn(), "B");
 
-    const { rerender } = render(<RouteStackFrames activeEntryId={routeA.id} entries={[routeA]} navigationAction={{ type: "BACK" }} />);
+    const { rerender } = render(
+      <RouteStackFrames
+        activeEntryId={routeA.id}
+        entries={[routeA]}
+        navigationAction={{ type: "BACK" }}
+      />,
+    );
 
     expect(renderA).toHaveBeenCalledTimes(1);
 
-    rerender(<RouteStackFrames activeEntryId={routeB.id} entries={[routeA, routeB]} navigationAction={{ type: "PUSH" }} />);
+    rerender(
+      <RouteStackFrames
+        activeEntryId={routeB.id}
+        entries={[routeA, routeB]}
+        navigationAction={{ type: "PUSH" }}
+      />,
+    );
 
     expect(renderA).toHaveBeenCalledTimes(1);
   });

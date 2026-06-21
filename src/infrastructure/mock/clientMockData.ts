@@ -22,7 +22,13 @@ export const clientMockData: ClientDetail[] = [
     name: "星河便利店",
     phone: "13612880001",
     updatedAt: "2026-06-11",
-    fields: { owner: "李娜", status: "待回访", source: "地推拜访", city: "深圳", industry: "零售便利" },
+    fields: {
+      owner: "李娜",
+      status: "待回访",
+      source: "地推拜访",
+      city: "深圳",
+      industry: "零售便利",
+    },
     planIds: [],
   },
   {
@@ -30,7 +36,13 @@ export const clientMockData: ClientDetail[] = [
     name: "晨光咖啡",
     phone: "13712880002",
     updatedAt: "2026-06-10",
-    fields: { owner: "周明", status: "方案确认", source: "小程序咨询", city: "广州", industry: "餐饮" },
+    fields: {
+      owner: "周明",
+      status: "方案确认",
+      source: "小程序咨询",
+      city: "广州",
+      industry: "餐饮",
+    },
     planIds: [],
   },
   {
@@ -38,7 +50,13 @@ export const clientMockData: ClientDetail[] = [
     name: "远航生鲜",
     phone: "13512880003",
     updatedAt: "2026-06-09",
-    fields: { owner: "王珊", status: "已签约", source: "平台招商", city: "宁波", industry: "生鲜超市" },
+    fields: {
+      owner: "王珊",
+      status: "已签约",
+      source: "平台招商",
+      city: "宁波",
+      industry: "生鲜超市",
+    },
     planIds: [],
   },
   {
@@ -46,7 +64,13 @@ export const clientMockData: ClientDetail[] = [
     name: "青橙健身",
     phone: "13412880004",
     updatedAt: "2026-06-08",
-    fields: { owner: "陈晨", status: "需求收集", source: "活动报名", city: "成都", industry: "健身服务" },
+    fields: {
+      owner: "陈晨",
+      status: "需求收集",
+      source: "活动报名",
+      city: "成都",
+      industry: "健身服务",
+    },
     planIds: [],
   },
   {
@@ -54,7 +78,13 @@ export const clientMockData: ClientDetail[] = [
     name: "云朵亲子乐园",
     phone: "13312880005",
     updatedAt: "2026-06-07",
-    fields: { owner: "赵阳", status: "待报价", source: "门店扫码", city: "苏州", industry: "亲子娱乐" },
+    fields: {
+      owner: "赵阳",
+      status: "待报价",
+      source: "门店扫码",
+      city: "苏州",
+      industry: "亲子娱乐",
+    },
     planIds: [],
   },
   {
@@ -62,7 +92,13 @@ export const clientMockData: ClientDetail[] = [
     name: "墨色书店",
     phone: "13212880006",
     updatedAt: "2026-06-06",
-    fields: { owner: "林雪", status: "暂停跟进", source: "展会名片", city: "南京", industry: "文化零售" },
+    fields: {
+      owner: "林雪",
+      status: "暂停跟进",
+      source: "展会名片",
+      city: "南京",
+      industry: "文化零售",
+    },
     planIds: [],
   },
   {
@@ -70,7 +106,13 @@ export const clientMockData: ClientDetail[] = [
     name: "蓝湾民宿",
     phone: "13112880007",
     updatedAt: "2026-06-05",
-    fields: { owner: "吴迪", status: "跟进中", source: "官网留资", city: "厦门", industry: "住宿服务" },
+    fields: {
+      owner: "吴迪",
+      status: "跟进中",
+      source: "官网留资",
+      city: "厦门",
+      industry: "住宿服务",
+    },
     planIds: [],
   },
   {
@@ -86,7 +128,13 @@ export const clientMockData: ClientDetail[] = [
     name: "北辰美业",
     phone: "15612880009",
     updatedAt: "2026-06-03",
-    fields: { owner: "刘璐", status: "待签约", source: "短视频投放", city: "北京", industry: "美业" },
+    fields: {
+      owner: "刘璐",
+      status: "待签约",
+      source: "短视频投放",
+      city: "北京",
+      industry: "美业",
+    },
     planIds: [],
   },
   {

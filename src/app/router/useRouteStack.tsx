@@ -53,7 +53,9 @@ function snapshotRouteStackLocation(location: RouteStackLocation) {
 
 function useRouteStackNavigationAction() {
   const router = useRouter();
-  const [navigationAction, setNavigationAction] = useState<RouteStackNavigationAction>({ type: "BACK" });
+  const [navigationAction, setNavigationAction] = useState<RouteStackNavigationAction>({
+    type: "BACK",
+  });
 
   useEffect(() => {
     return router.history.subscribe(({ action }) => {
@@ -104,8 +106,13 @@ export function useRouteStack() {
   const currentEntry = useMemo<RouteStackEntry | null>(() => {
     return createRouteStackEntry({ childMatch, location, routesById });
   }, [childMatch, location, routesById]);
-  const [entries, setEntries] = useState<RouteStackEntry[]>(() => (currentEntry ? [currentEntry] : []));
-  const stackCurrentEntry = useMemo(() => getRouteStackCurrentEntry(entries, currentEntry), [currentEntry, entries]);
+  const [entries, setEntries] = useState<RouteStackEntry[]>(() =>
+    currentEntry ? [currentEntry] : [],
+  );
+  const stackCurrentEntry = useMemo(
+    () => getRouteStackCurrentEntry(entries, currentEntry),
+    [currentEntry, entries],
+  );
   const [activeEntryId, setActiveEntryId] = useState(() => currentEntry?.id ?? null);
 
   useEffect(() => {
@@ -119,7 +126,9 @@ export function useRouteStack() {
       return;
     }
 
-    setEntries((currentEntries) => getNextRouteStackEntries(currentEntries, stackCurrentEntry, navigationAction));
+    setEntries((currentEntries) =>
+      getNextRouteStackEntries(currentEntries, stackCurrentEntry, navigationAction),
+    );
   }, [stackCurrentEntry, navigationAction]);
 
   return {

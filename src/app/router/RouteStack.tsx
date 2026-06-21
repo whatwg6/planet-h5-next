@@ -40,9 +40,11 @@ type RouteStackFramesProps = {
 
 const routeStackSlideClassNames = {
   enter: "translate-x-full",
-  enterActive: "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  enterActive:
+    "!translate-x-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
   exit: "translate-x-0",
-  exitActive: "!translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  exitActive:
+    "!translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
 };
 
 export function RouteStackFrames({
@@ -50,7 +52,11 @@ export function RouteStackFrames({
   activeEntryId,
   navigationAction,
 }: RouteStackFramesProps) {
-  const transitionDirection = getRouteStackTransitionDirectionFromEntries(entries, activeEntryId, navigationAction);
+  const transitionDirection = getRouteStackTransitionDirectionFromEntries(
+    entries,
+    activeEntryId,
+    navigationAction,
+  );
   const shouldAnimate = transitionDirection !== "replace";
 
   return (
@@ -88,11 +94,7 @@ const RouteStackFrame = memo(function RouteStackFrame({
   }, [entry.nodeRef, isActive]);
 
   return (
-    <div
-      className="route-stack__frame"
-      inert={!isActive}
-      ref={entry.nodeRef}
-    >
+    <div className="route-stack__frame" inert={!isActive} ref={entry.nodeRef}>
       <RouteStackEntryLocationProvider location={entry.location}>
         {entry.element}
       </RouteStackEntryLocationProvider>
@@ -111,5 +113,11 @@ export function RouteStack() {
     return null;
   }
 
-  return <RouteStackFrames activeEntryId={activeEntryId} entries={entries} navigationAction={navigationAction} />;
+  return (
+    <RouteStackFrames
+      activeEntryId={activeEntryId}
+      entries={entries}
+      navigationAction={navigationAction}
+    />
+  );
 }

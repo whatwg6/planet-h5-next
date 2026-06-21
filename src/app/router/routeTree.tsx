@@ -11,12 +11,36 @@ import { PlanSettingsRoute } from "@/pages/plan/PlanSettingsRoute";
 
 const rootRoute = createRootRoute({ component: RouteStack });
 const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: "/" });
-const clientListRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client", component: ClientListRoute });
-const clientDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId", component: ClientDetailRoute });
-const planSettingsRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId/plans/settings", component: PlanSettingsRoute });
-const planDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/client/$clientId/plans/$planId", component: PlanDetailRoute });
-const merchantListRoute = createRoute({ getParentRoute: () => rootRoute, path: "/merchant", component: MerchantListRoute });
-const merchantDetailRoute = createRoute({ getParentRoute: () => rootRoute, path: "/merchant/$merchantId", component: MerchantDetailRoute });
+const clientListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/client",
+  component: ClientListRoute,
+});
+const clientDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/client/$clientId",
+  component: ClientDetailRoute,
+});
+const planSettingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/client/$clientId/plans/settings",
+  component: PlanSettingsRoute,
+});
+const planDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/client/$clientId/plans/$planId",
+  component: PlanDetailRoute,
+});
+const merchantListRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/merchant",
+  component: MerchantListRoute,
+});
+const merchantDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/merchant/$merchantId",
+  component: MerchantDetailRoute,
+});
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
