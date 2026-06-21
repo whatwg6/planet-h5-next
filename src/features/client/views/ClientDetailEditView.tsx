@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { ClientDetail } from "@/domain/client/Client";
+import { validateClientName, validateClientRemark } from "@/domain/client/clientRules";
 import { useUpdateClientMutation } from "@/features/client/mutations/useUpdateClientMutation";
 import { useClientDetailUiStore } from "@/features/client/store/clientDetailUiStore";
 import { ConfirmDialog } from "@/shared/ui/Feedback";
@@ -15,6 +16,8 @@ type ClientDetailEditController = {
   cancelEdit: () => void;
   closeConfirm: () => void;
   confirmCancel: () => void;
+  nameError?: string;
+  remarkError?: string;
   save: () => void;
   setName: (name: string) => void;
   setRemark: (remark: string) => void;
@@ -29,6 +32,8 @@ function useClientDetailEditController(
     useClientDetailUiStore();
   const [name, setNameState] = useState(client.name);
   const [remark, setRemarkState] = useState(client.remark ?? "");
+  const nameError = validateClientName(name);
+  const remarkError = validateClientRemark(remark);
 
   useEffect(() => {
     setNameState(client.name);
@@ -60,6 +65,7 @@ function useClientDetailEditController(
   };
 
   const save = () => {
+    if (nameError || remarkError) return;
     mutation.mutate({ clientId: client.id, values: { name, remark } }, { onSuccess: closeEdit });
   };
 
@@ -71,6 +77,8 @@ function useClientDetailEditController(
     cancelEdit,
     closeConfirm,
     confirmCancel: closeEdit,
+    nameError,
+    remarkError,
     save,
     setName,
     setRemark,
@@ -96,11 +104,13 @@ export function ClientDetailEditView({
         <Field
           label="名称"
           value={controller.name}
+          error={controller.nameError}
           onChange={(event) => controller.setName(event.target.value)}
         />
         <Field
           label="备注"
           value={controller.remark}
+          error={controller.remarkError}
           onChange={(event) => controller.setRemark(event.target.value)}
           placeholder="请输入备注"
         />
@@ -121,7 +131,10 @@ function ClientDetailEditFooter({ controller }: { controller: ClientDetailEditCo
       <Button variant="secondary" onClick={controller.cancelEdit}>
         取消
       </Button>
-      <Button disabled={controller.isSaving} onClick={controller.save}>
+      <Button
+        disabled={controller.isSaving || Boolean(controller.nameError || controller.remarkError)}
+        onClick={controller.save}
+      >
         保存
       </Button>
     </div>

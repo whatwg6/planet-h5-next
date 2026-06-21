@@ -1454,7 +1454,7 @@ Migrate reusable business capabilities only after at least one migrated flow nee
 Candidates:
 
 - Select merchant.
-- Select Meican staff.
+- Select Mc staff.
 - Payment method.
 - Client member.
 - Card setting.

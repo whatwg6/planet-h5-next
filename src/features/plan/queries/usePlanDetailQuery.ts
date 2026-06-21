@@ -8,5 +8,6 @@ export function usePlanDetailQuery(clientId: string, planId: string) {
   return useQuery({
     queryKey: queryKeys.plans.detail(clientId, planId),
     queryFn: () => getPlanDetail(planRepositoryMock, clientId, planId),
+    enabled: Boolean(clientId && planId),
   });
 }

@@ -237,7 +237,7 @@ Migrate reusable business capabilities from `src/biz/features`.
 Candidates:
 
 - Select merchant
-- Select Meican staff
+- Select Mc staff
 - Payment method
 - Client member
 - Card setting

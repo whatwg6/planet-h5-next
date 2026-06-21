@@ -6,6 +6,7 @@ import { ClientDetailRoute } from "@/pages/client/ClientDetailRoute";
 import { ClientListRoute } from "@/pages/client/ClientListRoute";
 import { MerchantDetailRoute } from "@/pages/merchant/MerchantDetailRoute";
 import { MerchantListRoute } from "@/pages/merchant/MerchantListRoute";
+import { ClientOrderRoute } from "@/pages/order/ClientOrderRoute";
 import { PlanDetailRoute } from "@/pages/plan/PlanDetailRoute";
 import { PlanSettingsRoute } from "@/pages/plan/PlanSettingsRoute";
 
@@ -46,6 +47,16 @@ const opsPlanDetailRoute = createRoute({
   path: "/ops/client/$clientId/plan/$planId",
   component: PlanDetailRoute,
 });
+const opsPlanSettingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ops/client/$clientId/plan/$planId/setting",
+  component: PlanSettingsRoute,
+});
+const opsClientOrderRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/ops/client/$clientId/plan/$planId/order/$orderParams",
+  component: ClientOrderRoute,
+});
 const merchantListRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/merchant",
@@ -66,6 +77,8 @@ export const routeTree = rootRoute.addChildren([
   planSettingsRoute,
   planDetailRoute,
   opsPlanDetailRoute,
+  opsPlanSettingsRoute,
+  opsClientOrderRoute,
   merchantListRoute,
   merchantDetailRoute,
 ]);

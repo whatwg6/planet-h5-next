@@ -3,9 +3,18 @@ import { useRouter } from "@tanstack/react-router";
 import { usePlanDetailQuery } from "@/features/plan/queries/usePlanDetailQuery";
 import { InfoRow } from "@/shared/ui/DataDisplay";
 import { ErrorState, LoadingState } from "@/shared/ui/Feedback";
+import { Button } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
-export function PlanDetailView({ clientId, planId }: { clientId: string; planId: string }) {
+export function PlanDetailView({
+  clientId,
+  planId,
+  onOpenSettings,
+}: {
+  clientId: string;
+  planId: string;
+  onOpenSettings: () => void;
+}) {
   const router = useRouter();
   const query = usePlanDetailQuery(clientId, planId);
 
@@ -31,6 +40,9 @@ export function PlanDetailView({ clientId, planId }: { clientId: string; planId:
             <InfoRow key={key} label={key} value={value} />
           ))}
         </div>
+        <Button className="w-full" variant="secondary" onClick={onOpenSettings}>
+          方案设置
+        </Button>
         <div className="space-y-2">
           {query.data.rules.map((rule) => (
             <div

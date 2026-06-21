@@ -1,7 +1,26 @@
 export type PlanRule = {
-  id: string;
+  id:
+    | "open-times"
+    | "operation-day"
+    | "occupation-time"
+    | "restriction"
+    | "order-rule"
+    | "order-transfer"
+    | "manual-confirm-order"
+    | "pickup-setting"
+    | "location-setting";
   label: string;
   values: Record<string, string>;
+};
+
+export type PlanSettingSummary = {
+  id: string;
+  title: string;
+  group: "basic" | "order" | "menu" | "restriction" | "pickup" | "finance" | "advanced";
+  value?: string;
+  description?: string;
+  disabled?: boolean;
+  editable: "simple" | "structured" | "placeholder";
 };
 
 export type PlanDetail = {
@@ -9,6 +28,7 @@ export type PlanDetail = {
   clientId: string;
   name: string;
   fields: Record<string, string>;
+  settings: PlanSettingSummary[];
   rules: PlanRule[];
   updatedAt?: string;
 };

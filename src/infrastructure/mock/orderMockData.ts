@@ -1,0 +1,171 @@
+import type { ClientMemberOrderItem, ClientOrderDetail } from "@/domain/order/Order";
+
+export const orderDetailMockData: ClientOrderDetail[] = [
+  {
+    id: "o1",
+    clientId: "c1",
+    planId: "p1",
+    orderNo: "CO20260621001",
+    orderDate: "2026-06-21",
+    status: "making",
+    scheduleNodes: [
+      {
+        id: "s1",
+        orderDeadline: "2026-06-21T10:30:00+08:00",
+        mealTime: "2026-06-21T12:00:00+08:00",
+        merchants: [
+          { id: "m1", name: "星球食堂" },
+          { id: "m2", name: "轻食实验室" },
+        ],
+      },
+    ],
+    defaultScheduleNodes: [
+      {
+        id: "ds1",
+        orderDeadline: "2026-06-21T09:30:00+08:00",
+        mealTime: "2026-06-21T11:30:00+08:00",
+        merchants: [{ id: "m1", name: "星球食堂" }],
+      },
+    ],
+    priceSummary: {
+      totalAmountCents: 12800,
+      refundAmountCents: 1800,
+      mealPointCount: 3,
+      refundMealPointCount: 1,
+    },
+    productCount: 8,
+    memberCount: 3,
+    merchantSummaries: [
+      {
+        merchantId: "m1",
+        merchantName: "星球食堂",
+        status: "making",
+        productCount: 5,
+        amountCents: 8300,
+      },
+      {
+        merchantId: "m2",
+        merchantName: "轻食实验室",
+        status: "accepted",
+        productCount: 3,
+        amountCents: 4500,
+      },
+      {
+        merchantId: "m3",
+        merchantName: "咖啡补给站",
+        status: "notAccepted",
+        productCount: 0,
+        amountCents: 0,
+      },
+    ],
+  },
+  {
+    id: "o2",
+    clientId: "c1",
+    planId: "p1",
+    orderDate: "2026-06-22",
+    status: "submitted",
+    scheduleNodes: [],
+    defaultScheduleNodes: [
+      {
+        id: "ds2",
+        orderDeadline: "2026-06-22T10:00:00+08:00",
+        mealTime: "2026-06-22T12:15:00+08:00",
+        merchants: [
+          { id: "m1", name: "星球食堂" },
+          { id: "m3", name: "咖啡补给站" },
+        ],
+      },
+    ],
+    priceSummary: {
+      totalAmountCents: 7600,
+      refundAmountCents: 0,
+      mealPointCount: 2,
+    },
+    productCount: 4,
+    memberCount: 2,
+    merchantSummaries: [
+      {
+        merchantId: "m1",
+        merchantName: "星球食堂",
+        status: "notAccepted",
+        productCount: 2,
+        amountCents: 3800,
+      },
+      {
+        merchantId: "m3",
+        merchantName: "咖啡补给站",
+        status: "notAccepted",
+        productCount: 2,
+        amountCents: 3800,
+      },
+    ],
+  },
+];
+
+export const memberOrderMockData: Record<string, ClientMemberOrderItem[]> = {
+  o1: [
+    {
+      id: "mo1",
+      memberId: "u1",
+      memberName: "王小星",
+      contact: "13800000001",
+      productName: "照烧鸡腿饭",
+      merchantName: "星球食堂",
+      count: 2,
+      refundCount: 0,
+      amountCents: 3600,
+      status: "making",
+    },
+    {
+      id: "mo2",
+      memberId: "u2",
+      memberName: "李小月",
+      contact: "luna@example.com",
+      productName: "牛油果能量碗",
+      merchantName: "轻食实验室",
+      count: 3,
+      refundCount: 1,
+      amountCents: 4500,
+      status: "accepted",
+    },
+    {
+      id: "mo3",
+      memberId: "u3",
+      memberName: "陈小火",
+      contact: "13800000003",
+      productName: "拿铁",
+      merchantName: "咖啡补给站",
+      count: 3,
+      refundCount: 0,
+      amountCents: 4700,
+      status: "submitted",
+    },
+  ],
+  o2: [
+    {
+      id: "mo4",
+      memberId: "u1",
+      memberName: "王小星",
+      contact: "13800000001",
+      productName: "番茄牛肉面",
+      merchantName: "星球食堂",
+      count: 2,
+      refundCount: 0,
+      amountCents: 3800,
+      status: "submitted",
+    },
+    {
+      id: "mo5",
+      memberId: "u4",
+      memberName: "赵小云",
+      contact: "cloud@example.com",
+      productName: "美式咖啡",
+      merchantName: "咖啡补给站",
+      count: 2,
+      refundCount: 0,
+      amountCents: 3800,
+      status: "submitted",
+    },
+  ],
+};

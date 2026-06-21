@@ -14,6 +14,8 @@ describe("routeMeta", () => {
       "/ops/client",
       "/ops/client/$clientId",
       "/ops/client/$clientId/plan/$planId",
+      "/ops/client/$clientId/plan/$planId/order/$orderParams",
+      "/ops/client/$clientId/plan/$planId/setting",
     ]);
   });
 });

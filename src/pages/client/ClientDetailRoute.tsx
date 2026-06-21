@@ -4,10 +4,21 @@ import { routeModeState } from "@/app/router/historyState";
 import type { RouteStackPageProps } from "@/app/router/RouteStack";
 import { RouteModeSwitch } from "@/app/router/RouteModeSwitch";
 import { useClientDetailQuery } from "@/features/client/queries/useClientDetailQuery";
+import { ClientAppVersionSettingsView } from "@/features/client/views/ClientAppVersionSettingsView";
+import { ClientCostCenterSettingsView } from "@/features/client/views/ClientCostCenterSettingsView";
+import { ClientDepartmentSettingsView } from "@/features/client/views/ClientDepartmentSettingsView";
 import { ClientDetailEditView } from "@/features/client/views/ClientDetailEditView";
 import { ClientDetailView } from "@/features/client/views/ClientDetailView";
+import { ClientFieldSettingsView } from "@/features/client/views/ClientFieldSettingsView";
+import { ClientLoginSettingsView } from "@/features/client/views/ClientLoginSettingsView";
+import { ClientManagerSettingsView } from "@/features/client/views/ClientManagerSettingsView";
+import { ClientMealSettingsView } from "@/features/client/views/ClientMealSettingsView";
 import { ClientMealPlansView } from "@/features/client/views/ClientMealPlansView";
+import { ClientNameAndRemarkView } from "@/features/client/views/ClientNameAndRemarkView";
+import { ClientNotificationSettingsView } from "@/features/client/views/ClientNotificationSettingsView";
+import { ClientPasswordSettingsView } from "@/features/client/views/ClientPasswordSettingsView";
 import { ClientSettingsView } from "@/features/client/views/ClientSettingsView";
+import { ClientSupportSettingsView } from "@/features/client/views/ClientSupportSettingsView";
 import { ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Page } from "@/shared/ui/Page";
 
@@ -69,7 +80,27 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
       modes={{
         plan: <ClientMealPlansView client={query.data} onBack={back} onOpenPlan={openPlan} />,
         setting: <ClientSettingsView client={query.data} onBack={back} onOpenMode={enterMode} />,
+        nameAndRemark: (
+          <ClientNameAndRemarkView
+            client={query.data}
+            onBack={back}
+            onEdit={() => enterMode("nameAndRemarkEdit")}
+          />
+        ),
+        nameAndRemarkEdit: <ClientDetailEditView client={query.data} onClose={back} />,
         edit: <ClientDetailEditView client={query.data} onClose={back} />,
+        support: <ClientSupportSettingsView client={query.data} onBack={back} />,
+        loginSetting: <ClientLoginSettingsView client={query.data} onBack={back} />,
+        passwordSetting: <ClientPasswordSettingsView client={query.data} onBack={back} />,
+        notification: <ClientNotificationSettingsView client={query.data} onBack={back} />,
+        appVersion: <ClientAppVersionSettingsView client={query.data} onBack={back} />,
+        manager: <ClientManagerSettingsView client={query.data} onBack={back} />,
+        department: <ClientDepartmentSettingsView client={query.data} onBack={back} />,
+        costCenter: <ClientCostCenterSettingsView client={query.data} onBack={back} />,
+        fieldSetting: <ClientFieldSettingsView client={query.data} onBack={back} />,
+        mealPoint: <ClientMealSettingsView client={query.data} kind="mealPoint" onBack={back} />,
+        mealType: <ClientMealSettingsView client={query.data} kind="mealType" onBack={back} />,
+        mealGroup: <ClientMealSettingsView client={query.data} kind="mealGroup" onBack={back} />,
       }}
     />
   );
