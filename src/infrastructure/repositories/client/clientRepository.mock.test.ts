@@ -18,7 +18,9 @@ describe("clientRepositoryMock", () => {
   });
 
   it("returns empty results without throwing for unmatched keywords", async () => {
-    await expect(clientRepositoryMock.listClients({ keyword: "不存在的客户" })).resolves.toEqual([]);
+    await expect(clientRepositoryMock.listClients({ keyword: "不存在的客户" })).resolves.toEqual(
+      [],
+    );
   });
 
   it("preserves developer test markers on list summaries", async () => {

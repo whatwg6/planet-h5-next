@@ -23,12 +23,22 @@ export function ClientDetailView({
               测试客户
             </div>
           ) : null}
-          {client.remark ? <p className="text-sm leading-6 text-text-secondary">{client.remark}</p> : null}
+          {client.remark ? (
+            <p className="text-sm leading-6 text-text-secondary">{client.remark}</p>
+          ) : null}
         </section>
 
         <div className="space-y-3">
-          <ClientDetailEntry title="用餐计划" description="查看客户下的用餐方案" onClick={onOpenMealPlans} />
-          <ClientDetailEntry title="客户设置" description="名称、账号、支付和高级设置" onClick={onOpenSettings} />
+          <ClientDetailEntry
+            title="用餐计划"
+            description="查看客户下的用餐方案"
+            onClick={onOpenMealPlans}
+          />
+          <ClientDetailEntry
+            title="客户设置"
+            description="名称、账号、支付和高级设置"
+            onClick={onOpenSettings}
+          />
         </div>
       </div>
     </Page>

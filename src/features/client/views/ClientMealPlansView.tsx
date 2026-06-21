@@ -39,7 +39,9 @@ function MealPlanCard({ plan, onClick }: { plan: ClientMealPlanSummary; onClick:
       className="block w-full rounded-md border border-border-solid-line-2 bg-background-primary-container p-4 text-left shadow-card active:bg-background-primary-container--active"
     >
       <span className="block text-base font-medium text-text-primary">{plan.name}</span>
-      <span className="mt-2 block text-sm text-text-secondary">{businessTypeText[plan.businessType]}</span>
+      <span className="mt-2 block text-sm text-text-secondary">
+        {businessTypeText[plan.businessType]}
+      </span>
       {plan.updatedAt ? (
         <span className="mt-1 block text-xs text-text-tertiary">更新于 {plan.updatedAt}</span>
       ) : null}

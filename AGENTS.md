@@ -94,6 +94,7 @@ Before handing work back, run at least:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm test
 ```
 
@@ -109,6 +110,7 @@ pnpm build
 - Prefer existing naming and folder patterns over introducing a new abstraction.
 - Keep mock data deterministic.
 - Keep query keys centralized in `src/infrastructure/query/queryKeys.ts`.
+- Use `pnpm format` to apply Prettier formatting when needed; use `pnpm format:check` for verification.
 - Do not rewrite unrelated files or reformat the repository as a side effect.
 - Do not revert user changes unless explicitly asked.
 - Update `README.md` or this file when changing project structure, commands, or architectural rules.

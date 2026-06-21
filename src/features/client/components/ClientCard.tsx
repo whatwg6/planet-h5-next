@@ -18,7 +18,9 @@ export function ClientCard({
           客
         </div>
         <div className="min-w-0">
-          <div className="line-clamp-2 text-[17px] font-medium leading-6 text-text-primary">{name}</div>
+          <div className="line-clamp-2 text-[17px] font-medium leading-6 text-text-primary">
+            {name}
+          </div>
           {phone ? <div className="mt-1 text-sm text-text-secondary">{phone}</div> : null}
         </div>
       </div>

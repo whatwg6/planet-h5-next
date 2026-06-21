@@ -35,7 +35,9 @@ export function ClientSettingsView({
 
           return (
             <section key={group} className="space-y-2">
-              <h2 className="px-1 text-xs font-medium text-text-tertiary">{settingGroupTitle[group]}</h2>
+              <h2 className="px-1 text-xs font-medium text-text-tertiary">
+                {settingGroupTitle[group]}
+              </h2>
               <div className="overflow-hidden rounded-md border border-border-solid-line-2 bg-background-primary-container shadow-card">
                 {settings.map((setting) => (
                   <SettingRow
@@ -53,13 +55,7 @@ export function ClientSettingsView({
   );
 }
 
-function SettingRow({
-  setting,
-  onClick,
-}: {
-  setting: ClientSettingSummary;
-  onClick?: () => void;
-}) {
+function SettingRow({ setting, onClick }: { setting: ClientSettingSummary; onClick?: () => void }) {
   const isClickable = Boolean(onClick) && !setting.disabled;
 
   return (

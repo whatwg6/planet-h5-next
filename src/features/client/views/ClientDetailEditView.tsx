@@ -60,10 +60,7 @@ function useClientDetailEditController(
   };
 
   const save = () => {
-    mutation.mutate(
-      { clientId: client.id, values: { name, remark } },
-      { onSuccess: closeEdit },
-    );
+    mutation.mutate({ clientId: client.id, values: { name, remark } }, { onSuccess: closeEdit });
   };
 
   return {
