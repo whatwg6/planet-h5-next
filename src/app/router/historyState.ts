@@ -1,11 +1,15 @@
-export type ClientDetailRouteMode = "readonly" | "editing";
+export type RouteMode = string;
 
-export const clientDetailEditingState = { clientDetailMode: "editing" } as const;
+export const defaultRouteMode = "read";
 
-export function getClientDetailRouteMode(state: unknown): ClientDetailRouteMode {
-  if (typeof state === "object" && state !== null && "clientDetailMode" in state) {
-    return state.clientDetailMode === "editing" ? "editing" : "readonly";
+export function routeModeState<TMode extends RouteMode>(mode: TMode) {
+  return { routeMode: mode } as const;
+}
+
+export function getRouteMode(state: unknown, fallback: RouteMode = defaultRouteMode): RouteMode {
+  if (typeof state === "object" && state !== null && "routeMode" in state && typeof state.routeMode === "string") {
+    return state.routeMode;
   }
 
-  return "readonly";
+  return fallback;
 }

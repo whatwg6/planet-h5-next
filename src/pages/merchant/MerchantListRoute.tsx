@@ -1,5 +1,6 @@
+import { RouteModeSwitch } from "@/app/router/RouteModeSwitch";
 import { MerchantListView } from "@/features/merchant/views/MerchantListView";
 
 export function MerchantListRoute() {
-  return <MerchantListView />;
+  return <RouteModeSwitch fallback={<MerchantListView />} />;
 }

@@ -17,7 +17,7 @@ function Probe() {
   const location = useLocation();
   const routerStatus = useRouterState({ select: (state) => state.status });
   const mode = useRouterState({
-    select: (state) => (state.location.state as { clientDetailMode?: string }).clientDetailMode ?? "readonly",
+    select: (state) => (state.location.state as { routeMode?: string }).routeMode ?? "read",
   });
 
   return (
@@ -38,13 +38,13 @@ describe("RouteStackEntryLocationProvider", () => {
         __store: createStore({
           location: {
             pathname: "/client/c1",
-            state: { clientDetailMode: "editing" },
+            state: { routeMode: "edit" },
           },
           status: "idle",
         }),
         location: createStore({
           pathname: "/client/c1",
-          state: { clientDetailMode: "editing" },
+          state: { routeMode: "edit" },
         }),
       },
     };
@@ -57,7 +57,7 @@ describe("RouteStackEntryLocationProvider", () => {
       </RouterContextProvider>,
     );
 
-    const button = screen.getByRole("button", { name: "readonly:/client/c1:idle" });
+    const button = screen.getByRole("button", { name: "read:/client/c1:idle" });
     await user.click(button);
 
     expect(navigate).toHaveBeenCalledWith({ to: "/client" });

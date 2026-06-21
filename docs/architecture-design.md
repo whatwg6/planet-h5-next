@@ -70,7 +70,9 @@ src/
     router/
       routeTree.tsx
       routeMeta.ts
+      historyState.ts
       RouteStack.tsx
+      RouteModeSwitch.tsx
       router.ts
     providers/
       AppProviders.tsx
@@ -93,6 +95,8 @@ src/
       views/
         ClientListView.tsx
         ClientDetailView.tsx
+        ClientDetailReadView.tsx
+        ClientDetailEditView.tsx
       components/
         ClientCard.tsx
         ClientSearchBar.tsx
@@ -221,7 +225,7 @@ The H5 route map is:
 
 /client/$clientId
   Client detail
-  Client detail edit mode is represented by route history state and is not exposed as a URL.
+  Same-resource page modes such as edit are represented by route history state and are not exposed as separate URLs.
 
 /client/$clientId/plans/settings
   Plan settings
@@ -238,7 +242,9 @@ The H5 route map is:
 
 There is no `/client/$clientId/edit` route.
 
-Client editing is entered by pushing the same detail route with edit state in TanStack Router history state. The route state controls whether the detail page renders readonly or editing content, while `features/client/store/clientDetailUiStore.ts` owns edit-only UI state such as dirty tracking, discard confirmation, shared action bars, or draft reset.
+Same-route page modes are entered by pushing the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`. Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `fallback`, and additional states such as `edit`, `preview`, or future workflow states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
+
+Client editing is one concrete mode: `/client/$clientId` is pushed with `routeMode: "edit"`. The route switches between detail and edit feature views, while `features/client/store/clientDetailUiStore.ts` owns edit-only UI state such as dirty tracking, discard confirmation, action state, or draft reset.
 
 Each route should have route metadata:
 
@@ -364,6 +370,7 @@ TanStack Router owns:
 
 - Path params
 - Search params
+- History-state page mode such as `location.state.routeMode`
 - Route metadata
 - Link generation
 - Route-level preloading where useful
@@ -382,7 +389,7 @@ Zustand owns local H5 state:
 - List filters before they are committed to URL search params
 - List scroll positions
 - Current local UI mode
-- Client detail edit mode
+- Feature-local edit interaction state
 - Unsaved-change state
 - Plan settings draft state
 - Temporary context that should not be serialized into the URL
@@ -550,7 +557,7 @@ The highest-risk first tests are:
 - Business names are `client`, `merchant`, and `plan`.
 - Client and merchant routes are grouped by module, but there is no real permission system in the first version.
 - Repository contracts are designed up front, even if the first implementation uses mock data.
-- Client detail edit mode is not exposed as a route URL.
+- Same-resource page modes such as client detail edit are not exposed as route URLs.
 - `shared/ui` is an H5 base component layer, not a PC component library.
 - Reusable business components belong in focused feature capability modules such as `features/setting-rule`, not in `shared/ui`.
 - TanStack Query handles server state; Zustand does not duplicate server cache.
