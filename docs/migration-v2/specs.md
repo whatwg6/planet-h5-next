@@ -27,6 +27,21 @@ Out of scope:
 
 All migrated data must use mock repositories. Do not call old APIs because the old API surface is no longer reliable.
 
+## UI Migration Policy
+
+Migration includes UI structure and interaction behavior, not only data and business logic.
+
+Migrated pages should preserve:
+
+- Business behavior and reachable user flows.
+- Information architecture, field visibility, display mappings, and primary page sections.
+- Primary interaction patterns, including form inputs, validation feedback, loading, empty, error, and saved states when applicable.
+- Layout and styling that can be reasonably inferred from old source code, reusable components, style files, and assets.
+
+Pixel-level visual parity is not a default requirement because migration is primarily source-code driven and may not inspect the rendered old UI. Exact visual alignment requires explicit acceptance criteria, such as screenshots, design files, a runnable old page for comparison, or a task-specific visual QA checklist.
+
+When exact visual parity is not part of the task, visual differences should not block a migration slice as long as the migrated page keeps the business behavior, information structure, and main interaction affordances intact.
+
 ## Source Project Mapping
 
 Old project source roots map into the new architecture by responsibility:

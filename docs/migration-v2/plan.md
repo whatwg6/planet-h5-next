@@ -558,6 +558,8 @@ A migrated slice is done when:
 - Route metadata exists.
 - Route component is thin, does not own server state, and renders through `RouteModeSwitch`.
 - Feature view owns page composition.
+- UI migration preserves business behavior, information structure, and primary interaction patterns.
+- Pixel-level visual parity is not required unless screenshots, design files, a runnable old page, or explicit visual acceptance criteria are provided for the slice.
 - Server state uses TanStack Query.
 - Business behavior goes through application use cases.
 - Domain contracts and rules are framework-free.
