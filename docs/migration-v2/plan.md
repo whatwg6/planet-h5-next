@@ -1,8 +1,8 @@
 # Business Migration Plan V2
 
-This plan turns `docs/business-migration-specs-v2.md` into an executable migration checklist for moving business-facing H5 pages from the old `planet-h5` project into this project.
+This plan turns `specs.md` into an executable migration checklist for moving business-facing H5 pages from the old `planet-h5` project into this project.
 
-Architectural boundaries remain defined by `docs/architecture-design.md`. This document is only the migration execution plan.
+Architectural boundaries remain defined by `../architecture-design.md`. This document is only the migration execution plan.
 
 ## Goals
 

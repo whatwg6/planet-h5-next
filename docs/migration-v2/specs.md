@@ -2,7 +2,7 @@
 
 This document defines how to migrate business pages from `/Users/yxc/code/planet-h5` into this project.
 
-It is a migration guide, not a general architecture guide. Architectural boundaries remain defined by `docs/architecture-design.md`.
+It is a migration guide, not a general architecture guide. Architectural boundaries remain defined by `../architecture-design.md`.
 
 ## Scope
 

@@ -4,7 +4,7 @@
 
 This document tracks the business migration plan, current migration status, and executable slice notes.
 
-It is based on `docs/business-migration-specs.md`. If the migration spec changes, update this plan and `docs/business-migration-execution.md` together.
+It is based on `specs.md`. If the migration spec changes, update this plan and `execution.md` together.
 
 The first completed slice was the client list page. It established the migration rhythm for later slices:
 

@@ -6,9 +6,9 @@ This document is the execution entry point for business migration work.
 
 Use it together with:
 
-- `docs/business-migration-specs.md` for migration constraints and acceptance rules.
-- `docs/business-migration-plan.md` for milestone order, current status, and historical slice notes.
-- `docs/architecture-design.md` for long-term architecture boundaries.
+- `specs.md` for migration constraints and acceptance rules.
+- `plan.md` for milestone order, current status, and historical slice notes.
+- `../architecture-design.md` for long-term architecture boundaries.
 
 ## Current Route Standard
 

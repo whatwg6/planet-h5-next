@@ -11,13 +11,13 @@ The rewrite is business-first and mock-first:
 - Do not depend on the legacy API being reachable.
 - Do not make legacy API integration, Orval generation, token refresh, SSO, or hybrid request behavior a prerequisite for business migration.
 
-`docs/architecture-design.md` remains the source of truth for architecture boundaries. This document defines migration constraints, order, and acceptance criteria under those boundaries.
+`../architecture-design.md` remains the source of truth for architecture boundaries. This document defines migration constraints, order, and acceptance criteria under those boundaries.
 
 Migration docs are split by role:
 
-- `docs/business-migration-specs.md`: migration constraints and acceptance rules.
-- `docs/business-migration-plan.md`: migration priority, milestone plan, and current migration status.
-- `docs/business-migration-execution.md`: executable slice guidance for agents.
+- `specs.md`: migration constraints and acceptance rules.
+- `plan.md`: migration priority, milestone plan, and current migration status.
+- `execution.md`: executable slice guidance for agents.
 
 ## Source Project Scope
 

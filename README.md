@@ -80,4 +80,6 @@ Route metadata lives in `src/app/router/routeMeta.ts`. Route definitions live in
 ## Architecture Docs
 
 - `docs/architecture-design.md`: architecture intent, boundaries, patterns, and explicit decisions.
+- `docs/migration/`: original business migration specs, plan, and execution guide.
+- `docs/migration-v2/`: v2 business migration specs, plan, and execution guide.
 - `AGENTS.md`: operational checklist for agents and contributors making changes.
