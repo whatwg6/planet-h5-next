@@ -83,7 +83,7 @@ Create module folders only when the feature needs that layer.
 
 ## Route Design
 
-`src/app/router/routeTree.tsx` is the source of truth for registered routes. `src/app/router/routeMeta.ts` is the source of truth for route metadata such as title, module, and H5 keep-alive behavior.
+`src/app/router/routeTree.tsx` is the source of truth for registered routes. `src/app/router/routeMeta.ts` is the source of truth for route metadata such as title and module.
 
 The canonical migrated business route shape uses `/ops/...`. Development-friendly legacy routes may exist for local compatibility, but new migrated production business flows should target the `/ops` route shape.
 
@@ -95,9 +95,9 @@ There must not be routes such as `/client/$clientId/edit` only to represent a sa
 
 Each business route should have route metadata. Root, index, redirect-only, or framework-only routes may omit metadata when they do not represent a business page.
 
-Route metadata includes a `title`, a business `module`, and an optional `keepAlive` flag. It is used for page titles, analytics, future permission hooks, and H5 navigation behavior. `src/app/router/routeMeta.ts` owns the canonical metadata type.
+Route metadata includes a `title` and a business `module`. It is used for page titles, analytics, future permission hooks, and H5 navigation behavior. `src/app/router/routeMeta.ts` owns the canonical metadata type.
 
-The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` uses TanStack Router state as its source of truth, keeps inactive pages mounted for H5 keep-alive behavior, and handles forward, back, and replace navigation as page-stack transitions.
+The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` uses TanStack Router state as its source of truth and handles forward, back, and replace navigation as page-stack transitions.
 
 `RouteStack` must not maintain a second route table or manually match pathnames. `routeTree.tsx` remains the source of route registration. Route entry components that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for normal direct rendering.
 

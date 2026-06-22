@@ -126,7 +126,7 @@ Feature views must not read `location.state` directly. Same-URL page modes shoul
 - `src/app/router/historyState.ts`
 - `src/app/router/RouteModeSwitch.tsx`
 
-Route keep-alive should remain centralized in `src/app/router/RouteStack.tsx`.
+Route stack navigation should remain centralized in `src/app/router/RouteStack.tsx`.
 
 ## Migration Priority
 
