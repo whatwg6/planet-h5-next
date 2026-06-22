@@ -7,7 +7,7 @@ Architectural boundaries remain defined by `../architecture-design.md`. This doc
 ## Goals
 
 - Migrate the old client, plan, and client order business flows into the new lightweight Clean Architecture.
-- Preserve the old public business route shape based on `/ops/client-next...`.
+- Preserve the public business route shape based on `/ops/client...`.
 - Use deterministic mock repositories for every migrated server-backed behavior.
 - Convert old `pageType` page states into TanStack Router `routeMode` states.
 - Keep route files thin and move page composition into feature views.
@@ -18,22 +18,24 @@ Architectural boundaries remain defined by `../architecture-design.md`. This doc
 - Do not integrate real APIs.
 - Do not migrate old generated API clients, request clients, SSO, login callback, token injection, hybrid bridge behavior, S3 upload, deployment, monitoring, or dev demo pages.
 - Do not copy old folders wholesale into the new project.
-- Do not add new production route shapes to replace `/ops/client-next...`.
+- Do not add new production route shapes to replace `/ops/client...`.
 - Do not persist mock mutation state outside the current browser or test process.
 
 ## Current Gap Summary
 
-The current project already contains placeholder business routes and modules, but v2 migration changes the required production route contract:
+The current project already contains placeholder business routes and modules. V2 keeps the production
+route contract on `/ops/client...` and migrates existing placeholder behavior into that route shape.
 
-| Area          | Current project shape                                   | V2 target                                                    |
-| ------------- | ------------------------------------------------------- | ------------------------------------------------------------ |
-| Client list   | `/ops/client`                                           | `/ops/client-next`                                           |
-| Client detail | `/ops/client/$clientId`                                 | `/ops/client-next/$clientId`                                 |
-| Plan detail   | `/ops/client/$clientId/plan/$planId`                    | `/ops/client-next/$clientId/plan/$planId`                    |
-| Plan settings | `/ops/client/$clientId/plan/$planId/setting`            | `/ops/client-next/$clientId/plan/$planId/setting`            |
-| Client order  | `/ops/client/$clientId/plan/$planId/order/$orderParams` | `/ops/client-next/$clientId/plan/$planId/order/$orderParams` |
+| Area          | V2 target                                               |
+| ------------- | ------------------------------------------------------- |
+| Client list   | `/ops/client`                                           |
+| Client detail | `/ops/client/$clientId`                                 |
+| Plan detail   | `/ops/client/$clientId/plan/$planId`                    |
+| Plan settings | `/ops/client/$clientId/plan/$planId/setting`            |
+| Client order  | `/ops/client/$clientId/plan/$planId/order/$orderParams` |
 
-The migration should treat existing `/client...` and `/ops/client...` routes as local-only compatibility or placeholders unless a later task explicitly changes the production route contract. They must not become duplicate production business routes or replace `/ops/client-next...`.
+Do not keep legacy `/client...` development routes for this migration. Remove or replace them with
+`/ops/client...` route entries when the corresponding migrated route is implemented.
 
 ## Migration Principles
 
@@ -63,14 +65,42 @@ infrastructure -> domain
 
 ## Progress Tracking
 
-Use the `Status` line under each phase as the source of truth for migration progress.
+Record progress next to the concrete task, route mode, capability, or validation item that owns the
+work. Do not maintain a separate global progress table. The `Status` line under each phase is only a
+phase-level summary and should be updated after the concrete task statuses justify the phase change.
 
 Status values:
 
-- `Not started`: no v2 migration work has been completed for this phase.
-- `In progress`: implementation has started, but the phase definition of done is not met.
+- `Not started`: no implementation work has been completed for this phase or slice.
+- `In progress`: implementation has started, but the definition of done is not met.
 - `Blocked`: implementation cannot continue without a decision or external dependency.
-- `Done`: implementation and required validation for the phase are complete.
+- `Done`: implementation and required validation are complete.
+
+Slice progress rules:
+
+- Add status beside the relevant task or table row before starting any slice that is not already
+  listed.
+- Update the owning task or table row when work starts, completes, or becomes blocked.
+- For mode or capability inventories, use `Status` and `Evidence / blocker` columns.
+- Record detailed historical results in `execution.md`; keep `plan.md` as the current status index.
+- Set a phase to `Done` only when every required task or mode for that phase is `Done` and the phase
+  validation has passed or is explicitly recorded as not applicable.
+
+## Legacy Source Inventory
+
+Inspect the listed old source before implementing a slice. If a file is missing or old source behavior
+differs from this inventory, record a blocker or deviation before coding.
+
+| Plan area               | Legacy source files or symbols to inspect                                                                                                                                                 | Purpose                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Client list             | `src/apps/client/client-list/index.tsx`, `Detail.tsx`, `comps/Card.tsx`, `hooks/useClientList.tsx`, `helper/normalize.ts`, `types.ts`, `constants/*`                                      | List fields, filters, card display, empty/loading/error states          |
+| Client detail           | `src/apps/client/client-detail/index.tsx`, detail view files, `ClientDetailPageEnum`, hooks, helpers, constants, types                                                                    | Default detail behavior, route modes, field mappings, update commands   |
+| Plan detail             | `src/apps/client/plan-detail/index.tsx`, plan detail view files, hooks, helpers, constants, types                                                                                         | Plan summary fields, display mappings, reachable default behavior       |
+| Plan settings           | `src/apps/client/plan-setting/index.tsx`, setting view files, `PlanSettingPageEnum`, hooks, helpers, constants, types                                                                     | Settings mode inventory, form inputs, validation, save behavior         |
+| Client order            | `src/apps/client/client-order/index.tsx`, order detail and member order list views, `ClientOrderPageEnum`, hooks, helpers, constants, types                                               | `orderParams`, order status, schedule, member list, price summary rules |
+| Business capabilities   | `src/biz/features/payment-method`, `src/biz/features/client-member`, `src/biz/features/select-merchant`, `src/biz/features/select-meican-staff`, `src/biz/comps`, related constants/types | Capability props, validation, local state, save handoff                 |
+| Shared UI and assets    | `src/comps`, `src/assets/icons`, `src/assets/imgs`                                                                                                                                        | Business-agnostic primitive and asset migration                         |
+| Reference-only API data | `src/apis`, `src/apis-gen`, `src/apis-legacy`                                                                                                                                             | Field names or business meaning only; do not import into new runtime    |
 
 ## Phase 0: Baseline Cleanup And Route Contract
 
@@ -81,13 +111,15 @@ Objective: align the new project with the v2 route contract before deeper page m
 Tasks:
 
 - Add or update TanStack Router definitions in `src/app/router/routeTree.tsx` for:
-  - `/ops/client-next`
-  - `/ops/client-next/$clientId`
-  - `/ops/client-next/$clientId/plan/$planId`
-  - `/ops/client-next/$clientId/plan/$planId/setting`
-  - `/ops/client-next/$clientId/plan/$planId/order/$orderParams`
+  - `/ops/client`
+  - `/ops/client/$clientId`
+  - `/ops/client/$clientId/plan/$planId`
+  - `/ops/client/$clientId/plan/$planId/setting`
+  - `/ops/client/$clientId/plan/$planId/order/$orderParams`
 - Add matching metadata in `src/app/router/routeMeta.ts`.
-- Decide per task whether existing `/ops/client...` placeholder routes remain as local-only temporary compatibility routes or are removed. They must not be treated as migrated production routes.
+- Replace placeholder behavior on `/ops/client...` routes with migrated business behavior as each
+  slice is completed.
+- Remove legacy `/client...` development routes.
 - Ensure route entry components that read params accept `RouteStackPageProps` and fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Keep `RouteStack` as the only page-stack renderer. Do not add a second route table or pathname matcher.
 
@@ -118,11 +150,11 @@ Target files:
 
 Tasks:
 
-- Preserve the public route as `/ops/client-next`.
+- Preserve the public route as `/ops/client`.
 - Move business list filters, status mappings, and display constants into the narrowest appropriate layer.
 - Keep list server state in TanStack Query.
 - Use Zustand only for local interaction state such as draft filters or scroll position.
-- Navigate to client detail through `/ops/client-next/$clientId`.
+- Navigate to client detail through `/ops/client/$clientId`.
 - Keep old API types out of the view and hook layers.
 
 Validation:
@@ -153,47 +185,47 @@ Target files:
 
 Tasks:
 
-- Preserve the public route as `/ops/client-next/$clientId`.
+- Preserve the public route as `/ops/client/$clientId`.
 - Render the route through `RouteModeSwitch`.
-- Use `read` as the default behavior and keep feature views unaware of `location.state`.
+- Use `RouteModeSwitch defaultPage` for the default behavior and keep feature views unaware of `location.state`.
 - Translate old client backend response fields into domain entities and deterministic fixtures.
 - Add update mutations only for behavior that the migrated page reads back afterward.
 
 Client detail route modes to plan under this route:
 
-| Route mode                               | Target                                        |
-| ---------------------------------------- | --------------------------------------------- |
-| `plan`                                   | `ClientMealPlansView`                         |
-| `setting`                                | `ClientSettingsView`                          |
-| `nameAndRemark`                          | `ClientNameAndRemarkView`                     |
-| `nameAndRemarkEdit`                      | `ClientDetailEditView` or a focused edit view |
-| `notification`                           | `ClientNotificationSettingsView`              |
-| `paymentMethod`                          | `features/payment-method` capability          |
-| `mealType`                               | `ClientMealSettingsView`                      |
-| `mealTypeSetting`                        | focused meal type edit view                   |
-| `mealGroup`                              | `ClientMealSettingsView`                      |
-| `manager`                                | `ClientManagerSettingsView`                   |
-| `support`                                | `ClientSupportSettingsView`                   |
-| `supportEdit`                            | focused support edit view                     |
-| `department`                             | `ClientDepartmentSettingsView`                |
-| `departmentEdit`                         | focused department edit view                  |
-| `costCenter`                             | `ClientCostCenterSettingsView`                |
-| `costCenterEdit`                         | focused cost center edit view                 |
-| `appVersion`                             | `ClientAppVersionSettingsView`                |
-| `meicanCard`                             | `features/card-setting` capability            |
-| `externalCard`                           | `features/card-setting` capability            |
-| `mealPoint`                              | `ClientMealSettingsView`                      |
-| `fieldSetting`                           | `ClientFieldSettingsView`                     |
-| `fieldSettingDetail`                     | focused field setting detail view             |
-| `loginSetting`                           | `ClientLoginSettingsView`                     |
-| `loginSettingEmployeeNumber`             | focused employee number login view            |
-| `loginSettingThirdParty`                 | focused third-party login view                |
-| `loginSettingThirdPartyDetail`           | focused third-party login detail view         |
-| `loginSettingThirdPartyAssociateSetting` | focused third-party associate setting view    |
-| `loginSettingThirdPartyMealplanSetting`  | focused third-party meal plan setting view    |
-| `passwordSetting`                        | `ClientPasswordSettingsView`                  |
-| `passwordComplexitySetting`              | focused password complexity view              |
-| `passwordPeriodSetting`                  | focused password period view                  |
+| Route mode                               | Target                                        | Status        | Evidence / blocker |
+| ---------------------------------------- | --------------------------------------------- | ------------- | ------------------ |
+| `plan`                                   | `ClientMealPlansView`                         | `Not started` | Not started        |
+| `setting`                                | `ClientSettingsView`                          | `Not started` | Not started        |
+| `nameAndRemark`                          | `ClientNameAndRemarkView`                     | `Not started` | Not started        |
+| `nameAndRemarkEdit`                      | `ClientDetailEditView` or a focused edit view | `Not started` | Not started        |
+| `notification`                           | `ClientNotificationSettingsView`              | `Not started` | Not started        |
+| `paymentMethod`                          | `features/payment-method` capability          | `Not started` | Not started        |
+| `mealType`                               | `ClientMealSettingsView`                      | `Not started` | Not started        |
+| `mealTypeSetting`                        | focused meal type edit view                   | `Not started` | Not started        |
+| `mealGroup`                              | `ClientMealSettingsView`                      | `Not started` | Not started        |
+| `manager`                                | `ClientManagerSettingsView`                   | `Not started` | Not started        |
+| `support`                                | `ClientSupportSettingsView`                   | `Not started` | Not started        |
+| `supportEdit`                            | focused support edit view                     | `Not started` | Not started        |
+| `department`                             | `ClientDepartmentSettingsView`                | `Not started` | Not started        |
+| `departmentEdit`                         | focused department edit view                  | `Not started` | Not started        |
+| `costCenter`                             | `ClientCostCenterSettingsView`                | `Not started` | Not started        |
+| `costCenterEdit`                         | focused cost center edit view                 | `Not started` | Not started        |
+| `appVersion`                             | `ClientAppVersionSettingsView`                | `Not started` | Not started        |
+| `meicanCard`                             | `features/card-setting` capability            | `Not started` | Not started        |
+| `externalCard`                           | `features/card-setting` capability            | `Not started` | Not started        |
+| `mealPoint`                              | `ClientMealSettingsView`                      | `Not started` | Not started        |
+| `fieldSetting`                           | `ClientFieldSettingsView`                     | `Not started` | Not started        |
+| `fieldSettingDetail`                     | focused field setting detail view             | `Not started` | Not started        |
+| `loginSetting`                           | `ClientLoginSettingsView`                     | `Not started` | Not started        |
+| `loginSettingEmployeeNumber`             | focused employee number login view            | `Not started` | Not started        |
+| `loginSettingThirdParty`                 | focused third-party login view                | `Not started` | Not started        |
+| `loginSettingThirdPartyDetail`           | focused third-party login detail view         | `Not started` | Not started        |
+| `loginSettingThirdPartyAssociateSetting` | focused third-party associate setting view    | `Not started` | Not started        |
+| `loginSettingThirdPartyMealplanSetting`  | focused third-party meal plan setting view    | `Not started` | Not started        |
+| `passwordSetting`                        | `ClientPasswordSettingsView`                  | `Not started` | Not started        |
+| `passwordComplexitySetting`              | focused password complexity view              | `Not started` | Not started        |
+| `passwordPeriodSetting`                  | focused password period view                  | `Not started` | Not started        |
 
 Validation:
 
@@ -230,7 +262,9 @@ Tasks:
 Validation:
 
 - Domain rule tests for pure validation.
-- Mutation hook or view tests for forms with important branching behavior.
+- Form tests for each migrated validation-bearing mode must cover valid submit, at least one invalid
+  input, and cancel or back behavior when the form has unsaved local state.
+- Mutation tests must cover mutation readback when the page reads the changed value afterward.
 - Route dispatch tests for newly implemented modes.
 
 ## Phase 4: Plan Detail
@@ -251,10 +285,10 @@ Target files:
 
 Tasks:
 
-- Preserve the public route as `/ops/client-next/$clientId/plan/$planId`.
+- Preserve the public route as `/ops/client/$clientId/plan/$planId`.
 - Keep old client list and plan detail empty page-type enums as default pages unless old source adds reachable page types before migration.
 - Translate old plan display mappings and constants into domain, application, or feature files by responsibility.
-- Keep any route navigation to settings on `/ops/client-next/$clientId/plan/$planId/setting`.
+- Keep any route navigation to settings on `/ops/client/$clientId/plan/$planId/setting`.
 
 Validation:
 
@@ -281,7 +315,7 @@ Target files:
 
 Tasks:
 
-- Preserve the public route as `/ops/client-next/$clientId/plan/$planId/setting`.
+- Preserve the public route as `/ops/client/$clientId/plan/$planId/setting`.
 - Render the route through `RouteModeSwitch`.
 - Convert each old `PlanSettingPageEnum` value into a `routeMode`.
 - Use `features/setting-rule` or another focused feature capability for reusable business editors only when ownership boundaries are clean.
@@ -289,46 +323,47 @@ Tasks:
 
 Plan settings route modes to plan under this route:
 
-| Route mode                  | Target                                        |
-| --------------------------- | --------------------------------------------- |
-| `baseInfo`                  | focused plan base info view                   |
-| `baseInfoEdit`              | focused plan base info edit view              |
-| `operationDay`              | focused operation day view                    |
-| `restriction`               | focused merchant restriction view             |
-| `memberCount`               | focused member count view, if still reachable |
-| `clientMemberList`          | `features/client-member` capability           |
-| `clientMemberDetail`        | `features/client-member` capability           |
-| `openTimesDinnerIn`         | focused dinner-in open times view             |
-| `openTimesGroupDelivery`    | focused group delivery open times view        |
-| `maximumOrderAmount`        | focused maximum order amount view             |
-| `hidePrice`                 | focused hide price view                       |
-| `hidePriceAndMealPoint`     | focused hide price and meal point view        |
-| `disableAppendDish`         | focused disable append dish view              |
-| `hiddenAccountTypes`        | focused hidden account types view             |
-| `dishRemark`                | focused dish remark view                      |
-| `deliveryRemark`            | focused delivery remark view                  |
-| `orderRule`                 | focused order rule view                       |
-| `paymentMethod`             | `features/payment-method` capability          |
-| `paymentMethodSelectConfig` | `features/payment-method` capability          |
-| `manuallyConfirmOrder`      | focused manually confirm order view           |
-| `occupationTime`            | focused occupation time view                  |
-| `orderTransfer`             | focused order transfer view                   |
-| `merchantOrderVerification` | focused merchant verification view            |
-| `pickupSetting`             | focused pickup setting view                   |
-| `pickUpMealCodeRule`        | focused pickup meal code view                 |
-| `menuStyle`                 | focused menu style view                       |
-| `financeConfig`             | focused finance config view                   |
-| `financeConfigAmount`       | focused finance amount view                   |
-| `financeConfigMealType`     | focused finance meal type view                |
-| `location`                  | focused location setting view                 |
+| Route mode                  | Target                                        | Status        | Evidence / blocker |
+| --------------------------- | --------------------------------------------- | ------------- | ------------------ |
+| `baseInfo`                  | focused plan base info view                   | `Not started` | Not started        |
+| `baseInfoEdit`              | focused plan base info edit view              | `Not started` | Not started        |
+| `operationDay`              | focused operation day view                    | `Not started` | Not started        |
+| `restriction`               | focused merchant restriction view             | `Not started` | Not started        |
+| `memberCount`               | focused member count view, if still reachable | `Not started` | Not started        |
+| `clientMemberList`          | `features/client-member` capability           | `Not started` | Not started        |
+| `clientMemberDetail`        | `features/client-member` capability           | `Not started` | Not started        |
+| `openTimesDinnerIn`         | focused dinner-in open times view             | `Not started` | Not started        |
+| `openTimesGroupDelivery`    | focused group delivery open times view        | `Not started` | Not started        |
+| `maximumOrderAmount`        | focused maximum order amount view             | `Not started` | Not started        |
+| `hidePrice`                 | focused hide price view                       | `Not started` | Not started        |
+| `hidePriceAndMealPoint`     | focused hide price and meal point view        | `Not started` | Not started        |
+| `disableAppendDish`         | focused disable append dish view              | `Not started` | Not started        |
+| `hiddenAccountTypes`        | focused hidden account types view             | `Not started` | Not started        |
+| `dishRemark`                | focused dish remark view                      | `Not started` | Not started        |
+| `deliveryRemark`            | focused delivery remark view                  | `Not started` | Not started        |
+| `orderRule`                 | focused order rule view                       | `Not started` | Not started        |
+| `paymentMethod`             | `features/payment-method` capability          | `Not started` | Not started        |
+| `paymentMethodSelectConfig` | `features/payment-method` capability          | `Not started` | Not started        |
+| `manuallyConfirmOrder`      | focused manually confirm order view           | `Not started` | Not started        |
+| `occupationTime`            | focused occupation time view                  | `Not started` | Not started        |
+| `orderTransfer`             | focused order transfer view                   | `Not started` | Not started        |
+| `merchantOrderVerification` | focused merchant verification view            | `Not started` | Not started        |
+| `pickupSetting`             | focused pickup setting view                   | `Not started` | Not started        |
+| `pickUpMealCodeRule`        | focused pickup meal code view                 | `Not started` | Not started        |
+| `menuStyle`                 | focused menu style view                       | `Not started` | Not started        |
+| `financeConfig`             | focused finance config view                   | `Not started` | Not started        |
+| `financeConfigAmount`       | focused finance amount view                   | `Not started` | Not started        |
+| `financeConfigMealType`     | focused finance meal type view                | `Not started` | Not started        |
+| `location`                  | focused location setting view                 | `Not started` | Not started        |
 
 Validation:
 
 - Route mode dispatch tests for every implemented mode.
 - Domain and schema tests for validation-bearing settings.
 - Mock repository tests for deterministic save behavior.
-- Mutation hook tests for query invalidation or cache updates after saves.
-- View tests for high-risk setting editors.
+- Mutation hook tests for the exact query keys invalidated or cache entries updated after saves.
+- View tests for each implemented setting editor must cover loading, success, validation error, and
+  save failure states when those states are reachable.
 
 ## Phase 6: Client Order
 
@@ -352,23 +387,33 @@ Target files:
 
 Tasks:
 
-- Preserve the public route as `/ops/client-next/$clientId/plan/$planId/order/$orderParams`.
+- Preserve the public route as `/ops/client/$clientId/plan/$planId/order/$orderParams`.
 - Render the route through `RouteModeSwitch`.
 - Use the default page for order detail.
 - Convert old `clientMemberOrderList` page type into the `clientMemberOrderList` route mode.
 - Keep route code limited to reading the raw `orderParams` path param and passing it down. Put parsing, validation, and display rules in application or domain helpers, not in route components or view-only string handling.
+- Migrate merchant schedule info used by the order detail page.
+- Migrate price summary display rules, including multiple price summary cases in deterministic mock
+  data.
+- Migrate default time schedule behavior when it affects order detail or member order list display.
+- Cover multiple order statuses in domain display rules and mock fixtures.
 
 Validation:
 
-- Query hook tests for order detail and member order list.
+- Query hook tests for order detail and member order list, including status and schedule variants.
 - Route mode dispatch test for `clientMemberOrderList`.
-- Domain tests for order param parsing or display rules.
+- Domain tests for valid and invalid `orderParams`, order status display, schedule display, and price
+  summary rules.
+- Mock repository tests for multiple order statuses, merchant schedule info, and price summary cases.
 
 ## Phase 7: Shared Business Capability Modules
 
 Status: `Not started`
 
 Objective: migrate reusable business-aware capabilities only when a migrated page needs them.
+Capabilities that are required by earlier client, plan, or order slices must be migrated inside those
+owning slices. This phase is only for capability work that remains after the owning slices have been
+implemented.
 
 Candidate modules:
 
@@ -471,6 +516,26 @@ Run the narrowest useful test for each migrated slice:
 | Route mode dispatch | relevant route file under `src/pages/<module>`  |
 | Shared UI behavior  | relevant `src/shared/ui` folder                 |
 
+Minimum test checklist by slice type:
+
+| Slice type              | Minimum test cases                                                                                       |
+| ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| Route contract          | registered path, route metadata, required params, and route stack rendering through `RouteModeSwitch`    |
+| Route mode              | default page rendering, each implemented mode dispatch, unknown mode fallback, and back navigation       |
+| Query-backed read view  | query key params, deterministic success fixture, loading state, empty state, error state, and retry path |
+| Mutation-backed flow    | valid command, deterministic mock result, mutation readback when applicable, and exact query update      |
+| Validation-bearing form | default values, valid submit, invalid input messages, cancel/back behavior, and save failure state       |
+| Mock repository         | success fixture, empty or missing result, deterministic ordering, in-memory update, and no random values |
+| Shared capability       | required props, local state behavior, validation schema, save handoff, and owning-page integration       |
+
+Manual H5 stack checks are required for route, route mode, and cross-page navigation slices:
+
+- Open the route directly with required params.
+- Navigate forward from the owning list or detail page.
+- Push a same-URL route mode through `routeModeState`.
+- Use browser or H5 back navigation and verify the previous stack entry is restored.
+- Verify replace navigation does not leave stale stack entries.
+
 Before handing back migrated code, run:
 
 ```bash
@@ -489,24 +554,15 @@ pnpm build
 
 A migrated slice is done when:
 
-- Public route shape matches `/ops/client-next...` where applicable.
+- Public route shape matches `/ops/client...` where applicable.
 - Route metadata exists.
-- Route component is thin and renders through `RouteModeSwitch` when modes exist.
+- Route component is thin, does not own server state, and renders through `RouteModeSwitch`.
 - Feature view owns page composition.
 - Server state uses TanStack Query.
 - Business behavior goes through application use cases.
 - Domain contracts and rules are framework-free.
 - Repository implementation is mock-only and deterministic.
 - Query keys are centralized.
-- Tests cover the changed route, use case, repository, hook, or view behavior at the narrowest useful level.
+- Tests cover the applicable minimum test checklist for the slice type, or the skipped cases are
+  documented as not reachable.
 - `pnpm lint`, `pnpm format:check`, and `pnpm test` pass for completed code changes.
-
-## Open Questions To Confirm Before Implementation
-
-These should be resolved when starting implementation, not while drafting this plan:
-
-1. Should existing `/ops/client...` routes remain as compatibility routes after `/ops/client-next...` is added, or should they be removed?
-2. Should legacy `/client...` development routes remain available locally?
-3. Which old page modes are still reachable in production and must be migrated first?
-4. Which focused setting modes can be deferred behind placeholders, and which need complete form behavior in the first migration batch?
-5. Should merchant list and merchant detail remain outside this v2 migration scope unless required by merchant selection capability work?

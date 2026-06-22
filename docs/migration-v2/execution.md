@@ -23,7 +23,7 @@ Do not start implementation when:
 
 - The expected behavior is unclear.
 - The ownership boundary is unclear.
-- The compatibility or migration policy is unclear.
+- The migration policy is unclear.
 - The slice would require behavior the plan excludes.
 - The slice would cross an architectural boundary without an explicit decision.
 - Validation expectations are missing for risky behavior.
@@ -104,8 +104,9 @@ For each slice:
 4. Keep edits limited to the slice.
 5. Run the narrowest useful tests while developing.
 6. Run required validation before handoff.
-7. Record the result in the execution log.
-8. Propose plan status updates only when the status actually changes.
+7. Update the owning task, route mode, or capability row in `plan.md` when the slice status changes.
+8. Record the result in the execution log.
+9. Propose phase-level status updates only when the phase summary status actually changes.
 
 ## Boundary Check
 
@@ -154,12 +155,29 @@ Return to plan review when:
 
 - The user updates the plan.
 - A subagent finds old-source behavior that changes scope.
-- A compatibility decision changes the contract.
+- A route contract decision changes the contract.
 - A planned mode, subflow, or behavior is discovered to be unreachable or newly required.
 - Persistence needs differ from the plan.
 - The architecture boundary needed by the slice differs from the plan.
 
 Do not change approved plan scope, inventories, target files, ownership, or validation expectations unless the user or repository convention allows it. Otherwise, record the proposed change and ask before implementation continues.
+
+## Blocker Record
+
+Record blockers as soon as continuing would require guessing through an unclear decision or missing
+source behavior:
+
+```md
+### Blocker: <short title>
+
+- Plan phase:
+- Slice:
+- Blocking question:
+- Evidence:
+- Impacted files:
+- Options:
+- Required decision:
+```
 
 ## Deviation Record
 
@@ -185,9 +203,12 @@ A slice is complete only when:
 - Applicable tests were added or explicitly deemed unnecessary.
 - Required validation ran or skipped commands are documented.
 - Subagent handoffs, if any, were reviewed by the main agent.
+- The owning task, route mode, or capability row in `plan.md` is updated with the current status and evidence.
 - The execution log records the result.
 
-Record slice results in this execution document unless the current task explicitly names a different log location, such as a PR description or issue comment.
+Record slice results in this execution document unless the current task explicitly names a different
+log location, such as a PR description or issue comment. `plan.md` remains the current status index;
+`execution.md` is the historical evidence log.
 
 Record completed slices:
 

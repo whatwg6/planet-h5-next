@@ -141,42 +141,39 @@ src/app/router/routeMeta.ts
 src/pages/<module>/<Route>.tsx
 ```
 
-Migrated business route paths must follow the old `planet-h5` business routes. Use the old
-`src/constants/index.ts` `RoutePath` values as the route source of truth, excluding out-of-scope
-system and dev routes.
+Migrated business route paths must use this project's `/ops/client...` route contract. Exclude
+out-of-scope system and dev routes.
 
-Current business route inventory from old `planet-h5`:
+Business route inventory:
 
 ```txt
-old RoutePath.client
-  /ops/client-next
+RoutePath.client
+  /ops/client
   -> client list route
 
-old RoutePath.clientDetail
-  /ops/client-next/:id
+RoutePath.clientDetail
+  /ops/client/:id
   -> client detail route
 
-old RoutePath.clientPlanDetail
-  /ops/client-next/:id/plan/:planId
+RoutePath.clientPlanDetail
+  /ops/client/:id/plan/:planId
   -> plan detail route
 
-old RoutePath.clientPlanDetailSetting
-  /ops/client-next/:id/plan/:planId/setting
+RoutePath.clientPlanDetailSetting
+  /ops/client/:id/plan/:planId/setting
   -> plan settings route
 
-old RoutePath.clientOrder
-  /ops/client-next/:id/plan/:planId/order/:orderParams
+RoutePath.clientOrder
+  /ops/client/:id/plan/:planId/order/:orderParams
   -> client order route
 ```
 
-When registering these in TanStack Router, preserve the URL shape and convert path parameter syntax
-only as required by TanStack Router. For example, old `:id` may become a TanStack Router path
-parameter such as `$clientId`, but the public route shape must remain equivalent to the old
-`planet-h5` route.
+When registering these in TanStack Router, preserve the URL shape and convert path
+parameter syntax only as required by TanStack Router. For example, `:id` may become a TanStack Router
+path parameter such as `$clientId`, but the public route shape must remain `/ops/client...`.
 
-Do not invent new production route paths from the current project's existing placeholders. In
-particular, do not replace old `/ops/client-next...` routes with `/ops/client...` routes during this
-migration unless a later task explicitly changes the route contract.
+Do not invent new production route paths from the current project's existing placeholders.
+`/ops/client...` is the production route contract for this migration.
 
 Do not migrate old system or development routes:
 
@@ -189,13 +186,13 @@ Do not migrate old system or development routes:
 Route entry components must stay thin. They may:
 
 - Read route params.
-- Read current pathname when choosing a compatibility route shape.
-- Call query or mutation hooks.
-- Handle loading and error states.
-- Own navigation callbacks.
+- Create route-state navigation callbacks.
 - Render `RouteModeSwitch`.
 
-Route entry components must not contain large page layouts or business rendering.
+Route entry components must not call server-backed query or mutation hooks unless a later task
+explicitly documents a route-level preload exception. Loading, empty, error, and mutation states
+belong in feature views or feature hooks. Route entry components must not contain large page layouts
+or business rendering.
 
 ## Page Mode Migration
 
@@ -239,6 +236,9 @@ New pattern:
 
 Do not create extra URL paths for same-resource modes. For example, edit, settings, nested selectors, and detail subpanels that were old `pageType` states should become `routeMode` states unless they are truly shareable standalone resources.
 
+Default pages are not route modes. Render them through `RouteModeSwitch defaultPage` and list only
+non-default `pageType` states as `routeMode` values.
+
 ## Required Migration Inventory
 
 Use this inventory as the initial executable map. If old `planet-h5` adds or removes business
@@ -246,19 +246,18 @@ pageTypes before migration, update this section first, then implement code.
 
 Route-level inventory:
 
-| Old route                                              | Old entry                       | New TanStack route                                           | Route component                          | Default feature view                                 |
-| ------------------------------------------------------ | ------------------------------- | ------------------------------------------------------------ | ---------------------------------------- | ---------------------------------------------------- |
-| `/ops/client-next`                                     | `src/apps/client/client-list`   | `/ops/client-next`                                           | `src/pages/client/ClientListRoute.tsx`   | `src/features/client/views/ClientListView.tsx`       |
-| `/ops/client-next/:id`                                 | `src/apps/client/client-detail` | `/ops/client-next/$clientId`                                 | `src/pages/client/ClientDetailRoute.tsx` | `src/features/client/views/ClientDetailView.tsx`     |
-| `/ops/client-next/:id/plan/:planId`                    | `src/apps/client/plan-detail`   | `/ops/client-next/$clientId/plan/$planId`                    | `src/pages/plan/PlanDetailRoute.tsx`     | `src/features/plan/views/PlanDetailView.tsx`         |
-| `/ops/client-next/:id/plan/:planId/setting`            | `src/apps/client/plan-setting`  | `/ops/client-next/$clientId/plan/$planId/setting`            | `src/pages/plan/PlanSettingsRoute.tsx`   | `src/features/plan/views/PlanSettingsView.tsx`       |
-| `/ops/client-next/:id/plan/:planId/order/:orderParams` | `src/apps/client/client-order`  | `/ops/client-next/$clientId/plan/$planId/order/$orderParams` | `src/pages/order/ClientOrderRoute.tsx`   | `src/features/order/views/ClientOrderDetailView.tsx` |
+| Route                                             | Old entry                       | New TanStack route                                      | Route component                          | Default feature view                                 |
+| ------------------------------------------------- | ------------------------------- | ------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
+| `/ops/client`                                     | `src/apps/client/client-list`   | `/ops/client`                                           | `src/pages/client/ClientListRoute.tsx`   | `src/features/client/views/ClientListView.tsx`       |
+| `/ops/client/:id`                                 | `src/apps/client/client-detail` | `/ops/client/$clientId`                                 | `src/pages/client/ClientDetailRoute.tsx` | `src/features/client/views/ClientDetailView.tsx`     |
+| `/ops/client/:id/plan/:planId`                    | `src/apps/client/plan-detail`   | `/ops/client/$clientId/plan/$planId`                    | `src/pages/plan/PlanDetailRoute.tsx`     | `src/features/plan/views/PlanDetailView.tsx`         |
+| `/ops/client/:id/plan/:planId/setting`            | `src/apps/client/plan-setting`  | `/ops/client/$clientId/plan/$planId/setting`            | `src/pages/plan/PlanSettingsRoute.tsx`   | `src/features/plan/views/PlanSettingsView.tsx`       |
+| `/ops/client/:id/plan/:planId/order/:orderParams` | `src/apps/client/client-order`  | `/ops/client/$clientId/plan/$planId/order/$orderParams` | `src/pages/order/ClientOrderRoute.tsx`   | `src/features/order/views/ClientOrderDetailView.tsx` |
 
 Client detail page modes from old `ClientDetailPageEnum`:
 
 | Old pageType                             | New routeMode                            | Target view or capability                   |
 | ---------------------------------------- | ---------------------------------------- | ------------------------------------------- |
-| default                                  | read                                     | `ClientDetailView`                          |
 | `plan`                                   | `plan`                                   | `ClientMealPlansView`                       |
 | `setting`                                | `setting`                                | `ClientSettingsView`                        |
 | `nameAndRemark`                          | `nameAndRemark`                          | `ClientNameAndRemarkView`                   |
@@ -295,7 +294,6 @@ Plan settings page modes from old `PlanSettingPageEnum`:
 
 | Old pageType                | New routeMode               | Target view or capability                     |
 | --------------------------- | --------------------------- | --------------------------------------------- |
-| default                     | read                        | `PlanSettingsView`                            |
 | `baseInfo`                  | `baseInfo`                  | focused plan base info view                   |
 | `baseInfoEdit`              | `baseInfoEdit`              | focused plan base info edit view              |
 | `operationDay`              | `operationDay`              | focused operation day view                    |
@@ -331,14 +329,14 @@ Client order page modes from old `ClientOrderPageEnum`:
 
 | Old pageType            | New routeMode           | Target view                 |
 | ----------------------- | ----------------------- | --------------------------- |
-| default                 | read                    | `ClientOrderDetailView`     |
 | `clientMemberOrderList` | `clientMemberOrderList` | `ClientMemberOrderListView` |
 
 Old client list and plan detail currently define empty pageType enums, so they migrate as default route
 pages unless old `planet-h5` adds reachable pageTypes later.
 
-Every row above that is implemented must have at least route mode dispatch coverage or focused view/hook
-coverage, depending on the risk of the migrated behavior.
+Every row above that is implemented must satisfy the applicable minimum test checklist in
+`plan.md`, including route mode dispatch coverage for implemented modes and focused view, hook,
+schema, or repository coverage for the behavior owned by that row.
 
 ## Page Stack Migration
 
@@ -396,7 +394,10 @@ select-meican-staff
 card-setting
 ```
 
-Move these to focused feature capability modules under `src/features/<capability>`. Owning pages pass context through props, and saving remains in the owning page's mutation flow.
+Move these to focused feature capability modules under `src/features/<capability>`. Owning pages pass
+context through props, and saving remains in the owning page's mutation flow. Migrate a capability
+with the first owning slice that needs it; do not wait for a later catch-all capability phase when a
+client, plan, or order route mode depends on it.
 
 ## Form and Validation Migration
 
