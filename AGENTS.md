@@ -17,20 +17,22 @@ Before making code changes, inspect the relevant files and keep these anchors in
 
 ## Architecture Rules
 
-Follow this dependency direction:
+Architectural intent and boundaries are defined in `docs/architecture-design.md`. Follow its rules before changing code.
+
+The dependency direction is:
 
 ```txt
 pages -> features -> application -> domain
 infrastructure -> domain
 ```
 
-- `domain` contains entities, repository contracts, and pure business rules. Do not import React, TanStack Query, Axios, or browser APIs here.
-- `application` contains use cases. Use cases receive repository contracts and coordinate business operations.
-- `infrastructure` implements repositories, HTTP, mock data, and query keys.
-- `features` owns React views, hooks, local UI state, and business-facing components for one module.
-- `pages` are thin TanStack Router entry components.
-- `shared/ui` is for H5 UI primitives without client, merchant, plan, or order business meaning.
-- `shared/assets` is for business-agnostic icons, images, and brand assets.
+Keep these high-risk boundaries in mind while editing:
+
+- `domain` stays framework-free and must not import React, TanStack Query, Axios, or browser APIs.
+- Business-level feature behavior goes through `application` use cases.
+- Views must not import HTTP clients, mock data files, or backend response shapes.
+- `pages` stay thin route entry components.
+- `shared/ui` and `shared/assets` stay business-agnostic.
 
 Do not bypass use cases from feature code when the behavior is business-level. Do not place HTTP details in views.
 
@@ -75,8 +77,9 @@ When adding UI:
 
 When adding SVG assets:
 
+- Follow the SVG asset boundary in `docs/architecture-design.md`.
 - Put reusable icon SVG files in `src/shared/assets/icons` and export them from `src/shared/assets/icons/index.ts` with the `?react` suffix.
-- Put brand SVGs in `src/shared/assets/brand` and illustration/image SVGs in `src/shared/assets/images`; import these without `?react` when they should render as image URLs.
+- Put brand SVGs in `src/shared/assets/brand` and illustration/image SVGs in `src/shared/assets/images`.
 - Keep icon `viewBox` values, use kebab-case filenames, and rely on the SVGR pipeline to remove fixed fill/stroke attributes and inject `fill="currentColor"`.
 
 ## Testing Expectations
