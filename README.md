@@ -1,6 +1,6 @@
 # Planet H5 Next
 
-Planet H5 Next 是一个移动端 H5 业务前端。当前业务范围覆盖客户、商户、方案详情与方案设置等页面，代码采用适合 React 应用的轻量 Clean Architecture。
+Planet H5 Next 是一个移动端 H5 业务前端。当前业务范围覆盖客户、商户、方案详情、方案设置与订单等页面，代码采用适合 React 应用的轻量 Clean Architecture。
 
 ## Tech Stack
 

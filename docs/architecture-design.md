@@ -2,19 +2,9 @@
 
 ## Scope
 
-This document defines the frontend architecture for `planet-h5`, a mobile H5 business application.
+This document defines the frontend architecture intent, boundaries, and conventions for `planet-h5`, a mobile H5 business application.
 
-This document is the source of truth for architectural intent and boundaries. `AGENTS.md` turns these constraints into an operational guide for agents and contributors making code changes.
-
-The first business scope includes:
-
-- Client list
-- Client detail
-- Client detail edit mode
-- Plan settings
-- Plan detail
-- Merchant list
-- Merchant detail
+Concrete route registrations live in `src/app/router/routeTree.tsx`. Route metadata lives in `src/app/router/routeMeta.ts`. Route entry components live under `src/pages`. Feature modules live under `src/features`.
 
 The application is H5 only. It may contain operationally complex business workflows, but it is not a PC admin system.
 
@@ -56,271 +46,75 @@ Rules:
 
 - `domain` contains business entities, repository contracts, and pure business rules.
 - `application` contains use cases and coordinates business actions.
-- `infrastructure` contains Axios, mock data, and repository implementations.
+- `infrastructure` contains Axios, mock data, query keys under `infrastructure/query/`, and repository implementations.
 - `features` contains React views, feature queries, mutations, stores, and business components.
-- `pages` contains TanStack Router route entry components.
-- `shared/ui` contains H5 base components without client, merchant, or plan business meaning.
+- `pages` contains thin TanStack Router route entry components.
+- `shared/ui` contains H5 base components without client, merchant, plan, or order business meaning.
 - `shared/assets` contains business-agnostic icon, image, and brand assets.
 
-## Directory Structure
+## Directory Shape
+
+The project is organized by architectural layer first, then by business module where useful:
 
 ```txt
 src/
-  app/
-    router/
-      routeTree.tsx
-      routeMeta.ts
-      historyState.ts
-      RouteStack.tsx
-      RouteModeSwitch.tsx
-      router.ts
-    providers/
-      AppProviders.tsx
-    bootstrap/
-      queryClient.ts
-
-  pages/
-    client/
-      ClientListRoute.tsx
-      ClientDetailRoute.tsx
-    plan/
-      PlanSettingsRoute.tsx
-      PlanDetailRoute.tsx
-    merchant/
-      MerchantListRoute.tsx
-      MerchantDetailRoute.tsx
-
-  features/
-    client/
-      views/
-        ClientListView.tsx
-        ClientDetailView.tsx
-        ClientDetailReadView.tsx
-        ClientDetailEditView.tsx
-      components/
-        ClientCard.tsx
-        ClientSearchBar.tsx
-        ClientStatusTag.tsx
-        ClientDetailReadonly.tsx
-        ClientDetailEditor.tsx
-        ClientEditActionBar.tsx
-      queries/
-        useClientListQuery.ts
-        useClientDetailQuery.ts
-      mutations/
-        useUpdateClientMutation.ts
-      store/
-        clientListStore.ts
-        clientDetailUiStore.ts
-
-    plan/
-      views/
-        PlanSettingsView.tsx
-        PlanDetailView.tsx
-      components/
-        PlanBasicForm.tsx
-        PlanRuleEditor.tsx
-        PlanSummary.tsx
-      queries/
-        usePlanDetailQuery.ts
-      mutations/
-        useSavePlanSettingsMutation.ts
-      store/
-        planDraftStore.ts
-
-    merchant/
-      views/
-        MerchantListView.tsx
-        MerchantDetailView.tsx
-      components/
-        MerchantCard.tsx
-        MerchantSearchBar.tsx
-        MerchantStatusTag.tsx
-      queries/
-        useMerchantListQuery.ts
-        useMerchantDetailQuery.ts
-      store/
-        merchantListStore.ts
-
-    setting-rule/
-      components/
-        SettingRuleEditor.tsx
-        SettingRulePreview.tsx
-      hooks/
-        useSettingRuleForm.ts
-      schema/
-        settingRuleSchema.ts
-      types.ts
-
-  application/
-    client/
-      getClientList.ts
-      getClientDetail.ts
-      updateClient.ts
-    plan/
-      getPlanDetail.ts
-      savePlanSettings.ts
-    merchant/
-      getMerchantList.ts
-      getMerchantDetail.ts
-
-  domain/
-    client/
-      Client.ts
-      ClientRepository.ts
-      clientRules.ts
-    plan/
-      Plan.ts
-      PlanRepository.ts
-      planRules.ts
-    merchant/
-      Merchant.ts
-      MerchantRepository.ts
-      merchantRules.ts
-
-  infrastructure/
-    http/
-      axiosClient.ts
-      httpError.ts
-    repositories/
-      client/
-        clientRepository.http.ts
-        clientRepository.mock.ts
-      plan/
-        planRepository.http.ts
-        planRepository.mock.ts
-      merchant/
-        merchantRepository.http.ts
-        merchantRepository.mock.ts
-    mock/
-      clientMockData.ts
-      planMockData.ts
-      merchantMockData.ts
-    query/
-      queryKeys.ts
-
-  shared/
-    assets/
-      icons/
-      images/
-      brand/
-    ui/
-      Page/
-      Navigation/
-      List/
-      Form/
-      Feedback/
-      DataDisplay/
-    hooks/
-    utils/
+  app/              App bootstrap, providers, router, route-state helpers
+  pages/            TanStack Router route entry components
+  features/         Feature views, query hooks, mutation hooks, UI state, feature components
+  application/      Use cases that coordinate repository calls
+  domain/           Entities, repository contracts, pure business rules
+  infrastructure/   HTTP clients, repositories, mock data, query keys
+  shared/           Business-agnostic shared UI, assets, utilities
+    assets/         Business-agnostic icons, images, and brand assets
+  test/             Vitest/MSW test setup
 ```
+
+A typical business module can have matching folders across layers:
+
+```txt
+pages/<module>/
+features/<module>/
+application/<module>/
+domain/<module>/
+infrastructure/repositories/<module>/
+```
+
+Create module folders only when the feature needs that layer.
 
 ## Route Design
 
-The H5 route map is:
+`src/app/router/routeTree.tsx` is the source of truth for registered routes. `src/app/router/routeMeta.ts` is the source of truth for route metadata such as title, module, and H5 keep-alive behavior.
+
+The canonical migrated business route shape uses `/ops/...`. Development-friendly legacy routes may exist for local compatibility, but new migrated production business flows should target the `/ops` route shape.
+
+Same-resource page modes are represented with TanStack Router history state, not separate URL paths. For example, an edit, preview, or workflow state should push the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`.
+
+Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `defaultPage`, and additional states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
+
+There must not be routes such as `/client/$clientId/edit` only to represent a same-resource UI mode.
+
+Each business route should have route metadata. Root, index, redirect-only, or framework-only routes may omit metadata when they do not represent a business page.
+
+Route metadata includes a `title`, a business `module`, and an optional `keepAlive` flag. It is used for page titles, analytics, future permission hooks, and H5 navigation behavior. `src/app/router/routeMeta.ts` owns the canonical metadata type.
+
+The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` uses TanStack Router state as its source of truth, keeps inactive pages mounted for H5 keep-alive behavior, and handles forward, back, and replace navigation as page-stack transitions.
+
+`RouteStack` must not maintain a second route table or manually match pathnames. `routeTree.tsx` remains the source of route registration. Route entry components that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for normal direct rendering.
+
+## Feature Mapping Pattern
+
+For a server-backed page, keep the responsibility split consistent:
 
 ```txt
-/client
-  Client list
-
-/client/$clientId
-  Client detail
-  Same-resource page modes such as edit are represented by route history state and are not exposed as separate URLs.
-
-/client/$clientId/plans/settings
-  Plan settings
-
-/client/$clientId/plans/$planId
-  Plan detail
-
-/ops/client
-  Production client list
-
-/ops/client/$clientId
-  Production client detail
-
-/ops/client/$clientId/plan/$planId
-  Production plan detail
-
-/merchant
-  Merchant list
-
-/merchant/$merchantId
-  Merchant detail
+pages/<module>/<Route>.tsx
+  -> features/<module>/views/<View>.tsx
+    -> features/<module>/queries or mutations
+      -> application/<module>/<useCase>.ts
+        -> domain/<module>/<Repository>.ts
+          -> infrastructure/repositories/<module>/*
 ```
 
-There is no `/client/$clientId/edit` route.
-
-Same-route page modes are entered by pushing the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`. Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `defaultPage`, and additional states such as `edit`, `preview`, or future workflow states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
-
-Client editing is one concrete mode: `/client/$clientId` is pushed with `routeMode: "edit"`. The route switches between detail and edit feature views, while `features/client/store/clientDetailUiStore.ts` owns edit-only UI state such as dirty tracking, discard confirmation, action state, or draft reset.
-
-Each route should have route metadata:
-
-```ts
-type RouteMeta = {
-  title: string;
-  module: "client" | "plan" | "merchant";
-  keepAlive?: boolean;
-};
-```
-
-Route metadata is used for page titles, analytics, future permission hooks, and H5 navigation behavior.
-
-The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` implements H5-style page stack behavior:
-
-- `PUSH` adds the current matched page to the stack and keeps previous pages mounted but hidden.
-- `POP` restores a previous page by TanStack history key and truncates entries above it.
-- `REPLACE` replaces an existing entry with the same pathname, or the current top entry.
-
-`RouteStack` must use TanStack Router's current match, route component, params, and history key as the source of truth. It must not maintain a second route table or manually match pathnames. Route entry components that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for normal direct rendering.
-
-## Page Mapping
-
-```txt
-Client list
-  pages/client/ClientListRoute.tsx
-  features/client/views/ClientListView.tsx
-  application/client/getClientList.ts
-  domain/client/ClientRepository.ts
-  infrastructure/repositories/client/*
-
-Client detail
-  pages/client/ClientDetailRoute.tsx
-  features/client/views/ClientDetailView.tsx
-  application/client/getClientDetail.ts
-  application/client/updateClient.ts
-  domain/client/ClientRepository.ts
-  infrastructure/repositories/client/*
-
-Plan settings
-  pages/plan/PlanSettingsRoute.tsx
-  features/plan/views/PlanSettingsView.tsx
-  application/plan/savePlanSettings.ts
-  domain/plan/PlanRepository.ts
-  infrastructure/repositories/plan/*
-
-Plan detail
-  pages/plan/PlanDetailRoute.tsx
-  features/plan/views/PlanDetailView.tsx
-  application/plan/getPlanDetail.ts
-  domain/plan/PlanRepository.ts
-  infrastructure/repositories/plan/*
-
-Merchant list
-  pages/merchant/MerchantListRoute.tsx
-  features/merchant/views/MerchantListView.tsx
-  application/merchant/getMerchantList.ts
-  domain/merchant/MerchantRepository.ts
-  infrastructure/repositories/merchant/*
-
-Merchant detail
-  pages/merchant/MerchantDetailRoute.tsx
-  features/merchant/views/MerchantDetailView.tsx
-  application/merchant/getMerchantDetail.ts
-  domain/merchant/MerchantRepository.ts
-  infrastructure/repositories/merchant/*
-```
+Routes stay thin. Feature views own page composition and interaction. Application use cases coordinate business operations. Repository implementations hide backend and mock response details from the rest of the app.
 
 ## Data Flow
 
@@ -349,29 +143,7 @@ View
     -> UI state update
 ```
 
-Client detail edit flow:
-
-```txt
-Open /client/$clientId
-  -> useClientDetailQuery(clientId)
-  -> render ClientDetailReadonly
-
-Tap edit
-  -> clientDetailUiStore.enterEdit()
-  -> initialize React Hook Form values from client detail
-  -> render ClientDetailEditor
-
-Tap save
-  -> useUpdateClientMutation()
-  -> updateClient use case
-  -> ClientRepository.updateClient()
-  -> invalidate client detail query
-  -> clientDetailUiStore.exitEdit()
-
-Tap cancel or H5 back while dirty
-  -> show confirm dialog
-  -> discard draft and exit edit, or stay editing
-```
+Business-level behavior should go through application use cases. Views should not reach directly into HTTP clients, mock data, or backend response shapes.
 
 ## State Management Boundaries
 
@@ -379,42 +151,36 @@ TanStack Router owns:
 
 - Path params
 - Search params
-- History-state page mode such as `location.state.routeMode`
+- History-state page modes such as `location.state.routeMode`
 - Route metadata
 - Link generation
 - Route-level preloading where useful
 
-TanStack Query owns:
+TanStack Query owns server state:
 
-- Client list data
-- Client detail data
-- Merchant list data
-- Merchant detail data
-- Plan detail data
+- Server-backed list and detail data
 - Request loading, error, retry, cache, and invalidation
+- Mutation cache coordination where useful
 
-Zustand owns local H5 state:
+Zustand owns local H5 interaction state:
 
+- Drafts and unsaved-change state
 - List filters before they are committed to URL search params
 - List scroll positions
-- Current local UI mode
-- Feature-local edit interaction state
-- Unsaved-change state
-- Plan settings draft state
-- Temporary context that should not be serialized into the URL
+- Feature-local UI modes and temporary context that should not be serialized into the URL
 
 React Hook Form and Zod own:
 
-- Plan settings forms
-- Client edit forms
-- Future filter forms or edit forms
+- Edit, settings, filter, and other validation-bearing forms
 - Validation schema and typed form values
+
+TanStack Query handles server state; Zustand must not duplicate server cache.
 
 ## Shared UI Boundary
 
 `shared/ui` is the project's H5 base component layer.
 
-It may include:
+It may include primitives such as:
 
 - `Page`
 - `NavBar`
@@ -432,11 +198,7 @@ It may include:
 - `Tabs`
 - `BottomActionBar`
 
-It must not include business-specific names or logic such as client status, merchant cards, or plan rules.
-
-Business components live under `features/*/components`.
-
-`shared/assets` is the project's business-agnostic asset layer. Reusable icon SVG files belong in `shared/assets/icons`; brand assets belong in `shared/assets/brand`; image and illustration assets belong in `shared/assets/images`.
+It must not include business-specific names or logic such as client status, merchant cards, or plan rules. Business components live under `features/*/components`.
 
 Examples:
 
@@ -480,94 +242,71 @@ features/setting-rule/
   types.ts
 ```
 
-This kind of module is appropriate when the same setting-rule editor is used by both client setting and plan setting.
-
-Usage:
-
-```txt
-features/client
-  -> imports features/setting-rule public components
-
-features/plan
-  -> imports features/setting-rule public components
-```
-
 Boundary rules:
 
-- `features/setting-rule` may depend on `shared/ui`, `shared/hooks`, and pure `domain` rules.
-- `features/setting-rule` must not import `pages`.
-- `features/setting-rule` must not import `features/client` or `features/plan`.
-- `features/client` and `features/plan` pass context into the shared component through props.
-- Saving still belongs to the owning page's mutation, such as `useUpdateClientMutation` or `useSavePlanSettingsMutation`.
+- Shared feature capability modules may depend on `shared/ui`, `shared/utils`, and pure `domain` rules.
+- They must not import `pages`.
+- They must not import owning feature modules such as `features/client` or `features/plan`.
+- Owning feature modules pass context into the shared component through props.
+- Saving still belongs to the owning page's mutation.
 - The shared business component may own form fragments, validation schema, local interaction state, and UI composition.
-- The shared business component should not decide whether it is saving a client or a plan.
+- The shared business component should not decide which owning business flow is saving it.
 
-This keeps the reusable editor independent while still allowing client and plan pages to use different save flows.
+This keeps reusable business UI independent while still allowing pages to use different save flows.
 
 ## Repository and Mock Strategy
 
 Pages and views never import Axios or mock data directly.
 
-Repository interfaces are defined in `domain`.
+Repository interfaces are defined in `domain`. HTTP and mock implementations live in `infrastructure`.
 
-HTTP and mock implementations live in `infrastructure`.
+Feature hooks import the repository module facade from `infrastructure/repositories/<module>` and pass it into application use case functions. No central DI container.
 
-Feature hooks import repository implementations directly from `infrastructure/repositories/<module>` and pass them into application use case functions. No central DI container.
+Each repository module should expose a stable facade from `infrastructure/repositories/<module>/index.ts`. The facade exports the selected implementation as `<module>Repository`, so feature hooks do not import `*.mock` or `*.http` files directly.
+
+Example module export:
+
+```ts
+export { clientRepositoryMock as clientRepository } from "./clientRepository.mock";
+```
 
 For example:
 
 ```ts
 import { getClientList } from "@/application/client/getClientList";
-import { clientRepositoryMock } from "@/infrastructure/repositories/client/clientRepository.mock";
+import { clientRepository } from "@/infrastructure/repositories/client";
 
 export function useClientListQuery(params: ClientListParams) {
   return useQuery({
     queryKey: queryKeys.clients.list(params),
-    queryFn: () => getClientList(clientRepositoryMock, params),
+    queryFn: () => getClientList(clientRepository, params),
   });
 }
 ```
 
-To switch from mock data to real APIs, change the repository import in each hook from `*Repository.mock` to `*Repository.http`.
+To switch from mock data to real APIs, prefer changing the selected implementation in `infrastructure/repositories/<module>/index.ts` so feature hooks keep importing the same facade.
 
 Repository implementations return domain entities directly. Backend response shapes should not leak into feature views.
 
 ## Testing Strategy
 
-Unit tests:
+Use the narrowest useful test for the change:
 
-- Domain rules
-- Application use cases
-- Repository implementations
+- Domain rules: colocated `*.test.ts` beside the rule file.
+- Use cases: `src/application/<module>/*UseCases.test.ts`.
+- Repository implementations: tests under `src/infrastructure/repositories/<module>`.
+- Query hooks and views: React Testing Library tests under the relevant feature folder.
+- Route metadata: `src/app/router/routeMeta.test.ts`.
+- Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
 
-Component tests:
-
-- Feature views
-- Form validation flows
-- Shared H5 UI states
-
-Integration tests:
-
-- Query hooks with MSW
-- Mutation success and error states
-- Client detail edit mode and unsaved-change behavior
-
-The highest-risk first tests are:
-
-- Client list query and empty/error states
-- Client detail edit save/cancel flow
-- Plan settings validation and save mutation
-- Repository mapper behavior for malformed or missing fields
+Prioritize tests around changed behavior, risky mapping logic, validation, mutation cache updates, and route mode dispatch.
 
 ## Explicit Decisions
 
 - The project is H5 only.
 - The project uses `pnpm` as its package manager.
-- Business names are `client`, `merchant`, and `plan`.
-- Client and merchant routes are grouped by module, but there is no real permission system in the first version.
-- Repository contracts are designed up front, even if the first implementation uses mock data.
-- Same-resource page modes such as client detail edit are not exposed as route URLs.
+- Repository contracts are defined in `domain` and exist independently of their implementations.
+- Same-resource page modes are not exposed as route URLs.
 - `shared/ui` is an H5 base component layer, not a PC component library.
-- Reusable business components belong in focused feature capability modules such as `features/setting-rule`, not in `shared/ui`.
-- TanStack Query handles server state; Zustand does not duplicate server cache.
-- Zustand handles local interaction state and drafts.
+- Reusable business components belong in focused feature capability modules, not in `shared/ui`.
+- TanStack Query handles server state; Zustand handles local interaction state and drafts.

@@ -29,7 +29,7 @@ infrastructure -> domain
 - `infrastructure` implements repositories, HTTP, mock data, and query keys.
 - `features` owns React views, hooks, local UI state, and business-facing components for one module.
 - `pages` are thin TanStack Router entry components.
-- `shared/ui` is for H5 UI primitives without client, merchant, or plan business meaning.
+- `shared/ui` is for H5 UI primitives without client, merchant, plan, or order business meaning.
 - `shared/assets` is for business-agnostic icons, images, and brand assets.
 
 Do not bypass use cases from feature code when the behavior is business-level. Do not place HTTP details in views.
