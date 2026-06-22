@@ -61,18 +61,20 @@ infrastructure -> domain
 ## Main Routes
 
 ```txt
-/client
-/client/$clientId
-/client/$clientId/plans/settings
-/client/$clientId/plans/$planId
 /ops/client
 /ops/client/$clientId
 /ops/client/$clientId/plan/$planId
+/ops/client/$clientId/plan/$planId/setting
+/ops/client/$clientId/plan/$planId/order/$orderParams
 /merchant
 /merchant/$merchantId
 ```
 
 Route metadata lives in `src/app/router/routeMeta.ts`. Route definitions live in `src/app/router/routeTree.tsx`.
+
+The canonical migrated business route shape uses `/ops/...`. Development-friendly `/client/...`
+routes may exist for local compatibility, but new migrated production business flows should target
+the `/ops` route shape.
 
 H5 page switching is rendered through `src/app/router/RouteStack.tsx`. The root route owns this stack so a `PUSH` navigation keeps the previous page mounted and hidden instead of unmounting it. The stack uses TanStack Router's current match, route component, route params, and history key; do not add a second manual pathname matcher or route table for keep-alive behavior.
 

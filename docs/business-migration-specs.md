@@ -1,8 +1,8 @@
-# Planet H5 Business Migration Plan
+# Planet H5 Business Migration Specs
 
 ## Purpose
 
-This document defines the business migration plan for rewriting `/Users/yxc/code/planet-h5` on top of this project.
+This document defines the business migration constraints for rewriting `/Users/yxc/code/planet-h5` on top of this project.
 
 The rewrite is business-first and mock-first:
 
@@ -11,7 +11,13 @@ The rewrite is business-first and mock-first:
 - Do not depend on the legacy API being reachable.
 - Do not make legacy API integration, Orval generation, token refresh, SSO, or hybrid request behavior a prerequisite for business migration.
 
-`docs/architecture-design.md` remains the source of truth for architecture boundaries. This document defines the migration order and acceptance criteria under those boundaries.
+`docs/architecture-design.md` remains the source of truth for architecture boundaries. This document defines migration constraints, order, and acceptance criteria under those boundaries.
+
+Migration docs are split by role:
+
+- `docs/business-migration-specs.md`: migration constraints and acceptance rules.
+- `docs/business-migration-plan.md`: migration priority, milestone plan, and current migration status.
+- `docs/business-migration-execution.md`: executable slice guidance for agents.
 
 ## Source Project Scope
 
@@ -138,7 +144,7 @@ Acceptance:
 - The main route flow can be completed using mock data.
 - H5 stack navigation remains correct.
 - List and detail pages support loading, empty, error, and success states.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ### P1: Client Detail Business Settings
 
@@ -287,6 +293,7 @@ Before handing back a migrated business slice, run:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm test
 ```
 
@@ -313,6 +320,7 @@ Use this checklist for each migrated business slice:
 - Business-aware components stay out of `shared/ui`.
 - Tests added at the narrowest useful level.
 - `pnpm lint` passes.
+- `pnpm format:check` passes.
 - `pnpm test` passes.
 
 ## Recommended First Milestone

@@ -1,12 +1,12 @@
-# Planet H5 Business Migration Execution Guide
+# Planet H5 Business Migration Plan And Execution Notes
 
 ## Purpose
 
-This document breaks the business migration plan into executable slices.
+This document tracks the business migration plan, current migration status, and executable slice notes.
 
-This execution guide is based on `docs/business-migration-specs.md`. If the migration plan changes, update this guide to keep the execution slices aligned with the plan.
+It is based on `docs/business-migration-specs.md`. If the migration spec changes, update this plan and `docs/business-migration-execution.md` together.
 
-The first slice is the client list page. It should establish the migration rhythm for later slices:
+The first completed slice was the client list page. It established the migration rhythm for later slices:
 
 1. Read the legacy business behavior.
 2. Map legacy files to new architecture boundaries.
@@ -388,6 +388,7 @@ Run:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm test
 ```
 
@@ -422,6 +423,7 @@ The client list slice is complete when:
 - Test client tagging is represented if supported by the domain type.
 - Client cards navigate to client detail.
 - `pnpm lint` passes.
+- `pnpm format:check` passes.
 - `pnpm test` passes.
 
 ## Slice 2: Client Detail Hub Page
@@ -569,13 +571,13 @@ src/app/router/RouteModeSwitch.tsx
 
 For this slice, the detail hub is the default page.
 
-Do not fully migrate these modes yet:
+Current code already registers these same-URL modes in `src/pages/client/ClientDetailRoute.tsx`:
 
 ```txt
 plan
 setting
 nameAndRemark
-paymentMethod
+nameAndRemarkEdit
 mealPoint
 manager
 costCenter
@@ -590,9 +592,9 @@ mealGroup
 passwordSetting
 ```
 
-Instead, the hub should expose entry callbacks that can later push `routeModeState("plan")` or `routeModeState("setting")` when those slices are implemented.
+Treat this section as historical guidance for the detail hub slice. For future client-detail slices, keep using `routeModeState(...)` and `RouteModeSwitch`; do not introduce separate URL paths or feature-level `location.state` reads for these same-resource pages.
 
-If a temporary placeholder is needed, keep it in the page layer or a clearly named feature placeholder. Do not model unfinished pages as domain concepts.
+If a placeholder is needed, keep it in the page layer or a clearly named feature placeholder. Do not model unfinished pages as domain concepts.
 
 ### Step 3: Model Client Detail Data
 
@@ -803,6 +805,7 @@ Run:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm test
 ```
 
@@ -838,6 +841,7 @@ The client detail hub slice is complete when:
 - Destination behavior is explicitly placeholder or disabled until hybrid migration.
 - Loading, error, and success states are handled.
 - `pnpm lint` passes.
+- `pnpm format:check` passes.
 - `pnpm test` passes.
 
 ## Remaining Slice Order
@@ -942,7 +946,7 @@ src/features/client/components/ClientSettingRow.tsx
 - Feature views do not read `location.state`.
 - Setting summaries come from mock-backed client detail data or a client settings query.
 - Unmigrated setting rows do not crash.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Slice 4: Client Meal Plans List
 
@@ -1008,7 +1012,7 @@ src/app/router/routeMeta.ts
 - Clients with no plans show an empty state.
 - Plan rows navigate to plan detail.
 - No plan settings edit behavior is included yet.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Slice 5: Plan Detail Summary
 
@@ -1084,7 +1088,7 @@ src/app/router/routeMeta.ts
 - Plan detail data comes from `planRepositoryMock`.
 - The settings entry navigates to `/ops/client/$clientId/plan/$planId/setting`.
 - No legacy API client is imported.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Slice 6: Plan Settings List
 
@@ -1148,7 +1152,7 @@ src/app/router/routeMeta.ts
 - Plan settings list is reachable from plan detail.
 - All P1 plan setting entries are represented as summaries.
 - Unmigrated setting editors are not silently linked to missing pages.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Slice 7: Name And Remark Editing
 
@@ -1210,7 +1214,7 @@ src/pages/client/ClientDetailRoute.tsx
 - Name and remark can be edited with mock data.
 - The client detail hub reflects saved values after mutation.
 - Invalid input is blocked with business validation.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Slice 8: Simple Client Setting Edit Pages
 
@@ -1261,7 +1265,7 @@ src/pages/client
 - Each setting has explicit read, edit, save, cancel, and error behavior.
 - Validation is not inline in route components.
 - Related client detail or settings queries update after save.
-- `pnpm lint` and `pnpm test` pass after each setting.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass after each setting.
 
 ## Slice 9: Structured Client Setting Edit Pages
 
@@ -1292,7 +1296,7 @@ Suggested order:
 - Structured setting state is represented in domain or application types.
 - Reusable business selectors do not import legacy API clients.
 - Cross-module behavior is covered by focused tests.
-- `pnpm lint` and `pnpm test` pass after each setting.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass after each setting.
 
 ## Slice 10: Simple Plan Setting Edit Pages
 
@@ -1329,7 +1333,7 @@ Suggested order:
 - Simple plan settings save against mock data.
 - Plan detail and settings list reflect saved changes.
 - No HTTP repository is required for acceptance.
-- `pnpm lint` and `pnpm test` pass after each setting.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass after each setting.
 
 ## Slice 11: Structured Plan Rule Edit Pages
 
@@ -1376,7 +1380,7 @@ src/infrastructure/repositories/plan/planRepository.mock.ts
 - Complex plan rules are validated outside route components.
 - Reusable rule UI is not duplicated across plan setting pages.
 - Mock data covers at least one valid and one invalid or edge case per rule type.
-- `pnpm lint`, `pnpm test`, and `pnpm build` pass for broad rule-editor changes.
+- `pnpm lint`, `pnpm format:check`, `pnpm test`, and `pnpm build` pass for broad rule-editor changes.
 
 ## Slice 12: Client Order Flow
 
@@ -1443,7 +1447,7 @@ src/app/router/routeMeta.ts
 - Order list and detail work from deterministic mock data.
 - Order display rules are not duplicated across views.
 - Invalid `orderParams` produce a controlled error state.
-- `pnpm lint`, `pnpm test`, and `pnpm build` pass.
+- `pnpm lint`, `pnpm format:check`, `pnpm test`, and `pnpm build` pass.
 
 ## Slice 13: Shared Business Capabilities
 
@@ -1488,7 +1492,7 @@ Use matching capabilities under:
 - It is used by at least one migrated flow.
 - It does not depend on legacy API clients.
 - It has focused tests for its data and consumer behavior.
-- `pnpm lint` and `pnpm test` pass.
+- `pnpm lint`, `pnpm format:check`, and `pnpm test` pass.
 
 ## Final Migration Verification
 
@@ -1507,6 +1511,7 @@ Run:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm test
 pnpm build
 ```
