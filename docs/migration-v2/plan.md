@@ -96,9 +96,19 @@ Target file lists identify the expected primary files for a phase. They are not 
 update tests, query keys, route metadata, and nearby support files whenever the phase validation or
 architecture rules require them.
 
+## Test-First Migration Rule
+
+Tasks named `Add failing coverage` must be completed before the implementation task that follows
+them. If the current implementation already passes the new test, record that in `execution.md` and
+continue with the implementation task.
+
+The `Validation` sections below are regression checklists. They run after implementation and must not
+replace the `Add failing coverage` tasks in each phase.
+
 ## Validation Evidence Standard
 
-Validation must produce reviewable evidence, not only a statement that testing was considered.
+Validation is the final regression pass for a slice. It must produce reviewable evidence, not only a
+statement that testing was considered.
 
 For every completed slice, record the following in `execution.md`:
 
@@ -110,33 +120,21 @@ For every completed slice, record the following in `execution.md`:
 - Any skipped checklist item as `N/A`, with the reason it is not reachable or not applicable.
 
 Do not mark a slice or phase `Done` with generic notes such as "tested", "covered", or "not
-needed". If a validation item cannot be proven with an automated test, record the manual check or the
-reason a test would not add useful coverage.
+needed". If a validation item is not reachable for the slice, record it as `N/A` with the concrete
+reason.
 
-## Playwright Validation Standard
+## E2E Coverage Assignments
 
-Use Playwright to constrain real H5 route, stack, and interaction behavior. React Testing Library and
-Vitest prove component and logic contracts; Playwright proves the migrated flow works in a browser.
+Only the flows in this table require Playwright coverage. Do not add other Playwright tests during
+this migration unless this table is updated first.
 
-Phase 0 must introduce the Playwright harness if it is not already present:
-
-- Add a `pnpm e2e` script.
-- Add Playwright configuration with a mobile H5 viewport.
-- Configure the test web server to run the Vite app.
-- Add a smoke test that can open the app and verify the `/ops/client` entry route.
-
-For every route, route mode, cross-page navigation, high-use shared UI, or browser-only interaction
-slice, add or update Playwright tests that prove the relevant user-visible flow. At minimum, cover:
-
-- Direct route open with required params.
-- Forward navigation from the owning page.
-- Same-URL `routeMode` navigation when the slice implements a route mode.
-- Browser back navigation restoring the previous stack entry.
-- Replace navigation not leaving stale stack entries when replace behavior is part of the slice.
-- Mobile viewport layout sanity for the migrated page or mode.
-
-Manual browser checks are allowed only when Playwright cannot reasonably automate the case. Record the
-reason, route, viewport, and observed result in `execution.md`.
+| Phase | Playwright file / flow                   | Required browser assertions                                                                                |
+| ----- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 0     | `/ops/client` smoke                      | Open `/ops/client` in the configured mobile viewport and verify the route renders through the Vite server. |
+| 1     | Client list to detail                    | Open `/ops/client`, navigate to one client detail, verify `/ops/client/$clientId`, then browser back.      |
+| 2     | Client detail to plan detail             | Open `/ops/client/$clientId`, navigate to one plan detail, verify `/ops/client/$clientId/plan/$planId`.    |
+| 5     | Plan detail to setting and one edit mode | Open plan detail, navigate to setting, open the first implemented edit mode, then browser back twice.      |
+| 6     | Client order member list mode            | Open one order detail, enter `clientMemberOrderList` route mode, then browser back to order detail.        |
 
 ## Legacy Source Inventory
 
@@ -162,6 +160,13 @@ Objective: align the new project with the v2 route contract before deeper page m
 
 Tasks:
 
+- Add failing coverage in `src/app/router/routeMeta.test.ts` for all five required `/ops/client...`
+  route metadata entries.
+- Add failing router coverage for all five `/ops/client...` paths and for the absence of migrated
+  client, plan, or order compatibility paths outside `/ops/client...`.
+- Add failing route stack coverage proving the root route renders `RouteStack`.
+- Add or update Playwright smoke coverage for opening `/ops/client` in the configured mobile
+  viewport.
 - Add or update TanStack Router definitions in `src/app/router/routeTree.tsx` for:
   - `/ops/client`
   - `/ops/client/$clientId`
@@ -174,8 +179,7 @@ Tasks:
 - Do not add non-`/ops/client...` compatibility routes for migrated client, plan, or order flows.
 - Ensure route entry components that read params accept `RouteStackPageProps` and fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Keep `RouteStack` as the only page-stack renderer. Do not add a second route table or pathname matcher.
-- Introduce the Playwright e2e harness described in the Playwright Validation Standard when it is not
-  already present.
+- Introduce the Playwright e2e harness when it is not already present.
 
 Validation:
 
@@ -212,8 +216,17 @@ Target files:
 
 Tasks:
 
+- Add failing query hook coverage for committed list params in `queryKeys`, excluding draft local
+  state from the key.
+- Add failing use case and mock repository coverage for filtering, ordering, empty results, and
+  missing or invalid params.
+- Add failing view coverage for loading, empty, error, populated list, and navigation to
+  `/ops/client/$clientId`.
+- Add or update Playwright coverage for `/ops/client` to `/ops/client/$clientId` navigation and
+  browser back.
 - Preserve the public route as `/ops/client`.
-- Move business list filters, status mappings, and display constants into the narrowest appropriate layer.
+- Put list filter query params in the client query hook, client status values and pure mappings in
+  `src/domain/client`, and card display labels in `src/features/client`.
 - Keep list server state in TanStack Query.
 - Use Zustand only for local interaction state such as draft filters or scroll position.
 - Navigate to client detail through `/ops/client/$clientId`.
@@ -251,6 +264,15 @@ Target files:
 
 Tasks:
 
+- Add failing query hook coverage for a detail key that includes `clientId`.
+- Add failing use case coverage for detail read behavior and each update command migrated in this
+  phase.
+- Add failing mock repository coverage for deterministic detail reads, missing-client behavior, and
+  in-memory update readback when the default page reads the changed value afterward.
+- Add failing view coverage for default detail loading, error, and success states.
+- Add failing route coverage for default page rendering, unknown route mode fallback, and each route
+  mode implemented in this phase.
+- Add or update Playwright coverage for client detail to plan detail navigation.
 - Preserve the public route as `/ops/client/$clientId`.
 - Render the route through `RouteModeSwitch`.
 - Use `RouteModeSwitch defaultPage` for the default behavior and keep feature views unaware of `location.state`.
@@ -324,6 +346,15 @@ Recommended order:
 
 Tasks:
 
+- For each focused mode before implementation, add failing domain rule tests for pure validation
+  rules used by that mode.
+- For each focused mode before implementation, add failing form or view tests for default values,
+  valid submit, one invalid input message, save failure, and cancel or back behavior.
+- For each focused mode before implementation, add failing mutation tests for command payload,
+  deterministic mock result, query invalidation or cache update keys, and readback when the page reads
+  saved data afterward.
+- For each focused mode before implementation, add failing route dispatch tests for that mode and
+  unknown mode fallback.
 - Convert old imperative form state to React Hook Form and Zod for validation-bearing forms.
 - Put pure business validation in `src/domain/client` when it is not React-specific.
 - Put form schemas in the feature when the schema is view/form-specific.
@@ -360,6 +391,13 @@ Target files:
 
 Tasks:
 
+- Add failing query hook coverage for a plan detail key that includes `clientId` and `planId`.
+- Add failing use case and mock repository coverage for success, missing plan, and deterministic
+  display-mapping inputs.
+- Add failing view coverage for loading, error, and success states.
+- Add failing route coverage for passing params to the view, default page rendering, and navigation
+  to `/ops/client/$clientId/plan/$planId/setting`.
+- Add failing route metadata coverage for the plan detail route title and `plan` module.
 - Preserve the public route as `/ops/client/$clientId/plan/$planId`.
 - Treat the old plan detail default or empty page-type enum as the default page unless old source
   inspection finds additional reachable non-default page types before migration.
@@ -396,10 +434,23 @@ Target files:
 
 Tasks:
 
+- Add failing route mode dispatch coverage for default page rendering, every implemented setting
+  mode, unknown mode fallback, and back navigation behavior.
+- For each setting mode before implementation, add failing domain or schema tests for valid and
+  invalid examples when the mode has validation.
+- Add failing mock repository coverage for deterministic save behavior, missing plan behavior, no
+  random values, and in-memory readback when saved values are shown afterward.
+- Add failing mutation hook coverage for the exact save command payload and query keys invalidated or
+  updated after save.
+- For each implemented setting editor, add failing view tests for loading, success, validation error,
+  save failure, and cancel or back behavior.
+- Add or update Playwright coverage for plan detail to settings navigation, opening the first
+  implemented edit mode, and browser back twice.
 - Preserve the public route as `/ops/client/$clientId/plan/$planId/setting`.
 - Render the route through `RouteModeSwitch`.
 - Convert each old `PlanSettingPageEnum` value into a `routeMode`.
-- Use `features/setting-rule` or another focused feature capability for reusable business editors only when ownership boundaries are clean.
+- Use `features/setting-rule` for setting editors shared by both client and plan routes. Keep editors
+  used by only this route under `src/features/plan`.
 - Keep all saves in the plan mutation and application use case.
 
 Plan settings route modes to plan under this route:
@@ -471,6 +522,18 @@ Target files:
 
 Tasks:
 
+- Add failing domain coverage for valid and invalid `orderParams`, order status display, schedule
+  display, default time schedule behavior, and price summary rules.
+- Add failing query hook coverage for order detail and member-order-list keys, including status and
+  schedule variants.
+- Add failing mock repository coverage for multiple order statuses, merchant schedule info, price
+  summary cases, missing order behavior, and deterministic ordering.
+- Add failing route coverage for invalid `orderParams` guard rendering, default order detail
+  rendering, unknown mode fallback, and `clientMemberOrderList` dispatch.
+- Add failing view coverage for order detail loading, error, and success states, plus member order
+  list loading, empty, error, and success states.
+- Add or update Playwright coverage for order detail to `clientMemberOrderList` route mode and
+  browser back.
 - Preserve the public route as `/ops/client/$clientId/plan/$planId/order/$orderParams`.
 - Render the route through `RouteModeSwitch`.
 - Use the default page for order detail.
@@ -520,6 +583,12 @@ Candidate modules:
 
 Tasks:
 
+- Before implementing each capability, add failing component or hook coverage for required props,
+  local state behavior, validation schema, and cancel or back behavior.
+- Before wiring each capability into an owning page, add failing save handoff coverage proving the
+  capability calls the owning page save flow with the expected command payload.
+- Before wiring each capability into an owning page, add failing owning-page integration coverage for
+  save, query invalidation, or cache update behavior.
 - Keep capability modules business-aware and out of `shared/ui`.
 - Let owning routes or feature views pass context through props.
 - Keep persistence and save orchestration in the owning page's mutation flow.
@@ -552,6 +621,20 @@ Allowed shared UI examples:
 - `Field`
 - Generic tabs, dialogs, action sheets, pull refresh, or infinite list primitives
 
+Tasks:
+
+- Before adding a shared UI primitive, add failing tests for the props, state, and callbacks used by
+  the owning page.
+- Before adding reusable icon SVGs, add or update asset validation coverage for kebab-case filenames,
+  preserved `viewBox`, and `?react` exports from `src/shared/assets/icons/index.ts`.
+- For `Page`, `NavigationBar`, `Button`, `LoadingState`, `EmptyState`, and `ErrorState`, add a
+  verification entry to `execution.md` naming the route or screen where the primitive was checked.
+- Put reusable icon SVG files in `src/shared/assets/icons`.
+- Export reusable icons from `src/shared/assets/icons/index.ts` with `?react`.
+- Put brand SVG files in `src/shared/assets/brand`.
+- Put illustration or image SVG files in `src/shared/assets/images`.
+- Keep icon SVG filenames kebab-case and preserve `viewBox`.
+
 Asset rules:
 
 - Reusable icon SVG files go in `src/shared/assets/icons`.
@@ -564,8 +647,9 @@ Validation:
 
 - UI primitive tests prove non-trivial behavior such as controlled state, disabled/loading states,
   accessibility labels, callbacks, or keyboard/touch interaction.
-- For high-use primitives, record visual or interaction verification in `execution.md`, including the
-  screen or route where the primitive was checked.
+- For `Page`, `NavigationBar`, `Button`, `LoadingState`, `EmptyState`, and `ErrorState`, record
+  visual or interaction verification in `execution.md`, including the screen or route where the
+  primitive was checked.
 - Asset validation proves icon SVGs keep `viewBox`, use kebab-case filenames, and are exported with
   `?react` only from `src/shared/assets/icons/index.ts`.
 
@@ -607,46 +691,22 @@ export { clientRepositoryMock as clientRepository } from "./clientRepository.moc
 
 ## Testing Matrix
 
-Run the narrowest useful test for each migrated slice:
+For each migrated slice, complete the phase's `Add failing coverage` tasks before implementation.
+Use these locations for the test files:
 
-| Change type         | Test location                                   |
-| ------------------- | ----------------------------------------------- |
-| Domain rules        | colocated `*.test.ts` beside the rule           |
-| Use cases           | `src/application/<module>/*UseCases.test.ts`    |
-| Mock repositories   | `src/infrastructure/repositories/<module>`      |
-| Query hooks         | relevant `src/features/<module>/queries` folder |
-| Views               | relevant `src/features/<module>/views` folder   |
-| Route metadata      | `src/app/router/routeMeta.test.ts`              |
-| Route mode dispatch | relevant route file under `src/pages/<module>`  |
-| Shared UI behavior  | relevant `src/shared/ui` folder                 |
-| Playwright e2e      | `e2e` or `tests/e2e` folder                     |
+| Change type         | Test location                                                            |
+| ------------------- | ------------------------------------------------------------------------ |
+| Domain rules        | colocated `*.test.ts` beside the rule                                    |
+| Use cases           | `src/application/<module>/*UseCases.test.ts`                             |
+| Mock repositories   | `src/infrastructure/repositories/<module>`                               |
+| Query hooks         | relevant `src/features/<module>/queries` folder                          |
+| Views               | relevant `src/features/<module>/views` folder                            |
+| Route metadata      | `src/app/router/routeMeta.test.ts`                                       |
+| Route mode dispatch | relevant route file under `src/pages/<module>`                           |
+| Shared UI behavior  | relevant `src/shared/ui` folder                                          |
+| Playwright e2e      | `e2e` or `tests/e2e` folder for flows listed in E2E Coverage Assignments |
 
-Minimum test checklist by slice type:
-
-Apply only the rows that match the slice. If a listed case is not reachable for that slice, record it
-as `N/A` in `execution.md` with a concrete reason.
-
-| Slice type              | Minimum test cases                                                                                       |
-| ----------------------- | -------------------------------------------------------------------------------------------------------- |
-| Route contract          | registered path, route metadata, required params, and route stack rendering through `RouteModeSwitch`    |
-| Route mode              | default page rendering, each implemented mode dispatch, unknown mode fallback, and back navigation       |
-| Query-backed read view  | query key params, deterministic success fixture, loading state, empty state, error state, and retry path |
-| Mutation-backed flow    | valid command, deterministic mock result, mutation readback when applicable, and exact query update      |
-| Validation-bearing form | default values, valid submit, invalid input messages, cancel/back behavior, and save failure state       |
-| Mock repository         | success fixture, empty or missing result, deterministic ordering, in-memory update, and no random values |
-| Shared capability       | required props, local state behavior, validation schema, save handoff, and owning-page integration       |
-| Playwright flow         | direct route open, forward navigation, route mode navigation, browser back, and mobile viewport sanity   |
-
-Playwright H5 stack checks are required for route, route mode, and cross-page navigation slices:
-
-- Open the route directly with required params.
-- Navigate forward from the owning list or detail page.
-- Push a same-URL route mode through `routeModeState`.
-- Use browser or H5 back navigation and verify the previous stack entry is restored.
-- Verify replace navigation does not leave stale stack entries.
-
-Record Playwright H5 stack check results in the slice entry in `execution.md`. If a check falls back
-to manual verification, record the reason and observed result.
+Record Playwright results in `execution.md` only for phases listed in E2E Coverage Assignments.
 
 Before handing back migrated code, run:
 
@@ -656,13 +716,13 @@ pnpm format:check
 pnpm test
 ```
 
-For route, route mode, cross-page navigation, shared UI, or browser-interaction changes, also run:
+For phases 0, 1, 2, 5, and 6, also run:
 
 ```bash
 pnpm e2e
 ```
 
-For broad route, build, or shared UI changes, also run:
+For phases 0, 5, and 8, also run:
 
 ```bash
 pnpm build
@@ -683,8 +743,7 @@ A migrated slice is done when:
 - Domain contracts and rules are framework-free.
 - Repository implementation is mock-only and deterministic.
 - Query keys are centralized.
-- Tests cover the applicable minimum test checklist for the slice type, or the skipped cases are
+- Tests listed in the owning phase tasks have been added or updated; skipped phase task cases are
   documented as not reachable.
 - `pnpm lint`, `pnpm format:check`, and `pnpm test` pass for completed code changes.
-- `pnpm e2e` passes when the slice changes route, route mode, cross-page navigation, shared UI, or
-  browser interaction behavior.
+- `pnpm e2e` passes for phases 0, 1, 2, 5, and 6.
