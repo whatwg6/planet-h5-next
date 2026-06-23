@@ -26,7 +26,7 @@ function Probe() {
   });
 
   return (
-    <button onClick={() => router.navigate({ to: "/client" })}>
+    <button onClick={() => router.navigate({ to: "/ops/client" })}>
       {mode}:{location.pathname}:{routerStatus}
     </button>
   );
@@ -42,13 +42,13 @@ describe("RouteStackEntryLocationProvider", () => {
       stores: {
         __store: createStore({
           location: {
-            pathname: "/client/c1",
+            pathname: "/ops/client/c1",
             state: { routeMode: "edit" },
           },
           status: "idle",
         }),
         location: createStore({
-          pathname: "/client/c1",
+          pathname: "/ops/client/c1",
           state: { routeMode: "edit" },
         }),
       },
@@ -56,15 +56,15 @@ describe("RouteStackEntryLocationProvider", () => {
 
     render(
       <RouterContextProvider router={router as never}>
-        <RouteStackEntryLocationProvider location={{ pathname: "/client/c1", state: {} }}>
+        <RouteStackEntryLocationProvider location={{ pathname: "/ops/client/c1", state: {} }}>
           <Probe />
         </RouteStackEntryLocationProvider>
       </RouterContextProvider>,
     );
 
-    const button = screen.getByRole("button", { name: "read:/client/c1:idle" });
+    const button = screen.getByRole("button", { name: "read:/ops/client/c1:idle" });
     await user.click(button);
 
-    expect(navigate).toHaveBeenCalledWith({ to: "/client" });
+    expect(navigate).toHaveBeenCalledWith({ to: "/ops/client" });
   });
 });

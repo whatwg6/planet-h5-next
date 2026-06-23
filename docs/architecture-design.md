@@ -85,8 +85,6 @@ Create module folders only when the feature needs that layer.
 
 `src/app/router/routeTree.tsx` is the source of truth for registered routes. `src/app/router/routeMeta.ts` is the source of truth for route metadata such as title and module.
 
-The canonical migrated business route shape uses `/ops/...`. Development-friendly legacy routes may exist for local compatibility, but new migrated production business flows should target the `/ops` route shape.
-
 Same-resource page modes are represented with TanStack Router history state, not separate URL paths. For example, an edit, preview, or workflow state should push the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`.
 
 Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `defaultPage`, and additional states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.

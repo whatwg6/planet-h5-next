@@ -5,10 +5,6 @@ import { routeMeta } from "./routeMeta";
 describe("routeMeta", () => {
   it("defines metadata for every route in the spec", () => {
     expect(Object.keys(routeMeta).sort()).toEqual([
-      "/client",
-      "/client/$clientId",
-      "/client/$clientId/plans/$planId",
-      "/client/$clientId/plans/settings",
       "/merchant",
       "/merchant/$merchantId",
       "/ops/client",

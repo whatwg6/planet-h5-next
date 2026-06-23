@@ -1,4 +1,4 @@
-import { useNavigate, useParams, useRouter, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 
 import { routeModeState } from "@/app/router/historyState";
 import type { RouteStackPageProps } from "@/app/router/RouteStack";
@@ -26,7 +26,6 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
   const params = useParams({ strict: false, shouldThrow: false });
   const navigate = useNavigate();
   const router = useRouter();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const clientId = routeParams?.clientId ?? params?.clientId ?? "";
   const query = useClientDetailQuery(clientId);
   const back = () => router.history.back();
@@ -45,24 +44,16 @@ export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
     );
 
   const enterMode = (mode: string) => {
-    const detailPath = pathname.startsWith("/ops/client")
-      ? "/ops/client/$clientId"
-      : "/client/$clientId";
-
     void navigate({
-      to: detailPath,
+      to: "/ops/client/$clientId",
       params: { clientId: query.data.id },
       state: (state) => ({ ...state, ...routeModeState(mode) }),
     });
   };
 
   const openPlan = (planId: string) => {
-    const planPath = pathname.startsWith("/ops/client")
-      ? "/ops/client/$clientId/plan/$planId"
-      : "/client/$clientId/plans/$planId";
-
     void navigate({
-      to: planPath,
+      to: "/ops/client/$clientId/plan/$planId",
       params: { clientId: query.data.id, planId },
     });
   };

@@ -12,35 +12,15 @@ import { PlanSettingsRoute } from "@/pages/plan/PlanSettingsRoute";
 
 const rootRoute = createRootRoute({ component: RouteStack });
 const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: "/" });
-const clientListRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/client",
-  component: ClientListRoute,
-});
 const opsClientListRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/ops/client",
   component: ClientListRoute,
 });
-const clientDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/client/$clientId",
-  component: ClientDetailRoute,
-});
 const opsClientDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/ops/client/$clientId",
   component: ClientDetailRoute,
-});
-const planSettingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/client/$clientId/plans/settings",
-  component: PlanSettingsRoute,
-});
-const planDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/client/$clientId/plans/$planId",
-  component: PlanDetailRoute,
 });
 const opsPlanDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -70,12 +50,8 @@ const merchantDetailRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  clientListRoute,
   opsClientListRoute,
-  clientDetailRoute,
   opsClientDetailRoute,
-  planSettingsRoute,
-  planDetailRoute,
   opsPlanDetailRoute,
   opsPlanSettingsRoute,
   opsClientOrderRoute,

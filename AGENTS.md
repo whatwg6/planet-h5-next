@@ -3,7 +3,6 @@
 This file is the working guide for AI coding agents in this repository.
 
 `docs/architecture-design.md` is the source of truth for architectural intent and boundaries.
-`AGENTS.md` is the operational guide for agents and contributors making code changes under those constraints.
 
 ## First Read
 
