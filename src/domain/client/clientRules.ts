@@ -3,12 +3,30 @@ import type {
   ClientCostCenter,
   ClientDepartment,
   ClientFieldSettings,
+  ClientListParams,
   ClientNotificationSetting,
   ClientPasswordSetting,
+  ClientSummary,
 } from "@/domain/client/Client";
 
 export function hasClientIdentity(client: { id: string }) {
   return client.id.trim().length > 0;
+}
+
+export function normalizeClientListParams(params: ClientListParams = {}): ClientListParams {
+  const keyword = params.keyword?.trim();
+  return keyword ? { keyword } : {};
+}
+
+export function compareClientSummaryByUpdatedAtDesc(left: ClientSummary, right: ClientSummary) {
+  const leftUpdatedAt = left.updatedAt ?? "";
+  const rightUpdatedAt = right.updatedAt ?? "";
+
+  if (leftUpdatedAt !== rightUpdatedAt) {
+    return rightUpdatedAt.localeCompare(leftUpdatedAt);
+  }
+
+  return left.id.localeCompare(right.id);
 }
 
 export function validateClientName(name: string) {

@@ -4,22 +4,35 @@ import { ClientCard } from "@/features/client/components/ClientCard";
 import { useClientListQuery } from "@/features/client/queries/useClientListQuery";
 import { useClientListStore } from "@/features/client/store/clientListStore";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
-import { Field } from "@/shared/ui/Form";
+import { Button, Field } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
 export function ClientListView() {
-  const { keyword, setKeyword } = useClientListStore();
-  const query = useClientListQuery({ keyword });
+  const { draftKeyword, committedKeyword, setDraftKeyword, commitKeyword } = useClientListStore();
+  const query = useClientListQuery({ keyword: committedKeyword });
 
   return (
     <Page title="4.0 客户">
       <div className="space-y-4">
-        <Field
-          label="搜索"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-          placeholder="输入名称或电话"
-        />
+        <form
+          className="flex items-end gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            commitKeyword();
+          }}
+        >
+          <div className="min-w-0 flex-1">
+            <Field
+              label="搜索"
+              value={draftKeyword}
+              onChange={(event) => setDraftKeyword(event.target.value)}
+              placeholder="输入名称或电话"
+            />
+          </div>
+          <Button className="shrink-0" type="submit">
+            搜索
+          </Button>
+        </form>
         {query.isLoading ? <LoadingState /> : null}
         {query.isError ? <ErrorState title="加载失败" onRetry={() => query.refetch()} /> : null}
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}

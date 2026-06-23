@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  compareClientSummaryByUpdatedAtDesc,
   hasClientIdentity,
   normalizeClientAppVersionSetting,
+  normalizeClientListParams,
   normalizeClientLoginSetting,
   uniqueClientSelectionIds,
   validateClientAppVersionSetting,
@@ -17,6 +19,24 @@ describe("clientRules boundary", () => {
   it("only checks whether a client identity is present", () => {
     expect(hasClientIdentity({ id: "c1" })).toBe(true);
     expect(hasClientIdentity({ id: "" })).toBe(false);
+  });
+
+  it("normalizes client list params before repository filtering", () => {
+    expect(normalizeClientListParams()).toEqual({});
+    expect(normalizeClientListParams({ keyword: "  " })).toEqual({});
+    expect(normalizeClientListParams({ keyword: "  客户 A  " })).toEqual({ keyword: "客户 A" });
+  });
+
+  it("sorts client summaries by newest update time then id", () => {
+    const clients = [
+      { id: "c2", name: "客户 B", updatedAt: "2026-06-12" },
+      { id: "c1", name: "客户 A", updatedAt: "2026-06-13" },
+      { id: "c3", name: "客户 C", updatedAt: "2026-06-12" },
+    ];
+
+    expect(
+      [...clients].sort(compareClientSummaryByUpdatedAtDesc).map((client) => client.id),
+    ).toEqual(["c1", "c2", "c3"]);
   });
 
   it("validates name and remark edit limits", () => {

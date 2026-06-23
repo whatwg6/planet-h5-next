@@ -1,5 +1,9 @@
 import type { ClientRepository } from "@/domain/client/ClientRepository";
 import {
+  compareClientSummaryByUpdatedAtDesc,
+  normalizeClientListParams,
+} from "@/domain/client/clientRules";
+import {
   buildClientSettingSummaries,
   clientMockData,
   createDefaultClientSettings,
@@ -7,7 +11,9 @@ import {
 
 export const clientRepositoryMock: ClientRepository = {
   async listClients(params) {
-    return clientMockData
+    const normalizedParams = normalizeClientListParams(params);
+
+    return [...clientMockData]
       .map((client) => ({
         id: client.id,
         name: client.name,
@@ -17,10 +23,11 @@ export const clientRepositoryMock: ClientRepository = {
       }))
       .filter(
         (client) =>
-          !params.keyword ||
-          client.name.includes(params.keyword) ||
-          client.phone?.includes(params.keyword),
-      );
+          !normalizedParams.keyword ||
+          client.name.includes(normalizedParams.keyword) ||
+          client.phone?.includes(normalizedParams.keyword),
+      )
+      .sort(compareClientSummaryByUpdatedAtDesc);
   },
   async getClientDetail(clientId) {
     const client = clientMockData.find((item) => item.id === clientId);

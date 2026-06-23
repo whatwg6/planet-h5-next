@@ -3,7 +3,9 @@ import { createRef, useEffect } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { routeTree } from "./routeTree";
 import { RouteStackFrames, getNextRouteStackEntries, type RouteStackEntry } from "./RouteStack";
+import { RouteStack } from "./RouteStack";
 
 vi.mock("./RouteStackEntryLocationProvider", () => ({
   RouteStackEntryLocationProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
@@ -91,6 +93,10 @@ describe("getNextRouteStackEntries", () => {
 });
 
 describe("RouteStackFrames", () => {
+  it("keeps the root route bound to RouteStack", () => {
+    expect(routeTree.options.component).toBe(RouteStack);
+  });
+
   it("keeps the previous route mounted when a new route becomes active", () => {
     const unmountA = vi.fn();
     const unmountB = vi.fn();

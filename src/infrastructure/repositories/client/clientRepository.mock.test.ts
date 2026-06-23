@@ -4,7 +4,7 @@ import { clientRepositoryMock } from "./clientRepository.mock";
 
 describe("clientRepositoryMock", () => {
   it("filters client summaries by name keyword", async () => {
-    const clients = await clientRepositoryMock.listClients({ keyword: "星河" });
+    const clients = await clientRepositoryMock.listClients({ keyword: " 星河 " });
 
     expect(clients).toHaveLength(1);
     expect(clients[0]).toEqual(expect.objectContaining({ id: "c3", name: "星河便利店" }));
@@ -21,6 +21,12 @@ describe("clientRepositoryMock", () => {
     await expect(clientRepositoryMock.listClients({ keyword: "不存在的客户" })).resolves.toEqual(
       [],
     );
+  });
+
+  it("returns deterministic newest-first summaries when params are empty", async () => {
+    const clients = await clientRepositoryMock.listClients({});
+
+    expect(clients.slice(0, 3).map((client) => client.id)).toEqual(["c1", "c2", "c3"]);
   });
 
   it("preserves developer test markers on list summaries", async () => {

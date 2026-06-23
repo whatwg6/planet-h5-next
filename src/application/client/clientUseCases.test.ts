@@ -26,8 +26,13 @@ const repository: ClientRepository = {
 
 describe("client use cases", () => {
   it("delegates list params to the repository", async () => {
-    await getClientList(repository, { keyword: "A" });
+    await getClientList(repository, { keyword: " A " });
     expect(repository.listClients).toHaveBeenCalledWith({ keyword: "A" });
+  });
+
+  it("accepts missing client list params", async () => {
+    await getClientList(repository);
+    expect(repository.listClients).toHaveBeenCalledWith({});
   });
 
   it("rejects empty client ids before detail lookup", async () => {

@@ -1,11 +1,15 @@
 import { create } from "zustand";
 
 type ClientListState = {
-  keyword: string;
-  setKeyword: (keyword: string) => void;
+  draftKeyword: string;
+  committedKeyword: string;
+  setDraftKeyword: (keyword: string) => void;
+  commitKeyword: () => void;
 };
 
 export const useClientListStore = create<ClientListState>((set) => ({
-  keyword: "",
-  setKeyword: (keyword) => set({ keyword }),
+  draftKeyword: "",
+  committedKeyword: "",
+  setDraftKeyword: (keyword) => set({ draftKeyword: keyword }),
+  commitKeyword: () => set((state) => ({ committedKeyword: state.draftKeyword })),
 }));
