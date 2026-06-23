@@ -35,6 +35,31 @@ describe("clientRepositoryMock", () => {
     expect(clients[0]).toEqual(expect.objectContaining({ id: "c1", isDeveloperTest: true }));
   });
 
+  it("returns deterministic client detail with meal plans and setting summaries", async () => {
+    const detail = await clientRepositoryMock.getClientDetail("c1");
+
+    expect(detail).toEqual(
+      expect.objectContaining({
+        id: "c1",
+        name: "客户 A",
+        isDeveloperTest: true,
+        remark: "总部试点客户，优先验证 4.0 客户详情流程。",
+      }),
+    );
+    expect(detail.mealPlans[0]).toEqual(
+      expect.objectContaining({ id: "p1", name: "方案 A", businessType: "groupDelivery" }),
+    );
+    expect(detail.settings.find((setting) => setting.id === "nameAndRemark")).toEqual(
+      expect.objectContaining({ value: "客户 A" }),
+    );
+  });
+
+  it("throws for missing client detail", async () => {
+    await expect(clientRepositoryMock.getClientDetail("missing")).rejects.toThrow(
+      "Client not found",
+    );
+  });
+
   it("updates name and setting summary values in memory", async () => {
     const updated = await clientRepositoryMock.updateClient({
       clientId: "c3",

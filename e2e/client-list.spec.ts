@@ -19,3 +19,14 @@ test("navigates from client list to detail and back", async ({ page }) => {
   await expect(page).toHaveURL(/\/ops\/client$/);
   await expect(page.getByRole("heading", { name: "4.0 客户" })).toBeVisible();
 });
+
+test("navigates from client detail to plan detail", async ({ page }) => {
+  await page.goto("/#/ops/client/c1");
+
+  await expect(page.getByRole("heading", { name: "客户详情" })).toBeVisible();
+  await page.getByRole("button", { name: /用餐计划/ }).click();
+  await expect(page.getByRole("heading", { name: "用餐计划" })).toBeVisible();
+
+  await page.getByRole("button", { name: /方案 A/ }).click();
+  await expect(page).toHaveURL(/\/ops\/client\/c1\/plan\/p1/);
+});

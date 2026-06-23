@@ -9,6 +9,13 @@ import {
   createDefaultClientSettings,
 } from "@/infrastructure/mock/clientMockData";
 
+function toClientDetailSnapshot(client: (typeof clientMockData)[number]) {
+  return structuredClone({
+    ...client,
+    settings: buildClientSettingSummaries(client),
+  });
+}
+
 export const clientRepositoryMock: ClientRepository = {
   async listClients(params) {
     const normalizedParams = normalizeClientListParams(params);
@@ -32,7 +39,7 @@ export const clientRepositoryMock: ClientRepository = {
   async getClientDetail(clientId) {
     const client = clientMockData.find((item) => item.id === clientId);
     if (!client) throw new Error("Client not found");
-    return client;
+    return toClientDetailSnapshot(client);
   },
   async updateClient(input) {
     const client = clientMockData.find((item) => item.id === input.clientId);
@@ -112,6 +119,6 @@ export const clientRepositoryMock: ClientRepository = {
       };
     }
     client.settings = buildClientSettingSummaries(client);
-    return client;
+    return toClientDetailSnapshot(client);
   },
 };

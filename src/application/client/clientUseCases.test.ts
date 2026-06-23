@@ -39,6 +39,12 @@ describe("client use cases", () => {
     await expect(getClientDetail(repository, " ")).rejects.toThrow("clientId is required");
   });
 
+  it("delegates client detail lookups to the repository by client id", async () => {
+    await getClientDetail(repository, "c1");
+
+    expect(repository.getClientDetail).toHaveBeenCalledWith("c1");
+  });
+
   it("passes update values through without applying business decisions", async () => {
     await updateClient(repository, { clientId: "c1", values: { name: "客户 A" } });
     expect(repository.updateClient).toHaveBeenCalledWith({

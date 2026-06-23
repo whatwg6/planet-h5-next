@@ -9,10 +9,11 @@ import { ClientDetailRoute } from "./ClientDetailRoute";
 const navigateMock = vi.fn();
 const historyBackMock = vi.fn();
 let routeState: Record<string, unknown> = {};
+let routeParams: { clientId?: string } = { clientId: "c1" };
 
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
-  useParams: () => ({ clientId: "c1" }),
+  useParams: () => routeParams,
   useRouter: () => ({ history: { back: historyBackMock } }),
   useRouterState: <T,>({
     select,
@@ -36,6 +37,7 @@ describe("ClientDetailRoute", () => {
     navigateMock.mockReset();
     historyBackMock.mockReset();
     routeState = {};
+    routeParams = { clientId: "c1" };
   });
 
   it("pushes settings mode into route state from the detail home page", async () => {
@@ -55,6 +57,36 @@ describe("ClientDetailRoute", () => {
     const settingsState = navigateMock.mock.calls[0][0].state({ __TSR_index: 0 });
     expect(settingsState).toMatchObject({ routeMode: "setting" });
     expect(screen.queryByRole("button", { name: "保存" })).not.toBeInTheDocument();
+  });
+
+  it("renders the legacy default entries and web destination fallback", async () => {
+    const user = userEvent.setup();
+    renderWithQuery(<ClientDetailRoute />);
+
+    expect(await screen.findByRole("button", { name: /用餐计划/ })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /目的地/ }));
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "此功能专为移动端设计，请移步 APP 继续使用。",
+    );
+  });
+
+  it("falls back to the default detail page for an unknown route mode", async () => {
+    routeState = { routeMode: "notMigratedYet" };
+
+    renderWithQuery(<ClientDetailRoute />);
+
+    expect(await screen.findByRole("heading", { name: "客户详情" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /用餐计划/ })).toBeInTheDocument();
+  });
+
+  it("passes route params into the detail query", async () => {
+    routeParams = { clientId: "c2" };
+
+    renderWithQuery(<ClientDetailRoute />);
+
+    expect(await screen.findByText("客户 B")).toBeInTheDocument();
+    expect(screen.queryByText("测试客户")).not.toBeInTheDocument();
   });
 
   it("pushes name and remark mode from the settings page row", async () => {

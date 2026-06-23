@@ -1,6 +1,8 @@
 import type { ClientDetail } from "@/domain/client/Client";
+import { Button } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 import { cn } from "@/shared/utils/cn";
+import { useState } from "react";
 
 export function ClientDetailView({
   client,
@@ -13,8 +15,23 @@ export function ClientDetailView({
   onOpenMealPlans: () => void;
   onOpenSettings: () => void;
 }) {
+  const [destinationMessage, setDestinationMessage] = useState("");
+
   return (
-    <Page title="客户详情" onBack={onBack}>
+    <Page
+      title="客户详情"
+      onBack={onBack}
+      navigationRight={
+        <Button
+          variant="ghost"
+          className="h-10 w-10 px-0"
+          aria-label="客户设置"
+          onClick={onOpenSettings}
+        >
+          设置
+        </Button>
+      }
+    >
       <div className="space-y-4">
         <section className="space-y-3 px-1 pt-2">
           <h1 className="text-xl font-semibold leading-7 text-text-primary">{client.name}</h1>
@@ -35,11 +52,19 @@ export function ClientDetailView({
             onClick={onOpenMealPlans}
           />
           <ClientDetailEntry
-            title="客户设置"
-            description="名称、账号、支付和高级设置"
-            onClick={onOpenSettings}
+            title="目的地"
+            description="查看企业地址及目的地配置"
+            onClick={() => setDestinationMessage("此功能专为移动端设计，请移步 APP 继续使用。")}
           />
         </div>
+        {destinationMessage ? (
+          <div
+            role="status"
+            className="rounded-md bg-background-components px-3 py-2 text-sm text-text-secondary"
+          >
+            {destinationMessage}
+          </div>
+        ) : null}
       </div>
     </Page>
   );
