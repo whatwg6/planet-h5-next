@@ -16,8 +16,6 @@ export type {
   RouteStackEntry,
   RouteStackNavigationAction,
   RouteStackNavigationType,
-  RouteStackPageProps,
-  RouteStackParams,
 } from "@/app/router/routeStackModel";
 export {
   getNextRouteStackEntries,

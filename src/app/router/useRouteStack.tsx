@@ -7,8 +7,6 @@ import {
   getRouteStackCurrentEntry,
   type RouteStackEntry,
   type RouteStackNavigationAction,
-  type RouteStackPageProps,
-  type RouteStackParams,
 } from "@/app/router/routeStackModel";
 
 type RouteStackLocationState = {
@@ -21,12 +19,11 @@ type RouteStackMatch = {
   id: string;
   routeId: string;
   pathname: string;
-  params: RouteStackParams;
 };
 
 type RouteStackComponentRoute = {
   options: {
-    component?: ComponentType<RouteStackPageProps>;
+    component?: ComponentType;
   };
 };
 
@@ -90,7 +87,7 @@ function createRouteStackEntry({
     location: snapshotRouteStackLocation(location),
     pathname: location.pathname,
     historyIndex: getLocationHistoryIndex(location),
-    element: <Page routeParams={childMatch.params} />,
+    element: <Page />,
     nodeRef: createRef<HTMLDivElement>(),
   };
 }

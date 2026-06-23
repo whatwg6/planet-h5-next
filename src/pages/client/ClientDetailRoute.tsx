@@ -1,7 +1,6 @@
 import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 
 import { routeModeState } from "@/app/router/historyState";
-import type { RouteStackPageProps } from "@/app/router/RouteStack";
 import { RouteModeSwitch } from "@/app/router/RouteModeSwitch";
 import { useClientDetailQuery } from "@/features/client/queries/useClientDetailQuery";
 import { ClientAppVersionSettingsView } from "@/features/client/views/ClientAppVersionSettingsView";
@@ -22,11 +21,11 @@ import { ClientSupportSettingsView } from "@/features/client/views/ClientSupport
 import { ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Page } from "@/shared/ui/Page";
 
-export function ClientDetailRoute({ routeParams }: RouteStackPageProps) {
+export function ClientDetailRoute() {
   const params = useParams({ strict: false, shouldThrow: false });
   const navigate = useNavigate();
   const router = useRouter();
-  const clientId = routeParams?.clientId ?? params?.clientId ?? "";
+  const clientId = params?.clientId ?? "";
   const query = useClientDetailQuery(clientId);
   const back = () => router.history.back();
 

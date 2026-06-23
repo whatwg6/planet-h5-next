@@ -16,7 +16,7 @@ When adding a new route:
 1. Add the route component under `src/pages/<module>`.
 2. Add or update the view under `src/features/<module>/views`.
 3. Register the route in `src/app/router/routeTree.tsx`.
-4. If the route reads path params, let the route component accept optional `routeParams` from `src/app/router/RouteStack.tsx` and fall back to `useParams({ strict: false, shouldThrow: false })`.
+4. If the route reads path params, call `useParams({ strict: false, shouldThrow: false })` in the route component.
 5. Render route entry content through `RouteModeSwitch` from `src/app/router/RouteModeSwitch.tsx`; put the normal page in `defaultPage`, and add same-URL page modes in `modes` when needed.
 6. Add route tests when registration or behavior changes.
 

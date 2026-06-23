@@ -1,7 +1,6 @@
 import { useNavigate, useParams, useRouter } from "@tanstack/react-router";
 
 import { routeModeState } from "@/app/router/historyState";
-import type { RouteStackPageProps } from "@/app/router/RouteStack";
 import { RouteModeSwitch } from "@/app/router/RouteModeSwitch";
 import { parseOrderParams } from "@/domain/order/orderRules";
 import { ClientMemberOrderListView } from "@/features/order/views/ClientMemberOrderListView";
@@ -9,13 +8,13 @@ import { ClientOrderDetailView } from "@/features/order/views/ClientOrderDetailV
 import { ErrorState } from "@/shared/ui/Feedback";
 import { Page } from "@/shared/ui/Page";
 
-export function ClientOrderRoute({ routeParams }: RouteStackPageProps) {
+export function ClientOrderRoute() {
   const params = useParams({ strict: false, shouldThrow: false });
   const router = useRouter();
   const navigate = useNavigate();
-  const clientId = routeParams?.clientId ?? params?.clientId ?? "";
-  const planId = routeParams?.planId ?? params?.planId ?? "";
-  const rawOrderParams = routeParams?.orderParams ?? params?.orderParams ?? "";
+  const clientId = params?.clientId ?? "";
+  const planId = params?.planId ?? "";
+  const rawOrderParams = params?.orderParams ?? "";
   const parsed = parseOrderParams(rawOrderParams);
   const back = () => router.history.back();
 

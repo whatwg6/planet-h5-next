@@ -1,11 +1,5 @@
 import type { ReactNode, RefObject } from "react";
 
-export type RouteStackParams = Record<string, string>;
-
-export type RouteStackPageProps = {
-  routeParams?: RouteStackParams;
-};
-
 export type RouteStackNavigationType = "PUSH" | "REPLACE" | "FORWARD" | "BACK" | "GO";
 
 export type RouteStackNavigationAction =

@@ -1,18 +1,14 @@
 import { useParams } from "@tanstack/react-router";
 
-import type { RouteStackPageProps } from "@/app/router/RouteStack";
 import { RouteModeSwitch } from "@/app/router/RouteModeSwitch";
 import { PlanSettingsView } from "@/features/plan/views/PlanSettingsView";
 
-export function PlanSettingsRoute({ routeParams }: RouteStackPageProps) {
+export function PlanSettingsRoute() {
   const params = useParams({ strict: false, shouldThrow: false });
   return (
     <RouteModeSwitch
       defaultPage={
-        <PlanSettingsView
-          clientId={routeParams?.clientId ?? params?.clientId ?? ""}
-          planId={routeParams?.planId ?? params?.planId ?? ""}
-        />
+        <PlanSettingsView clientId={params?.clientId ?? ""} planId={params?.planId ?? ""} />
       }
     />
   );
