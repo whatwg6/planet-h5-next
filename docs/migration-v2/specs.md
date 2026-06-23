@@ -27,6 +27,10 @@ Out of scope:
 
 All migrated data must use mock repositories. Do not call old APIs because the old API surface is no longer reliable.
 
+Existing placeholder or partially migrated code in this project is not a compatibility target. During
+migration, replace or delete existing placeholder implementations when they conflict with this
+spec. The old `planet-h5` source and this document define the migration target.
+
 ## UI Migration Policy
 
 Migration includes UI structure and interaction behavior, not only data and business logic.
@@ -184,8 +188,9 @@ RoutePath.clientOrder
 ```
 
 When registering these in TanStack Router, preserve the URL shape and convert path
-parameter syntax only as required by TanStack Router. For example, `:id` may become a TanStack Router
-path parameter such as `$clientId`, but the public route shape must remain `/ops/client...`.
+parameter syntax only as required by TanStack Router. For example, old `:id` should become the
+client-specific TanStack Router parameter `$clientId`, but the public route shape must remain
+`/ops/client...`.
 
 Do not invent new production route paths from the current project's existing placeholders.
 `/ops/client...` is the production route contract for this migration.
@@ -254,105 +259,6 @@ Do not create extra URL paths for same-resource modes. For example, edit, settin
 Default pages are not route modes. Render them through `RouteModeSwitch defaultPage` and list only
 non-default `pageType` states as `routeMode` values.
 
-## Required Migration Inventory
-
-Use this inventory as the initial executable map. If old `planet-h5` adds or removes business
-pageTypes before migration, update this section first, then implement code.
-
-Route-level inventory:
-
-| Route                                             | Old entry                       | New TanStack route                                      | Route component                          | Default feature view                                 |
-| ------------------------------------------------- | ------------------------------- | ------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
-| `/ops/client`                                     | `src/apps/client/client-list`   | `/ops/client`                                           | `src/pages/client/ClientListRoute.tsx`   | `src/features/client/views/ClientListView.tsx`       |
-| `/ops/client/:id`                                 | `src/apps/client/client-detail` | `/ops/client/$clientId`                                 | `src/pages/client/ClientDetailRoute.tsx` | `src/features/client/views/ClientDetailView.tsx`     |
-| `/ops/client/:id/plan/:planId`                    | `src/apps/client/plan-detail`   | `/ops/client/$clientId/plan/$planId`                    | `src/pages/plan/PlanDetailRoute.tsx`     | `src/features/plan/views/PlanDetailView.tsx`         |
-| `/ops/client/:id/plan/:planId/setting`            | `src/apps/client/plan-setting`  | `/ops/client/$clientId/plan/$planId/setting`            | `src/pages/plan/PlanSettingsRoute.tsx`   | `src/features/plan/views/PlanSettingsView.tsx`       |
-| `/ops/client/:id/plan/:planId/order/:orderParams` | `src/apps/client/client-order`  | `/ops/client/$clientId/plan/$planId/order/$orderParams` | `src/pages/order/ClientOrderRoute.tsx`   | `src/features/order/views/ClientOrderDetailView.tsx` |
-
-Client detail page modes from old `ClientDetailPageEnum`:
-
-| Old pageType                             | New routeMode                            | Target view or capability                   |
-| ---------------------------------------- | ---------------------------------------- | ------------------------------------------- |
-| `plan`                                   | `plan`                                   | `ClientMealPlansView`                       |
-| `setting`                                | `setting`                                | `ClientSettingsView`                        |
-| `nameAndRemark`                          | `nameAndRemark`                          | `ClientNameAndRemarkView`                   |
-| `nameAndRemarkEdit`                      | `nameAndRemarkEdit`                      | `ClientDetailEditView` or focused edit view |
-| `notification`                           | `notification`                           | `ClientNotificationSettingsView`            |
-| `paymentMethod`                          | `paymentMethod`                          | `features/payment-method` capability        |
-| `mealType`                               | `mealType`                               | `ClientMealSettingsView`                    |
-| `mealTypeSetting`                        | `mealTypeSetting`                        | focused meal type edit view                 |
-| `mealGroup`                              | `mealGroup`                              | `ClientMealSettingsView`                    |
-| `manager`                                | `manager`                                | `ClientManagerSettingsView`                 |
-| `support`                                | `support`                                | `ClientSupportSettingsView`                 |
-| `supportEdit`                            | `supportEdit`                            | focused support edit view                   |
-| `department`                             | `department`                             | `ClientDepartmentSettingsView`              |
-| `departmentEdit`                         | `departmentEdit`                         | focused department edit view                |
-| `costCenter`                             | `costCenter`                             | `ClientCostCenterSettingsView`              |
-| `costCenterEdit`                         | `costCenterEdit`                         | focused cost center edit view               |
-| `appVersion`                             | `appVersion`                             | `ClientAppVersionSettingsView`              |
-| `meicanCard`                             | `meicanCard`                             | `features/card-setting` capability          |
-| `externalCard`                           | `externalCard`                           | `features/card-setting` capability          |
-| `mealPoint`                              | `mealPoint`                              | `ClientMealSettingsView`                    |
-| `fieldSetting`                           | `fieldSetting`                           | `ClientFieldSettingsView`                   |
-| `fieldSettingDetail`                     | `fieldSettingDetail`                     | focused field setting detail view           |
-| `loginSetting`                           | `loginSetting`                           | `ClientLoginSettingsView`                   |
-| `loginSettingEmployeeNumber`             | `loginSettingEmployeeNumber`             | focused employee number login view          |
-| `loginSettingThirdParty`                 | `loginSettingThirdParty`                 | focused third-party login view              |
-| `loginSettingThirdPartyDetail`           | `loginSettingThirdPartyDetail`           | focused third-party login detail view       |
-| `loginSettingThirdPartyAssociateSetting` | `loginSettingThirdPartyAssociateSetting` | focused third-party associate setting view  |
-| `loginSettingThirdPartyMealplanSetting`  | `loginSettingThirdPartyMealplanSetting`  | focused third-party meal plan setting view  |
-| `passwordSetting`                        | `passwordSetting`                        | `ClientPasswordSettingsView`                |
-| `passwordComplexitySetting`              | `passwordComplexitySetting`              | focused password complexity view            |
-| `passwordPeriodSetting`                  | `passwordPeriodSetting`                  | focused password period view                |
-
-Plan settings page modes from old `PlanSettingPageEnum`:
-
-| Old pageType                | New routeMode               | Target view or capability                     |
-| --------------------------- | --------------------------- | --------------------------------------------- |
-| `baseInfo`                  | `baseInfo`                  | focused plan base info view                   |
-| `baseInfoEdit`              | `baseInfoEdit`              | focused plan base info edit view              |
-| `operationDay`              | `operationDay`              | focused operation day view                    |
-| `restriction`               | `restriction`               | focused merchant restriction view             |
-| `memberCount`               | `memberCount`               | focused member count view, if still reachable |
-| `clientMemberList`          | `clientMemberList`          | `features/client-member` capability           |
-| `clientMemberDetail`        | `clientMemberDetail`        | `features/client-member` capability           |
-| `openTimesDinnerIn`         | `openTimesDinnerIn`         | focused dinner-in open times view             |
-| `openTimesGroupDelivery`    | `openTimesGroupDelivery`    | focused group delivery open times view        |
-| `maximumOrderAmount`        | `maximumOrderAmount`        | focused maximum order amount view             |
-| `hidePrice`                 | `hidePrice`                 | focused hide price view                       |
-| `hidePriceAndMealPoint`     | `hidePriceAndMealPoint`     | focused hide price and meal point view        |
-| `disableAppendDish`         | `disableAppendDish`         | focused disable append dish view              |
-| `hiddenAccountTypes`        | `hiddenAccountTypes`        | focused hidden account types view             |
-| `dishRemark`                | `dishRemark`                | focused dish remark view                      |
-| `deliveryRemark`            | `deliveryRemark`            | focused delivery remark view                  |
-| `orderRule`                 | `orderRule`                 | focused order rule view                       |
-| `paymentMethod`             | `paymentMethod`             | `features/payment-method` capability          |
-| `paymentMethodSelectConfig` | `paymentMethodSelectConfig` | `features/payment-method` capability          |
-| `manuallyConfirmOrder`      | `manuallyConfirmOrder`      | focused manually confirm order view           |
-| `occupationTime`            | `occupationTime`            | focused occupation time view                  |
-| `orderTransfer`             | `orderTransfer`             | focused order transfer view                   |
-| `merchantOrderVerification` | `merchantOrderVerification` | focused merchant verification view            |
-| `pickupSetting`             | `pickupSetting`             | focused pickup setting view                   |
-| `pickUpMealCodeRule`        | `pickUpMealCodeRule`        | focused pickup meal code view                 |
-| `menuStyle`                 | `menuStyle`                 | focused menu style view                       |
-| `financeConfig`             | `financeConfig`             | focused finance config view                   |
-| `financeConfigAmount`       | `financeConfigAmount`       | focused finance amount view                   |
-| `financeConfigMealType`     | `financeConfigMealType`     | focused finance meal type view                |
-| `location`                  | `location`                  | focused location setting view                 |
-
-Client order page modes from old `ClientOrderPageEnum`:
-
-| Old pageType            | New routeMode           | Target view                 |
-| ----------------------- | ----------------------- | --------------------------- |
-| `clientMemberOrderList` | `clientMemberOrderList` | `ClientMemberOrderListView` |
-
-Old client list and plan detail currently define empty pageType enums, so they migrate as default route
-pages unless old `planet-h5` adds reachable pageTypes later.
-
-Every row above that is implemented must satisfy the applicable minimum test checklist in
-`plan.md`, including route mode dispatch coverage for implemented modes and focused view, hook,
-schema, or repository coverage for the behavior owned by that row.
-
 ## Page Stack Migration
 
 Do not migrate the old page stack implementation.
@@ -375,7 +281,9 @@ Route components that need params should follow this shape:
 ```tsx
 export function SomeRoute({ routeParams }: RouteStackPageProps) {
   const params = useParams({ strict: false, shouldThrow: false });
-  const id = routeParams?.id ?? params?.id ?? "";
+  const clientId = routeParams?.clientId ?? params?.clientId ?? "";
+  const planId = routeParams?.planId ?? params?.planId ?? "";
+  const orderParams = routeParams?.orderParams ?? params?.orderParams ?? "";
 }
 ```
 
