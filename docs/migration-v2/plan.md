@@ -11,23 +11,14 @@
 - This plan
 - Legacy source files listed in the relevant task
 
-Record implementation evidence in `docs/migration-v2/execution.md`. If it does not exist, create it in Task 1.
+Record implementation evidence in `docs/migration-v2/execution-log.md`. If it does not exist, create it in Task 1.
 
-## Rules That Apply To Every Task
+## Execution Checklist For Every Task
+
+Use this checklist while executing each task.
 
 - Work in small TDD loops: failing test, run and confirm failure, minimal implementation, run and confirm pass.
-- Do not import old API clients, Axios clients, mock data files, backend response shapes, or request clients from route, view, query, or mutation code.
-- Do not add compatibility routes outside `/ops/client...` for migrated client, plan, or order flows.
-- Do not copy old folders wholesale. Classify each migrated behavior by layer before moving it.
-- Keep mock data deterministic: no `Date.now()`, random IDs, random ordering, timers, localStorage, sessionStorage, IndexedDB, cookies, or remote calls.
-- Repository facades for migrated business behavior export mock implementations only, for example:
-
-```ts
-export { clientRepositoryMock as clientRepository } from "./clientRepository.mock";
-```
-
-- For route components that read params, accept optional `RouteStackPageProps` params and fall back to `useParams({ strict: false, shouldThrow: false })`.
-- For every completed task, append evidence to `docs/migration-v2/execution.md`: old files inspected, tests changed, behavior covered, commands run, result, and any skipped checks with a concrete `N/A` reason.
+- For every task, update the status summary in `docs/migration-v2/execution-log.md` when status changes, and append evidence when work is completed.
 - Commit after each task when the tree is coherent. Suggested commit messages are included; adjust them when the actual scope differs.
 
 ## Standard Verification Commands
@@ -40,7 +31,7 @@ pnpm format:check
 pnpm test
 ```
 
-Also run `pnpm e2e` for Tasks 2, 3, 4, 7, and 8. Also run `pnpm build` for Tasks 2, 7, and 10.
+Also run `pnpm e2e` for Tasks 2, 3, 4, 7, and 10. Also run `pnpm build` for Tasks 2, 7, and 12.
 
 ## Playwright Coverage Contract
 
@@ -52,11 +43,11 @@ Only add Playwright flows from this table unless this plan is updated first.
 | 3    | Client list to detail                    | Open `/ops/client`, navigate to one client detail, verify `/ops/client/$clientId`, then browser back.   |
 | 4    | Client detail to plan detail             | Open `/ops/client/$clientId`, navigate to one plan detail, verify `/ops/client/$clientId/plan/$planId`. |
 | 7    | Plan detail to setting and one edit mode | Open plan detail, navigate to setting, open the first implemented edit mode, then browser back twice.   |
-| 8    | Client order member list mode            | Open one order detail, enter `clientMemberOrderList` route mode, then browser back to order detail.     |
+| 10   | Client order member list mode            | Open one order detail, enter `clientMemberOrderList` route mode, then browser back to order detail.     |
 
 ## Legacy Source Inventory
 
-Inspect the listed old files before implementing the owning task. If a path is missing or behavior differs from this inventory, record the deviation in `docs/migration-v2/execution.md` before coding.
+Inspect the listed old files before implementing the owning task. If a path is missing or behavior differs from this inventory, record the deviation in `docs/migration-v2/execution-log.md` before coding.
 
 | Area                  | Legacy source files or symbols                                                                                                                                   | Purpose                                                           |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -75,21 +66,35 @@ Inspect the listed old files before implementing the owning task. If a path is m
 
 **Files:**
 
-- Create or modify: `docs/migration-v2/execution.md`
+- Create or modify: `docs/migration-v2/execution-log.md`
 - Modify: `docs/migration-v2/plan.md` only if task status or scope changes
 
 **Step 1: Write the execution log skeleton**
 
-Create `docs/migration-v2/execution.md` with this structure:
+Create `docs/migration-v2/execution-log.md` with this structure:
 
 ```markdown
 # Business Migration V2 Execution Log
 
 Use this file for evidence produced while executing `docs/migration-v2/plan.md`.
 
+Allowed status values: `Not started`, `In progress`, `Completed`, `Blocked`, `Skipped`.
+
+## Status Summary
+
+| Task | Status      | Updated | Notes |
+| ---- | ----------- | ------- | ----- |
+| 1    | Not started | N/A     |       |
+
+## Route Mode Status
+
+| Area | Route mode | Target | Status | Updated | Notes |
+| ---- | ---------- | ------ | ------ | ------- | ----- |
+
 ## Evidence Template
 
 - Task:
+- Status:
 - Legacy source inspected:
 - Tests added or updated:
 - Behavior covered:
@@ -106,19 +111,19 @@ Use this file for evidence produced while executing `docs/migration-v2/plan.md`.
 Run:
 
 ```bash
-pnpm format:check docs/migration-v2/plan.md docs/migration-v2/execution.md
+pnpm format:check docs/migration-v2/plan.md docs/migration-v2/execution-log.md
 ```
 
-Expected: PASS. If Prettier reports formatting differences, run `pnpm format docs/migration-v2/plan.md docs/migration-v2/execution.md`, then rerun the check.
+Expected: PASS. If Prettier reports formatting differences, run `pnpm format docs/migration-v2/plan.md docs/migration-v2/execution-log.md`, then rerun the check.
 
 **Step 3: Record evidence**
 
-Append an entry for Task 1 to `docs/migration-v2/execution.md`.
+Append an entry for Task 1 to `docs/migration-v2/execution-log.md`.
 
 **Step 4: Commit**
 
 ```bash
-git add docs/migration-v2/plan.md docs/migration-v2/execution.md
+git add docs/migration-v2/plan.md docs/migration-v2/execution-log.md
 git commit -m "docs: prepare migration v2 execution log"
 ```
 
@@ -135,7 +140,7 @@ git commit -m "docs: prepare migration v2 execution log"
 - Modify: `src/pages/plan/PlanSettingsRoute.tsx`
 - Modify: `src/pages/order/ClientOrderRoute.tsx`
 - Modify or create: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Write failing router registration tests**
 
@@ -236,10 +241,10 @@ Expected: PASS.
 
 **Step 7: Record evidence and commit**
 
-Append Task 2 evidence to `docs/migration-v2/execution.md`, then:
+Append Task 2 evidence to `docs/migration-v2/execution-log.md`, then:
 
 ```bash
-git add src/app/router src/pages e2e/client-list.spec.ts docs/migration-v2/execution.md
+git add src/app/router src/pages e2e/client-list.spec.ts docs/migration-v2/execution-log.md
 git commit -m "test: lock ops client route contract"
 ```
 
@@ -265,11 +270,11 @@ git commit -m "test: lock ops client route contract"
 - Modify: `src/features/client/views/ClientListView.tsx`
 - Modify: `src/pages/client/ClientListRoute.tsx`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Inspect legacy client list files**
 
-Read the legacy client-list files from the inventory. Record exact file paths and important symbols in `execution.md`.
+Read the legacy client-list files from the inventory. Record exact file paths and important symbols in `execution-log.md`.
 
 **Step 2: Write failing domain, use-case, and repository tests**
 
@@ -341,7 +346,7 @@ Expected: PASS.
 **Step 7: Record evidence and commit**
 
 ```bash
-git add src/domain/client src/application/client src/infrastructure/mock/clientMockData.ts src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts src/features/client src/pages/client/ClientListRoute.tsx e2e/client-list.spec.ts docs/migration-v2/execution.md
+git add src/domain/client src/application/client src/infrastructure/mock/clientMockData.ts src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts src/features/client src/pages/client/ClientListRoute.tsx e2e/client-list.spec.ts docs/migration-v2/execution-log.md
 git commit -m "feat: migrate client list"
 ```
 
@@ -365,7 +370,7 @@ git commit -m "feat: migrate client list"
 - Modify: `src/infrastructure/mock/clientMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Inspect legacy client detail files**
 
@@ -411,40 +416,40 @@ Expected: FAIL until the detail page links to a plan.
 
 Render through `RouteModeSwitch`. Feature views must receive ordinary props and callbacks; they must not read `location.state`. Translate backend-like fields into domain entities and deterministic fixtures.
 
-**Step 6: Track client detail route modes**
+**Step 6: Inventory client detail route modes**
 
-Use this inventory while implementing focused modes in later tasks:
+Use this inventory while implementing focused modes in later tasks. Track execution status in `docs/migration-v2/execution-log.md`.
 
-| Route mode                                                                                                                                                                                | Target                                      | Status      |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
-| `plan`                                                                                                                                                                                    | `ClientMealPlansView`                       | Not started |
-| `setting`                                                                                                                                                                                 | `ClientSettingsView`                        | Not started |
-| `nameAndRemark`                                                                                                                                                                           | `ClientNameAndRemarkView`                   | Not started |
-| `nameAndRemarkEdit`                                                                                                                                                                       | `ClientDetailEditView` or focused edit view | Not started |
-| `notification`                                                                                                                                                                            | `ClientNotificationSettingsView`            | Not started |
-| `paymentMethod`                                                                                                                                                                           | `features/payment-method` capability        | Not started |
-| `mealType`, `mealTypeSetting`, `mealGroup`, `mealPoint`                                                                                                                                   | meal-setting views                          | Not started |
-| `manager`, `support`, `supportEdit`                                                                                                                                                       | manager/support views                       | Not started |
-| `department`, `departmentEdit`                                                                                                                                                            | department views                            | Not started |
-| `costCenter`, `costCenterEdit`                                                                                                                                                            | cost-center views                           | Not started |
-| `appVersion`                                                                                                                                                                              | app-version view                            | Not started |
-| `meicanCard`, `externalCard`                                                                                                                                                              | `features/card-setting` capability          | Not started |
-| `fieldSetting`, `fieldSettingDetail`                                                                                                                                                      | field-setting views                         | Not started |
-| `loginSetting`, `loginSettingEmployeeNumber`, `loginSettingThirdParty`, `loginSettingThirdPartyDetail`, `loginSettingThirdPartyAssociateSetting`, `loginSettingThirdPartyMealplanSetting` | login-setting views                         | Not started |
-| `passwordSetting`, `passwordComplexitySetting`, `passwordPeriodSetting`                                                                                                                   | password views                              | Not started |
+| Route mode                                                                                                                                                                                | Target                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `plan`                                                                                                                                                                                    | `ClientMealPlansView`                       |
+| `setting`                                                                                                                                                                                 | `ClientSettingsView`                        |
+| `nameAndRemark`                                                                                                                                                                           | `ClientNameAndRemarkView`                   |
+| `nameAndRemarkEdit`                                                                                                                                                                       | `ClientDetailEditView` or focused edit view |
+| `notification`                                                                                                                                                                            | `ClientNotificationSettingsView`            |
+| `paymentMethod`                                                                                                                                                                           | `features/payment-method` capability        |
+| `mealType`, `mealTypeSetting`, `mealGroup`, `mealPoint`                                                                                                                                   | meal-setting views                          |
+| `manager`, `support`, `supportEdit`                                                                                                                                                       | manager/support views                       |
+| `department`, `departmentEdit`                                                                                                                                                            | department views                            |
+| `costCenter`, `costCenterEdit`                                                                                                                                                            | cost-center views                           |
+| `appVersion`                                                                                                                                                                              | app-version view                            |
+| `meicanCard`, `externalCard`                                                                                                                                                              | `features/card-setting` capability          |
+| `fieldSetting`, `fieldSettingDetail`                                                                                                                                                      | field-setting views                         |
+| `loginSetting`, `loginSettingEmployeeNumber`, `loginSettingThirdParty`, `loginSettingThirdPartyDetail`, `loginSettingThirdPartyAssociateSetting`, `loginSettingThirdPartyMealplanSetting` | login-setting views                         |
+| `passwordSetting`, `passwordComplexitySetting`, `passwordPeriodSetting`                                                                                                                   | password views                              |
 
-Move a row to Done only after tests, implementation, validation, and execution evidence exist.
+Mark a route mode `Completed` in the execution log only after tests, implementation, validation, and evidence exist.
 
 **Step 7: Run focused verification and commit**
 
 ```bash
 pnpm test src/pages/client/ClientDetailRoute.test.tsx src/application/client/clientUseCases.test.ts src/infrastructure/repositories/client/clientRepository.mock.test.ts src/features/client/views
 pnpm e2e e2e/client-list.spec.ts
-git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/mock/clientMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution.md
+git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/mock/clientMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution-log.md
 git commit -m "feat: migrate client detail default page"
 ```
 
-## Task 5: Migrate Client Detail Focused Modes
+## Task 5: Migrate One Client Detail Route Mode
 
 **Files:**
 
@@ -460,7 +465,7 @@ git commit -m "feat: migrate client detail default page"
 - Modify: `src/infrastructure/repositories/client/clientRepository.mock.ts`
 - Modify: `src/infrastructure/repositories/client/clientRepository.mock.test.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Choose one focused mode**
 
@@ -498,11 +503,11 @@ Use React Hook Form and Zod for validation-bearing forms. Put pure validation in
 
 ```bash
 pnpm test src/pages/client/ClientDetailRoute.test.tsx src/domain/client/clientRules.test.ts src/application/client/clientUseCases.test.ts src/infrastructure/repositories/client/clientRepository.mock.test.ts src/features/client/views
-git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts docs/migration-v2/execution.md
-git commit -m "feat: migrate client detail focused mode"
+git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts docs/migration-v2/execution-log.md
+git commit -m "feat: migrate client detail route mode"
 ```
 
-Repeat Task 5 until every reachable client detail route mode is Done or recorded as N/A with evidence.
+Repeat Task 5 as a separate task execution for each reachable client detail route mode, or for a tightly coupled mode group, until every reachable mode is `Completed` or recorded as `Skipped` with evidence in the execution log.
 
 ## Task 6: Migrate Plan Detail Default Page
 
@@ -524,7 +529,7 @@ Repeat Task 5 until every reachable client detail route mode is Done or recorded
 - Modify: `src/infrastructure/repositories/plan/index.ts`
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Inspect legacy plan detail**
 
@@ -559,7 +564,7 @@ Keep plan detail on `/ops/client/$clientId/plan/$planId`. Keep any settings navi
 
 ```bash
 pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/router.test.ts
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/execution.md
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/execution-log.md
 git commit -m "feat: migrate plan detail"
 ```
 
@@ -580,7 +585,7 @@ git commit -m "feat: migrate plan detail"
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Inspect legacy plan settings**
 
@@ -626,23 +631,25 @@ Expected: FAIL until settings navigation and route mode work.
 
 Render through `RouteModeSwitch`. Convert old `PlanSettingPageEnum` values to `routeMode`. Keep saves in the plan mutation and application use case. Use `features/setting-rule` only for editors shared by both client and plan routes; keep route-specific editors in `features/plan`.
 
-**Step 6: Track plan setting modes**
+**Step 6: Inventory plan setting modes**
 
-| Route mode                                                                             | Target                               | Status      |
-| -------------------------------------------------------------------------------------- | ------------------------------------ | ----------- |
-| `baseInfo`, `baseInfoEdit`                                                             | plan base info read/edit             | Not started |
-| `operationDay`                                                                         | operation day view                   | Not started |
-| `restriction`                                                                          | merchant restriction view            | Not started |
-| `memberCount`                                                                          | member count view if reachable       | Not started |
-| `clientMemberList`, `clientMemberDetail`                                               | `features/client-member` capability  | Not started |
-| `openTimesDinnerIn`, `openTimesGroupDelivery`                                          | open-times views                     | Not started |
-| `maximumOrderAmount`, `hidePrice`, `hidePriceAndMealPoint`                             | price visibility and amount views    | Not started |
-| `disableAppendDish`, `hiddenAccountTypes`, `dishRemark`, `deliveryRemark`, `orderRule` | order-rule views                     | Not started |
-| `paymentMethod`, `paymentMethodSelectConfig`                                           | `features/payment-method` capability | Not started |
-| `manuallyConfirmOrder`, `occupationTime`, `orderTransfer`, `merchantOrderVerification` | order operation views                | Not started |
-| `pickupSetting`, `pickUpMealCodeRule`, `menuStyle`                                     | pickup/menu views                    | Not started |
-| `financeConfig`, `financeConfigAmount`, `financeConfigMealType`                        | finance views                        | Not started |
-| `location`                                                                             | location setting view                | Not started |
+Track execution status for these modes in `docs/migration-v2/execution-log.md`.
+
+| Route mode                                                                             | Target                               |
+| -------------------------------------------------------------------------------------- | ------------------------------------ |
+| `baseInfo`, `baseInfoEdit`                                                             | plan base info read/edit             |
+| `operationDay`                                                                         | operation day view                   |
+| `restriction`                                                                          | merchant restriction view            |
+| `memberCount`                                                                          | member count view if reachable       |
+| `clientMemberList`, `clientMemberDetail`                                               | `features/client-member` capability  |
+| `openTimesDinnerIn`, `openTimesGroupDelivery`                                          | open-times views                     |
+| `maximumOrderAmount`, `hidePrice`, `hidePriceAndMealPoint`                             | price visibility and amount views    |
+| `disableAppendDish`, `hiddenAccountTypes`, `dishRemark`, `deliveryRemark`, `orderRule` | order-rule views                     |
+| `paymentMethod`, `paymentMethodSelectConfig`                                           | `features/payment-method` capability |
+| `manuallyConfirmOrder`, `occupationTime`, `orderTransfer`, `merchantOrderVerification` | order operation views                |
+| `pickupSetting`, `pickUpMealCodeRule`, `menuStyle`                                     | pickup/menu views                    |
+| `financeConfig`, `financeConfigAmount`, `financeConfigMealType`                        | finance views                        |
+| `location`                                                                             | location setting view                |
 
 **Step 7: Verify and commit**
 
@@ -650,35 +657,89 @@ Render through `RouteModeSwitch`. Convert old `PlanSettingPageEnum` values to `r
 pnpm test src/pages/plan/PlanSettingsRoute.test.tsx src/domain/plan src/application/plan/planUseCases.test.ts src/infrastructure/repositories/plan src/features/plan
 pnpm e2e e2e/client-list.spec.ts
 pnpm build
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution.md
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution-log.md
 git commit -m "feat: migrate plan settings route"
 ```
 
-## Task 8: Migrate Client Order Detail And Member Order List
+## Task 8: Migrate One Plan Settings Route Mode
+
+**Files:**
+
+- Modify: `src/pages/plan/PlanSettingsRoute.tsx`
+- Modify: `src/pages/plan/PlanSettingsRoute.test.tsx`
+- Modify: `src/features/plan/views/*`
+- Modify: `src/features/plan/mutations/useSavePlanSettingsMutation.ts`
+- Modify: `src/features/plan/store/planDraftStore.ts`
+- Modify: `src/application/plan/savePlanSettings.ts`
+- Modify: `src/application/plan/planUseCases.test.ts`
+- Modify: `src/domain/plan/*`
+- Modify: `src/infrastructure/repositories/plan/*`
+- Modify: `src/infrastructure/mock/planMockData.ts`
+- Modify: `src/infrastructure/query/queryKeys.ts`
+- Modify: `docs/migration-v2/execution-log.md`
+
+**Step 1: Choose one setting mode**
+
+Pick the next highest-value plan setting route mode from Task 7. Do not implement multiple unrelated modes in one loop unless they share the same form, domain rule, and save command.
+
+**Step 2: Write failing schema, form, and view tests**
+
+For validation-bearing modes, cover default values, valid examples, invalid examples, one visible validation message, save failure, success state, and cancel/back behavior.
+
+Run:
+
+```bash
+pnpm test src/domain/plan src/features/plan
+```
+
+Expected: FAIL until the mode behavior exists.
+
+**Step 3: Write failing route, mutation, and repository tests**
+
+Cover route dispatch for the selected mode, unknown mode fallback, exact save command payload, deterministic mock result, query invalidation or cache update keys, and readback when the page displays saved data.
+
+Run:
+
+```bash
+pnpm test src/pages/plan/PlanSettingsRoute.test.tsx src/application/plan/planUseCases.test.ts src/infrastructure/repositories/plan
+```
+
+Expected: FAIL until route and save support exists.
+
+**Step 4: Implement the selected mode**
+
+Use React Hook Form and Zod for validation-bearing forms. Keep route-specific editors in `features/plan`. Use shared business capabilities only when the mode genuinely depends on a reusable capability such as payment method or client member selection.
+
+**Step 5: Verify and commit**
+
+```bash
+pnpm test src/pages/plan/PlanSettingsRoute.test.tsx src/domain/plan src/application/plan/planUseCases.test.ts src/infrastructure/repositories/plan src/features/plan
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/execution-log.md
+git commit -m "feat: migrate plan settings route mode"
+```
+
+Repeat Task 8 as a separate task execution for each reachable plan settings route mode, or for a tightly coupled mode group, until every reachable mode is `Completed` or recorded as `Skipped` with evidence in the execution log.
+
+## Task 9: Migrate Client Order Detail Default Page
 
 **Files:**
 
 - Modify: `src/pages/order/ClientOrderRoute.tsx`
 - Modify: `src/pages/order/ClientOrderRoute.test.tsx`
 - Modify: `src/features/order/views/ClientOrderDetailView.tsx`
-- Modify: `src/features/order/views/ClientMemberOrderListView.tsx`
 - Modify: `src/features/order/queries/useClientOrderDetailQuery.ts`
 - Modify: `src/features/order/queries/useClientOrderDetailQuery.test.tsx`
-- Modify: `src/features/order/queries/useClientMemberOrderListQuery.ts`
-- Modify or create: `src/features/order/queries/useClientMemberOrderListQuery.test.tsx`
 - Modify: `src/application/order/getClientOrderDetail.ts`
-- Modify: `src/application/order/listClientMemberOrders.ts`
 - Modify: `src/application/order/orderUseCases.test.ts`
 - Modify: `src/domain/order/*`
 - Modify: `src/infrastructure/repositories/order/*`
 - Modify: `src/infrastructure/mock/orderMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Inspect legacy client order**
 
-Record `orderParams` format, order statuses, merchant schedule fields, default time schedule behavior, price summary cases, member order list behavior, and `ClientOrderPageEnum` values.
+Record `orderParams` format, order statuses, merchant schedule fields, default time schedule behavior, price summary cases, and `ClientOrderPageEnum` values.
 
 **Step 2: Write failing domain tests**
 
@@ -694,7 +755,7 @@ Expected: FAIL until domain rules exist.
 
 **Step 3: Write failing repository and query tests**
 
-Cover order detail and member-order-list query keys, status and schedule variants, multiple order statuses, merchant schedule info, price summary cases, missing order, and deterministic ordering.
+Cover order detail query keys, status and schedule variants, multiple order statuses, merchant schedule info, price summary cases, missing order, and deterministic data.
 
 Run:
 
@@ -704,20 +765,17 @@ pnpm test src/application/order/orderUseCases.test.ts src/infrastructure/reposit
 
 Expected: FAIL until data and query behavior exist.
 
-**Step 4: Write failing route, view, and Playwright tests**
+**Step 4: Write failing route and view tests**
 
-Cover invalid `orderParams` guard rendering, default order detail rendering, unknown mode fallback, `clientMemberOrderList` dispatch, order detail loading/error/success, and member list loading/empty/error/success.
-
-Add Playwright coverage for entering `clientMemberOrderList` route mode and browser back.
+Cover invalid `orderParams` guard rendering, default order detail rendering, unknown mode fallback, link or action affordance for member-order-list mode, and order detail loading/error/success.
 
 Run:
 
 ```bash
 pnpm test src/pages/order/ClientOrderRoute.test.tsx src/features/order/views
-pnpm e2e e2e/client-list.spec.ts
 ```
 
-Expected: FAIL until route, views, and mode work.
+Expected: FAIL until route and detail view work.
 
 **Step 5: Implement order migration**
 
@@ -727,12 +785,71 @@ Keep the public route `/ops/client/$clientId/plan/$planId/order/$orderParams`. R
 
 ```bash
 pnpm test src/domain/order src/application/order/orderUseCases.test.ts src/infrastructure/repositories/order src/features/order src/pages/order/ClientOrderRoute.test.tsx
-pnpm e2e e2e/client-list.spec.ts
-git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution.md
-git commit -m "feat: migrate client order flows"
+git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/execution-log.md
+git commit -m "feat: migrate client order detail"
 ```
 
-## Task 9: Migrate Shared Business Capabilities On Demand
+## Task 10: Migrate Client Order Member List Route Mode
+
+**Files:**
+
+- Modify: `src/pages/order/ClientOrderRoute.tsx`
+- Modify: `src/pages/order/ClientOrderRoute.test.tsx`
+- Modify: `src/features/order/views/ClientMemberOrderListView.tsx`
+- Modify: `src/features/order/queries/useClientMemberOrderListQuery.ts`
+- Modify or create: `src/features/order/queries/useClientMemberOrderListQuery.test.tsx`
+- Modify: `src/application/order/listClientMemberOrders.ts`
+- Modify: `src/application/order/orderUseCases.test.ts`
+- Modify: `src/domain/order/*`
+- Modify: `src/infrastructure/repositories/order/*`
+- Modify: `src/infrastructure/mock/orderMockData.ts`
+- Modify: `src/infrastructure/query/queryKeys.ts`
+- Modify: `e2e/client-list.spec.ts`
+- Modify: `docs/migration-v2/execution-log.md`
+
+**Step 1: Inspect legacy member order list mode**
+
+Record the old `ClientOrderPageEnum` value, entry action from order detail, list fields, ordering, loading, empty, error, and browser back behavior.
+
+**Step 2: Write failing repository, query, and use-case tests**
+
+Cover member-order-list query keys, deterministic ordering, empty result, missing order, and any status or schedule fields displayed in the list.
+
+Run:
+
+```bash
+pnpm test src/application/order/orderUseCases.test.ts src/infrastructure/repositories/order src/features/order/queries
+```
+
+Expected: FAIL until member-order-list data exists.
+
+**Step 3: Write failing route, view, and Playwright tests**
+
+Cover `clientMemberOrderList` dispatch, unknown mode fallback, member list loading/empty/error/success, entering the mode from order detail, and browser back to order detail.
+
+Run:
+
+```bash
+pnpm test src/pages/order/ClientOrderRoute.test.tsx src/features/order/views
+pnpm e2e e2e/client-list.spec.ts
+```
+
+Expected: FAIL until the route mode and view work.
+
+**Step 4: Implement the route mode**
+
+Render through `RouteModeSwitch`. Keep parsing and display rules in domain/application helpers or feature-level view logic as appropriate; do not add raw backend shapes to the route or view.
+
+**Step 5: Verify and commit**
+
+```bash
+pnpm test src/domain/order src/application/order/orderUseCases.test.ts src/infrastructure/repositories/order src/features/order src/pages/order/ClientOrderRoute.test.tsx
+pnpm e2e e2e/client-list.spec.ts
+git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/execution-log.md
+git commit -m "feat: migrate client order member list mode"
+```
+
+## Task 11: Migrate Shared Business Capabilities On Demand
 
 **Files:**
 
@@ -745,7 +862,7 @@ git commit -m "feat: migrate client order flows"
   - `src/features/setting-rule/*`
 - Modify owning page files that integrate the capability
 - Modify owning mutation, use case, repository, and query-key tests
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Choose one capability only when an owning route mode needs it**
 
@@ -783,13 +900,13 @@ Keep business-aware reusable components out of `shared/ui`. Let owning routes or
 
 ```bash
 pnpm test src/features/payment-method src/features/client-member src/features/setting-rule
-git add src/features docs/migration-v2/execution.md
+git add src/features docs/migration-v2/execution-log.md
 git commit -m "feat: migrate shared business capability"
 ```
 
 Adjust the verification command and commit message to the actual capability.
 
-## Task 10: Migrate Shared UI Primitives And Assets On Demand
+## Task 12: Migrate Shared UI Primitives And Assets On Demand
 
 **Files:**
 
@@ -800,7 +917,7 @@ Adjust the verification command and commit message to the actual capability.
   - `src/shared/assets/brand/*`
   - `src/shared/assets/images/*`
 - Modify owning feature tests that use the primitive
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 
 **Step 1: Confirm the primitive or asset is business-agnostic**
 
@@ -831,15 +948,15 @@ Put reusable icon SVG files in `src/shared/assets/icons`, export them from `src/
 ```bash
 pnpm test src/shared/ui
 pnpm build
-git add src/shared docs/migration-v2/execution.md
+git add src/shared docs/migration-v2/execution-log.md
 git commit -m "feat: migrate shared ui primitive"
 ```
 
-## Task 11: Final Migration Audit
+## Task 13: Final Migration Audit
 
 **Files:**
 
-- Modify: `docs/migration-v2/execution.md`
+- Modify: `docs/migration-v2/execution-log.md`
 - Modify: `docs/migration-v2/plan.md` only if final status notes are added
 - Modify docs only if structure, commands, tooling, or architecture rules changed:
   - `README.md`
@@ -854,7 +971,7 @@ Search for forbidden imports:
 rg "axios|apis-gen|apis-legacy|src/apis|localStorage|sessionStorage|Date\\.now\\(|Math\\.random\\(" src/pages src/features src/application src/domain src/infrastructure/mock src/infrastructure/repositories
 ```
 
-Expected: No forbidden usage in migrated runtime paths. Any legitimate reference must be documented in `execution.md` with a reason.
+Expected: No forbidden usage in migrated runtime paths. Any legitimate reference must be documented in `execution-log.md` with a reason.
 
 **Step 2: Run route audit**
 
@@ -881,7 +998,7 @@ Expected: PASS.
 **Step 4: Record final evidence and commit**
 
 ```bash
-git add docs/migration-v2/execution.md docs/migration-v2/plan.md README.md AGENTS.md docs/architecture-design.md
+git add docs/migration-v2/execution-log.md docs/migration-v2/plan.md README.md AGENTS.md docs/architecture-design.md
 git commit -m "docs: complete migration v2 audit"
 ```
 
@@ -905,5 +1022,5 @@ A slice is Done only when:
 - Query keys are centralized in `src/infrastructure/query/queryKeys.ts`.
 - Tests listed in the owning task pass.
 - Playwright coverage passes for tasks listed in the Playwright Coverage Contract.
-- `docs/migration-v2/execution.md` contains reviewable evidence.
+- `docs/migration-v2/execution-log.md` contains reviewable evidence.
 - `pnpm lint`, `pnpm format:check`, and `pnpm test` pass before handoff.
