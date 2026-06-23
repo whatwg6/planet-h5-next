@@ -1,4 +1,4 @@
-# Business Migration V2 Implementation Plan
+# Business Migration Implementation Plan
 
 **Goal:** Migrate the client, plan, and client-order H5 business flows from `/Users/yxc/code/planet-h5` into this project on the `/ops/client...` route contract, backed only by deterministic mock repositories.
 
@@ -7,12 +7,12 @@
 ## Required Reading Before Any Task
 
 - `docs/architecture-design.md`
-- `docs/migration-v2/specs.md`
+- `docs/migration/specs.md`
 - This plan
 - Legacy source files listed in the relevant task
 
 Track task status, pending work, route-mode coverage, and implementation evidence in
-`docs/migration-v2/tracker.md`. If it does not exist, create it in Task 1.
+`docs/migration/tracker.md`. If it does not exist, create it in Task 1.
 
 ## Execution Checklist For Every Task
 
@@ -20,7 +20,7 @@ Use this checklist while executing each task.
 
 - Work in small TDD loops: failing test, run and confirm failure, minimal implementation, run and confirm pass.
 - For client-owned migration slices, delete the current-project implementation for that slice before rebuilding from the legacy source inventory. Keep only non-business shared primitives or infrastructure, and record any exception in `tracker.md`.
-- For every task, update the status summary in `docs/migration-v2/tracker.md` when status changes, and append evidence when work is completed.
+- For every task, update the status summary in `docs/migration/tracker.md` when status changes, and append evidence when work is completed.
 - Commit after each task when the tree is coherent. Suggested commit messages are included; adjust them when the actual scope differs.
 
 ## Standard Verification Commands
@@ -49,7 +49,7 @@ Only add Playwright flows from this table unless this plan is updated first.
 
 ## Legacy Source Inventory
 
-Inspect the listed old files before implementing the owning task. If a path is missing or behavior differs from this inventory, record the deviation in `docs/migration-v2/tracker.md` before coding.
+Inspect the listed old files before implementing the owning task. If a path is missing or behavior differs from this inventory, record the deviation in `docs/migration/tracker.md` before coding.
 
 | Area                  | Legacy source files or symbols                                                                                                                                   | Purpose                                                           |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -68,17 +68,17 @@ Inspect the listed old files before implementing the owning task. If a path is m
 
 **Files:**
 
-- Create or modify: `docs/migration-v2/tracker.md`
+- Create or modify: `docs/migration/tracker.md`
 
 **Step 1: Write the tracker skeleton**
 
-Create `docs/migration-v2/tracker.md` with this structure:
+Create `docs/migration/tracker.md` with this structure:
 
 ```markdown
-# Business Migration V2 Tracker
+# Business Migration Tracker
 
 Use this file to track migration task status, pending work, route-mode coverage, and evidence
-produced while executing `docs/migration-v2/plan.md`.
+produced while executing `docs/migration/plan.md`.
 
 Allowed status values: `Not started`, `In progress`, `Completed`, `Blocked`, `Skipped`.
 
@@ -116,20 +116,20 @@ questions without requiring a separate scan of the plan.
 Run:
 
 ```bash
-pnpm format:check docs/migration-v2/plan.md docs/migration-v2/tracker.md
+pnpm format:check docs/migration/plan.md docs/migration/tracker.md
 ```
 
-Expected: PASS. If Prettier reports formatting differences, run `pnpm format docs/migration-v2/plan.md docs/migration-v2/tracker.md`, then rerun the check.
+Expected: PASS. If Prettier reports formatting differences, run `pnpm format docs/migration/plan.md docs/migration/tracker.md`, then rerun the check.
 
 **Step 3: Record evidence**
 
-Append an entry for Task 1 to `docs/migration-v2/tracker.md`.
+Append an entry for Task 1 to `docs/migration/tracker.md`.
 
 **Step 4: Commit**
 
 ```bash
-git add docs/migration-v2/plan.md docs/migration-v2/tracker.md
-git commit -m "docs: prepare migration v2 tracker"
+git add docs/migration/plan.md docs/migration/tracker.md
+git commit -m "docs: prepare migration tracker"
 ```
 
 ## Task 2: Lock The `/ops/client...` Route Contract
@@ -145,7 +145,7 @@ git commit -m "docs: prepare migration v2 tracker"
 - Modify: `src/pages/plan/PlanSettingsRoute.tsx`
 - Modify: `src/pages/order/ClientOrderRoute.tsx`
 - Modify or create: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Write failing router registration tests**
 
@@ -246,10 +246,10 @@ Expected: PASS.
 
 **Step 7: Record evidence and commit**
 
-Append Task 2 evidence to `docs/migration-v2/tracker.md`, then:
+Append Task 2 evidence to `docs/migration/tracker.md`, then:
 
 ```bash
-git add src/app/router src/pages e2e/client-list.spec.ts docs/migration-v2/tracker.md
+git add src/app/router src/pages e2e/client-list.spec.ts docs/migration/tracker.md
 git commit -m "test: lock ops client route contract"
 ```
 
@@ -275,7 +275,7 @@ git commit -m "test: lock ops client route contract"
 - Modify: `src/features/client/views/ClientListView.tsx`
 - Modify: `src/pages/client/ClientListRoute.tsx`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy client list files**
 
@@ -351,7 +351,7 @@ Expected: PASS.
 **Step 7: Record evidence and commit**
 
 ```bash
-git add src/domain/client src/application/client src/infrastructure/mock/clientMockData.ts src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts src/features/client src/pages/client/ClientListRoute.tsx e2e/client-list.spec.ts docs/migration-v2/tracker.md
+git add src/domain/client src/application/client src/infrastructure/mock/clientMockData.ts src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts src/features/client src/pages/client/ClientListRoute.tsx e2e/client-list.spec.ts docs/migration/tracker.md
 git commit -m "feat: migrate client list"
 ```
 
@@ -375,7 +375,7 @@ git commit -m "feat: migrate client list"
 - Modify: `src/infrastructure/mock/clientMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy client detail files**
 
@@ -423,7 +423,7 @@ Render through `RouteModeSwitch`. Feature views must receive ordinary props and 
 
 **Step 6: Inventory client detail route modes**
 
-Use this inventory while implementing focused modes in later tasks. Track execution status in `docs/migration-v2/tracker.md`.
+Use this inventory while implementing focused modes in later tasks. Track execution status in `docs/migration/tracker.md`.
 
 | Route mode                                                                                                                                                                                | Target                                      |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
@@ -450,7 +450,7 @@ Mark a route mode `Completed` in the tracker only after tests, implementation, v
 ```bash
 pnpm test src/pages/client/ClientDetailRoute.test.tsx src/application/client/clientUseCases.test.ts src/infrastructure/repositories/client/clientRepository.mock.test.ts src/features/client/views
 pnpm e2e e2e/client-list.spec.ts
-git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/mock/clientMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/tracker.md
+git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/mock/clientMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration/tracker.md
 git commit -m "feat: migrate client detail default page"
 ```
 
@@ -470,7 +470,7 @@ git commit -m "feat: migrate client detail default page"
 - Modify: `src/infrastructure/repositories/client/clientRepository.mock.ts`
 - Modify: `src/infrastructure/repositories/client/clientRepository.mock.test.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Choose one focused mode**
 
@@ -508,7 +508,7 @@ Use React Hook Form and Zod for validation-bearing forms. Put pure validation in
 
 ```bash
 pnpm test src/pages/client/ClientDetailRoute.test.tsx src/domain/client/clientRules.test.ts src/application/client/clientUseCases.test.ts src/infrastructure/repositories/client/clientRepository.mock.test.ts src/features/client/views
-git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts docs/migration-v2/tracker.md
+git add src/pages/client src/features/client src/application/client src/domain/client src/infrastructure/repositories/client src/infrastructure/query/queryKeys.ts docs/migration/tracker.md
 git commit -m "feat: migrate client detail route mode"
 ```
 
@@ -534,7 +534,7 @@ Repeat Task 5 as a separate task execution for each reachable client detail rout
 - Modify: `src/infrastructure/repositories/plan/index.ts`
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy plan detail**
 
@@ -569,7 +569,7 @@ Keep plan detail on `/ops/client/$clientId/plan/$planId`. Keep any settings navi
 
 ```bash
 pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/router.test.ts
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/tracker.md
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration/tracker.md
 git commit -m "feat: migrate plan detail"
 ```
 
@@ -590,7 +590,7 @@ git commit -m "feat: migrate plan detail"
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy plan settings**
 
@@ -638,7 +638,7 @@ Render through `RouteModeSwitch`. Convert old `PlanSettingPageEnum` values to `r
 
 **Step 6: Inventory plan setting modes**
 
-Track execution status for these modes in `docs/migration-v2/tracker.md`.
+Track execution status for these modes in `docs/migration/tracker.md`.
 
 | Route mode                                                                             | Target                               |
 | -------------------------------------------------------------------------------------- | ------------------------------------ |
@@ -662,7 +662,7 @@ Track execution status for these modes in `docs/migration-v2/tracker.md`.
 pnpm test src/pages/plan/PlanSettingsRoute.test.tsx src/domain/plan src/application/plan/planUseCases.test.ts src/infrastructure/repositories/plan src/features/plan
 pnpm e2e e2e/client-list.spec.ts
 pnpm build
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/tracker.md
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration/tracker.md
 git commit -m "feat: migrate plan settings route"
 ```
 
@@ -681,7 +681,7 @@ git commit -m "feat: migrate plan settings route"
 - Modify: `src/infrastructure/repositories/plan/*`
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Choose one setting mode**
 
@@ -719,7 +719,7 @@ Use React Hook Form and Zod for validation-bearing forms. Keep route-specific ed
 
 ```bash
 pnpm test src/pages/plan/PlanSettingsRoute.test.tsx src/domain/plan src/application/plan/planUseCases.test.ts src/infrastructure/repositories/plan src/features/plan
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/tracker.md
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration/tracker.md
 git commit -m "feat: migrate plan settings route mode"
 ```
 
@@ -740,7 +740,7 @@ Repeat Task 8 as a separate task execution for each reachable plan settings rout
 - Modify: `src/infrastructure/repositories/order/*`
 - Modify: `src/infrastructure/mock/orderMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy client order**
 
@@ -790,7 +790,7 @@ Keep the public route `/ops/client/$clientId/plan/$planId/order/$orderParams`. R
 
 ```bash
 pnpm test src/domain/order src/application/order/orderUseCases.test.ts src/infrastructure/repositories/order src/features/order src/pages/order/ClientOrderRoute.test.tsx
-git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/tracker.md
+git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts docs/migration/tracker.md
 git commit -m "feat: migrate client order detail"
 ```
 
@@ -810,7 +810,7 @@ git commit -m "feat: migrate client order detail"
 - Modify: `src/infrastructure/mock/orderMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
 - Modify: `e2e/client-list.spec.ts`
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Inspect legacy member order list mode**
 
@@ -850,7 +850,7 @@ Render through `RouteModeSwitch`. Keep parsing and display rules in domain/appli
 ```bash
 pnpm test src/domain/order src/application/order/orderUseCases.test.ts src/infrastructure/repositories/order src/features/order src/pages/order/ClientOrderRoute.test.tsx
 pnpm e2e e2e/client-list.spec.ts
-git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration-v2/tracker.md
+git add src/pages/order src/features/order src/application/order src/domain/order src/infrastructure/repositories/order src/infrastructure/mock/orderMockData.ts src/infrastructure/query/queryKeys.ts e2e/client-list.spec.ts docs/migration/tracker.md
 git commit -m "feat: migrate client order member list mode"
 ```
 
@@ -867,7 +867,7 @@ git commit -m "feat: migrate client order member list mode"
   - `src/features/setting-rule/*`
 - Modify owning page files that integrate the capability
 - Modify owning mutation, use case, repository, and query-key tests
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Choose one capability only when an owning route mode needs it**
 
@@ -905,7 +905,7 @@ Keep business-aware reusable components out of `shared/ui`. Let owning routes or
 
 ```bash
 pnpm test src/features/payment-method src/features/client-member src/features/setting-rule
-git add src/features docs/migration-v2/tracker.md
+git add src/features docs/migration/tracker.md
 git commit -m "feat: migrate shared business capability"
 ```
 
@@ -922,7 +922,7 @@ Adjust the verification command and commit message to the actual capability.
   - `src/shared/assets/brand/*`
   - `src/shared/assets/images/*`
 - Modify owning feature tests that use the primitive
-- Modify: `docs/migration-v2/tracker.md`
+- Modify: `docs/migration/tracker.md`
 
 **Step 1: Confirm the primitive or asset is business-agnostic**
 
@@ -953,7 +953,7 @@ Put reusable icon SVG files in `src/shared/assets/icons`, export them from `src/
 ```bash
 pnpm test src/shared/ui
 pnpm build
-git add src/shared docs/migration-v2/tracker.md
+git add src/shared docs/migration/tracker.md
 git commit -m "feat: migrate shared ui primitive"
 ```
 
@@ -961,8 +961,8 @@ git commit -m "feat: migrate shared ui primitive"
 
 **Files:**
 
-- Modify: `docs/migration-v2/tracker.md`
-- Modify: `docs/migration-v2/plan.md` only if final status notes are added
+- Modify: `docs/migration/tracker.md`
+- Modify: `docs/migration/plan.md` only if final status notes are added
 - Modify docs only if structure, commands, tooling, or architecture rules changed:
   - `README.md`
   - `AGENTS.md`
@@ -1003,8 +1003,8 @@ Expected: PASS.
 **Step 4: Record final evidence and commit**
 
 ```bash
-git add docs/migration-v2/tracker.md docs/migration-v2/plan.md README.md AGENTS.md docs/architecture-design.md
-git commit -m "docs: complete migration v2 audit"
+git add docs/migration/tracker.md docs/migration/plan.md README.md AGENTS.md docs/architecture-design.md
+git commit -m "docs: complete migration audit"
 ```
 
 Only stage docs that actually changed.
@@ -1027,5 +1027,5 @@ A slice is Done only when:
 - Query keys are centralized in `src/infrastructure/query/queryKeys.ts`.
 - Tests listed in the owning task pass.
 - Playwright coverage passes for tasks listed in the Playwright Coverage Contract.
-- `docs/migration-v2/tracker.md` contains reviewable evidence.
+- `docs/migration/tracker.md` contains reviewable evidence.
 - `pnpm lint`, `pnpm format:check`, and `pnpm test` pass before handoff.

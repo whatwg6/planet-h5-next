@@ -1,7 +1,7 @@
-# Business Migration V2 Tracker
+# Business Migration Tracker
 
 Use this file to track migration task status, pending work, route-mode coverage, and evidence
-produced while executing `docs/migration-v2/plan.md`.
+produced while executing `docs/migration/plan.md`.
 
 Allowed status values: `Not started`, `In progress`, `Completed`, `Blocked`, `Skipped`.
 
@@ -79,9 +79,9 @@ Allowed status values: `Not started`, `In progress`, `Completed`, `Blocked`, `Sk
 - Status: Completed
 - Legacy source inspected: N/A; documentation guardrail task only.
 - Tests added or updated: N/A; no runtime behavior changed.
-- Behavior covered: Created the migration v2 tracker skeleton, added status tracking, added route mode status tracking, and kept `docs/migration-v2/plan.md` aligned with `tracker.md`.
+- Behavior covered: Created the migration tracker skeleton, added status tracking, added route mode status tracking, and kept `docs/migration/plan.md` aligned with `tracker.md`.
 - Commands run:
-  - `pnpm format:check docs/migration-v2/plan.md docs/migration-v2/tracker.md`
+  - `pnpm format:check docs/migration/plan.md docs/migration/tracker.md`
 - Result: PASS
 - Playwright coverage: N/A; no browser-level route flow changed.
 - Skipped or N/A items: Runtime tests, build, and e2e are N/A for this documentation-only baseline task.
@@ -90,7 +90,7 @@ Allowed status values: `Not started`, `In progress`, `Completed`, `Blocked`, `Sk
 
 - Task: 2
 - Status: Completed
-- Legacy source inspected: `docs/migration-v2/specs.md` route inventory; no legacy runtime source required for this route-contract guard task.
+- Legacy source inspected: `docs/migration/specs.md` route inventory; no legacy runtime source required for this route-contract guard task.
 - Tests added or updated: `src/app/router/router.test.ts`, `src/app/router/RouteStack.test.tsx`, `e2e/client-list.spec.ts`.
 - Behavior covered: All five `/ops/client...` routes match the TanStack route tree, migrated client/plan/order compatibility routes outside `/ops/client...` are absent, root route is bound to `RouteStack`, and `/ops/client` renders through Vite in the mobile Playwright project.
 - Commands run:
