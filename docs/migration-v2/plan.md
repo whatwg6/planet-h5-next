@@ -221,7 +221,7 @@ Ensure each route entry renders through:
 For param-reading routes, use this pattern:
 
 ```tsx
-const params = routeParams ?? useParams({ strict: false, shouldThrow: false });
+const params = useParams({ strict: false, shouldThrow: false });
 ```
 
 **Step 6: Run focused tests**

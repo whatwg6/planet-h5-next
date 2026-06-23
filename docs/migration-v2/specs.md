@@ -191,7 +191,7 @@ old PageContext location snapshot
   -> new RouteStackEntryLocationProvider
 
 old usePageContext params
-  -> routeParams from RouteStackPageProps, with useParams fallback
+  -> useParams({ strict: false, shouldThrow: false }) in route entries
 ```
 
 Do not introduce direct `window.history` handling.

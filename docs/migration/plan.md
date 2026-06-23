@@ -546,7 +546,7 @@ src/pages/client/ClientDetailRoute.tsx
 Route entry rules:
 
 - Keep `ClientDetailRoute` responsible for route params, query state, navigation callbacks, and mode dispatch only.
-- Prefer `routeParams?.clientId` from `RouteStack`, then fall back to `useParams({ strict: false, shouldThrow: false })`.
+- Read `clientId` with `useParams({ strict: false, shouldThrow: false })`.
 - Do not place client detail layout or business card rendering in the route file.
 - Do not use legacy `location.state.pageType` in feature views.
 

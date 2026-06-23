@@ -93,7 +93,7 @@ The route layer has three central mechanisms:
 - `routeMode`: same-resource page modes, such as edit, preview, or workflow states, use TanStack Router history state instead of extra paths. Push the same route with `location.state.routeMode` built by `routeModeState(mode)` from `src/app/router/historyState.ts`; do not add paths like `/client/$clientId/edit` only to express a UI mode.
 - `RouteModeSwitch`: route entry components dispatch modes through `src/app/router/RouteModeSwitch.tsx`. Put the normal page in `defaultPage` and same-URL modes in `modes`.
 
-Keep these mechanisms in the route layer. `RouteStack` must not keep a second route table or manually match pathnames. Route entries that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for direct rendering. Feature views must not read `location.state`; they receive ordinary props and callbacks.
+Keep these mechanisms in the route layer. `RouteStack` must not keep a second route table or manually match pathnames. Route entries that need params should read them with `useParams({ strict: false, shouldThrow: false })`. Feature views must not read `location.state`; they receive ordinary props and callbacks.
 
 ## Feature Mapping Pattern
 

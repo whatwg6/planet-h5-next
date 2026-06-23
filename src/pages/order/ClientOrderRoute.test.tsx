@@ -9,7 +9,7 @@ import { ClientOrderRoute } from "./ClientOrderRoute";
 const navigateMock = vi.fn();
 const historyBackMock = vi.fn();
 let routeState: Record<string, unknown> = {};
-let routeParams: Record<string, string> = {
+let paramsMock: Record<string, string> = {
   clientId: "c1",
   planId: "p1",
   orderParams: "CO20260621001-t1781971200000",
@@ -17,7 +17,7 @@ let routeParams: Record<string, string> = {
 
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigateMock,
-  useParams: () => routeParams,
+  useParams: () => paramsMock,
   useRouter: () => ({ history: { back: historyBackMock } }),
   useRouterState: <T,>({
     select,
@@ -36,11 +36,11 @@ describe("ClientOrderRoute", () => {
     navigateMock.mockReset();
     historyBackMock.mockReset();
     routeState = {};
-    routeParams = { clientId: "c1", planId: "p1", orderParams: "CO20260621001-t1781971200000" };
+    paramsMock = { clientId: "c1", planId: "p1", orderParams: "CO20260621001-t1781971200000" };
   });
 
   it("renders a controlled error state for invalid order params", () => {
-    routeParams = { clientId: "c1", planId: "p1", orderParams: "bad" };
+    paramsMock = { clientId: "c1", planId: "p1", orderParams: "bad" };
 
     renderWithQuery(<ClientOrderRoute />);
 
