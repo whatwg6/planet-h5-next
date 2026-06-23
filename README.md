@@ -40,7 +40,7 @@ pnpm format:check
 
 - `pnpm dev` — starts the Vite H5 development server.
 - `pnpm e2e` — runs Playwright end-to-end tests against a Vite dev server.
-- `pnpm lint` — runs a TypeScript no-emit check.
+- `pnpm lint` — runs TypeScript project-reference checks with `tsc -b`.
 - `pnpm format` — formats project files with Prettier.
 - `pnpm format:check` — verifies formatting without writing changes.
 
@@ -49,7 +49,7 @@ downloads in restricted or slow networks. Install Google Chrome on the machine b
 running `pnpm e2e`.
 
 The GitHub Pages workflow is defined in `.github/workflows/deploy-github-pages.yml`.
-It runs `pnpm lint`, `pnpm format:check`, and `pnpm test` before building static assets with `VITE_BASE_PATH=/planet-h5-next/` so they work under the repository subpath.
+It runs `pnpm lint`, `pnpm format:check`, `pnpm test`, and `pnpm e2e` before building static assets with `VITE_BASE_PATH=/planet-h5-next/` so they work under the repository subpath.
 
 ## Project Map
 
@@ -64,6 +64,7 @@ src/
   shared/           Business-agnostic shared UI and utilities
     assets/          Business-agnostic icons, images, and brand assets
   test/             Vitest/MSW test setup
+e2e/                Playwright end-to-end tests
 ```
 
 The core dependency direction is:

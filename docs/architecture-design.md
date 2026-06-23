@@ -68,6 +68,7 @@ src/
   shared/           Business-agnostic shared UI, assets, utilities
     assets/         Business-agnostic icons, images, and brand assets
   test/             Vitest/MSW test setup
+e2e/                Playwright end-to-end tests
 ```
 
 A typical business module can have matching folders across layers:
@@ -297,8 +298,13 @@ Use the narrowest useful test for the change:
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
 - Route metadata: `src/app/router/routeMeta.test.ts`.
 - Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
+- End-to-end route flows: Playwright tests under `e2e/`.
 
 Prioritize tests around changed behavior, risky mapping logic, validation, mutation cache updates, and route mode dispatch.
+
+Playwright tests run against the local Google Chrome channel and start the Vite dev
+server through `playwright.config.ts`. Use them for browser-level route, navigation,
+and user-flow coverage rather than replacing narrower unit or React Testing Library tests.
 
 ## Explicit Decisions
 
@@ -309,3 +315,4 @@ Prioritize tests around changed behavior, risky mapping logic, validation, mutat
 - `shared/ui` is an H5 base component layer, not a PC component library.
 - Reusable business components belong in focused feature capability modules, not in `shared/ui`.
 - TanStack Query handles server state; Zustand handles local interaction state and drafts.
+- Playwright e2e tests use the local Google Chrome channel.

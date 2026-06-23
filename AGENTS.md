@@ -91,6 +91,7 @@ Use the narrowest useful test for the change:
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
 - Route metadata: `src/app/router/routeMeta.test.ts`.
 - Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
+- End-to-end route flows: Playwright tests under `e2e/`.
 
 Before handing work back, run at least:
 
@@ -106,6 +107,14 @@ For broad or risky changes, also run:
 pnpm build
 ```
 
+For browser-level route, navigation, or user-flow changes, also run:
+
+```bash
+pnpm e2e
+```
+
+Playwright uses the local Google Chrome channel.
+
 ## Style And Maintenance
 
 - Keep TypeScript strict and avoid `any` unless the boundary truly requires it.
@@ -115,4 +124,4 @@ pnpm build
 - Use `pnpm format` to apply Prettier formatting when needed; use `pnpm format:check` for verification.
 - Do not rewrite unrelated files or reformat the repository as a side effect.
 - Do not revert user changes unless explicitly asked.
-- Update `README.md` or this file when changing project structure, commands, or architectural rules.
+- Update `README.md`, `AGENTS.md`, and `docs/architecture-design.md` when changing project structure, commands, test tooling, or architectural rules.

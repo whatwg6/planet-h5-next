@@ -45,6 +45,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: E2E test
+        run: pnpm e2e
+
       - name: Build
         run: pnpm build
         env:
