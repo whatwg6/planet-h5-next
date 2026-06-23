@@ -36,8 +36,8 @@ current local context, then replace or delete them when a slice migrates the cor
 | Plan settings | `/ops/client/$clientId/plan/$planId/setting`            |
 | Client order  | `/ops/client/$clientId/plan/$planId/order/$orderParams` |
 
-Do not keep legacy `/client...` development routes for this migration. Remove or replace them with
-`/ops/client...` route entries when the corresponding migrated route is implemented.
+Do not add compatibility route shapes for this migration. Each migrated business route uses the
+`/ops/client...` contract listed above.
 
 Do not keep replaced placeholder or partially migrated code as parallel code paths, compatibility
 fallbacks, or alternate route implementations. The old `planet-h5` source and `specs.md` define the
@@ -171,7 +171,7 @@ Tasks:
 - Add matching metadata in `src/app/router/routeMeta.ts`.
 - Replace placeholder behavior on `/ops/client...` routes with migrated business behavior as each
   slice is completed.
-- Remove legacy `/client...` development routes.
+- Do not add non-`/ops/client...` compatibility routes for migrated client, plan, or order flows.
 - Ensure route entry components that read params accept `RouteStackPageProps` and fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Keep `RouteStack` as the only page-stack renderer. Do not add a second route table or pathname matcher.
 - Introduce the Playwright e2e harness described in the Playwright Validation Standard when it is not
@@ -180,8 +180,8 @@ Tasks:
 Validation:
 
 - `src/app/router/routeMeta.test.ts` proves metadata exists for each required `/ops/client...` route.
-- Router coverage proves all five `/ops/client...` paths are registered and legacy `/client...`
-  development routes are absent.
+- Router coverage proves all five `/ops/client...` paths are registered and no alternate
+  compatibility route shape was added for migrated client, plan, or order flows.
 - Route stack coverage proves the root route still renders `RouteStack` and no second route table or
   pathname matcher was introduced.
 - For each route component that reads params, tests or focused code review evidence prove
