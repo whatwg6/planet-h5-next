@@ -3,8 +3,7 @@
 This document defines how old business concepts from `/Users/yxc/code/planet-h5` map into this project.
 
 It is a mapping guide, not an implementation plan or general architecture guide. Architectural
-boundaries remain defined by `../architecture-design.md`; task order and verification steps remain
-defined by the V2 migration plan produced from `plan-template-v2.md`.
+boundaries remain defined by `../architecture-design.md`.
 
 ## Scope
 
@@ -85,6 +84,23 @@ old src/assets/imgs
 ```
 
 Do not copy old folders into the new project wholesale. Classify every migrated file by responsibility first.
+
+## Icon Component Migration
+
+When old source uses an `Icons` namespace component such as `<Icons.XXX />`, treat it as an icon
+asset reference, not as a component API to preserve.
+
+For each usage:
+
+1. Trace `XXX` to the old icon registry or SVG source.
+2. Add the SVG file to `src/shared/assets/icons` only when it is a reusable, business-agnostic icon.
+3. Use a kebab-case filename and preserve the SVG `viewBox`.
+4. Export it from `src/shared/assets/icons/index.ts` with the `?react` suffix.
+5. Import the named icon component directly from the new icon index in migrated code.
+
+Do not recreate a global `Icons` object or namespace in the new project. If an old `Icons.XXX`
+usage points to a brand mark, illustration, content image, or business-specific/page-only asset,
+classify it under the normal asset rules instead of forcing it into `shared/assets/icons`.
 
 ## Current Project Client Baseline Policy
 
