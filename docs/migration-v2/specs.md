@@ -4,7 +4,7 @@ This document defines how old business concepts from `/Users/yxc/code/planet-h5`
 
 It is a mapping guide, not an implementation plan or general architecture guide. Architectural
 boundaries remain defined by `../architecture-design.md`; task order and verification steps remain
-defined by `plan.md`.
+defined by the V2 migration plan produced from `plan-template-v2.md`.
 
 ## Scope
 
@@ -99,7 +99,7 @@ inventory into the architecture.
 Keep only project-level primitives and infrastructure that are not client-business-specific, such
 as router helpers, shared UI primitives, app providers, test setup, and generic utilities. If a
 current client file is intentionally kept because it is already a non-business primitive or shared
-infrastructure, record that exception in `docs/migration/tracker.md`.
+infrastructure, record that exception in `docs/migration-v2/tracker.md`.
 
 ## Data Policy
 
