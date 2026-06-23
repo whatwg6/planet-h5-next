@@ -98,7 +98,8 @@ Each subagent must report:
 
 For each slice:
 
-1. Mark the slice as in progress in the working todos.
+1. Mark the owning task, route mode, or capability row in `plan.md` as `In progress`; mirror the
+   slice in working todos if useful.
 2. Confirm the slice belongs to the approved plan.
 3. Follow the plan exactly unless a deviation is recorded.
 4. Keep edits limited to the slice.
@@ -117,6 +118,14 @@ If a governing constraint is unclear, stop and revisit the source document befor
 ## Verification
 
 Run the plan's specified tests for the slice.
+
+For route, route mode, or cross-page navigation slices, also run the manual H5 stack checks:
+
+- Open the route directly with required params.
+- Navigate forward from the owning list or detail page.
+- Push a same-URL route mode through `routeModeState`.
+- Use browser or H5 back navigation and verify the previous stack entry is restored.
+- Verify replace navigation does not leave stale stack entries.
 
 Before handing back migrated code, run:
 
@@ -167,6 +176,9 @@ Do not change approved plan scope, inventories, target files, ownership, or vali
 Record blockers as soon as continuing would require guessing through an unclear decision or missing
 source behavior:
 
+When recording a blocker, update the owning task, route mode, or capability row in `plan.md` to
+`Blocked` and include the blocker title or evidence in the status note.
+
 ```md
 ### Blocker: <short title>
 
@@ -182,6 +194,9 @@ source behavior:
 ## Deviation Record
 
 Record deviations before or with the code change:
+
+When a deviation is recorded, reference the deviation title from the owning task, route mode, or
+capability row in `plan.md` so the current status points back to the decision record.
 
 ```md
 ### Deviation: <short title>
@@ -199,7 +214,8 @@ Record deviations before or with the code change:
 
 A slice is complete only when:
 
-- The implemented behavior matches the plan or has a recorded deviation.
+- The implemented behavior matches the plan or has a recorded deviation referenced from the owning
+  `plan.md` task, route mode, or capability row.
 - Applicable tests were added or explicitly deemed unnecessary.
 - Required validation ran or skipped commands are documented.
 - Subagent handoffs, if any, were reviewed by the main agent.

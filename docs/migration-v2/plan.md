@@ -23,8 +23,10 @@ Architectural boundaries remain defined by `../architecture-design.md`. This doc
 
 ## Current Gap Summary
 
-The current project already contains placeholder business routes and modules. V2 keeps the production
-route contract on `/ops/client...` and migrates existing placeholder behavior into that route shape.
+The current project may already contain placeholder or partially migrated business routes and
+modules. V2 does not treat those implementations as compatibility targets. Inspect them only as
+current local context, then replace or delete them when a slice migrates the corresponding old
+`planet-h5` behavior into the `/ops/client...` route contract.
 
 | Area          | V2 target                                               |
 | ------------- | ------------------------------------------------------- |
@@ -36,6 +38,10 @@ route contract on `/ops/client...` and migrates existing placeholder behavior in
 
 Do not keep legacy `/client...` development routes for this migration. Remove or replace them with
 `/ops/client...` route entries when the corresponding migrated route is implemented.
+
+Do not keep replaced placeholder or partially migrated code as parallel code paths, compatibility
+fallbacks, or alternate route implementations. The old `planet-h5` source and `specs.md` define the
+migration target.
 
 ## Migration Principles
 
@@ -78,13 +84,17 @@ Status values:
 
 Slice progress rules:
 
-- Add status beside the relevant task or table row before starting any slice that is not already
-  listed.
+- Add status beside the relevant task only when a phase is split into ad hoc task-level slices that
+  are not already covered by a route mode, capability, or validation table row.
 - Update the owning task or table row when work starts, completes, or becomes blocked.
 - For mode or capability inventories, use `Status` and `Evidence / blocker` columns.
 - Record detailed historical results in `execution.md`; keep `plan.md` as the current status index.
 - Set a phase to `Done` only when every required task or mode for that phase is `Done` and the phase
   validation has passed or is explicitly recorded as not applicable.
+
+Target file lists identify the expected primary files for a phase. They are not exhaustive. Add or
+update tests, query keys, route metadata, and nearby support files whenever the phase validation or
+architecture rules require them.
 
 ## Legacy Source Inventory
 
@@ -193,39 +203,39 @@ Tasks:
 
 Client detail route modes to plan under this route:
 
-| Route mode                               | Target                                        | Status        | Evidence / blocker |
-| ---------------------------------------- | --------------------------------------------- | ------------- | ------------------ |
-| `plan`                                   | `ClientMealPlansView`                         | `Not started` | Not started        |
-| `setting`                                | `ClientSettingsView`                          | `Not started` | Not started        |
-| `nameAndRemark`                          | `ClientNameAndRemarkView`                     | `Not started` | Not started        |
-| `nameAndRemarkEdit`                      | `ClientDetailEditView` or a focused edit view | `Not started` | Not started        |
-| `notification`                           | `ClientNotificationSettingsView`              | `Not started` | Not started        |
-| `paymentMethod`                          | `features/payment-method` capability          | `Not started` | Not started        |
-| `mealType`                               | `ClientMealSettingsView`                      | `Not started` | Not started        |
-| `mealTypeSetting`                        | focused meal type edit view                   | `Not started` | Not started        |
-| `mealGroup`                              | `ClientMealSettingsView`                      | `Not started` | Not started        |
-| `manager`                                | `ClientManagerSettingsView`                   | `Not started` | Not started        |
-| `support`                                | `ClientSupportSettingsView`                   | `Not started` | Not started        |
-| `supportEdit`                            | focused support edit view                     | `Not started` | Not started        |
-| `department`                             | `ClientDepartmentSettingsView`                | `Not started` | Not started        |
-| `departmentEdit`                         | focused department edit view                  | `Not started` | Not started        |
-| `costCenter`                             | `ClientCostCenterSettingsView`                | `Not started` | Not started        |
-| `costCenterEdit`                         | focused cost center edit view                 | `Not started` | Not started        |
-| `appVersion`                             | `ClientAppVersionSettingsView`                | `Not started` | Not started        |
-| `meicanCard`                             | `features/card-setting` capability            | `Not started` | Not started        |
-| `externalCard`                           | `features/card-setting` capability            | `Not started` | Not started        |
-| `mealPoint`                              | `ClientMealSettingsView`                      | `Not started` | Not started        |
-| `fieldSetting`                           | `ClientFieldSettingsView`                     | `Not started` | Not started        |
-| `fieldSettingDetail`                     | focused field setting detail view             | `Not started` | Not started        |
-| `loginSetting`                           | `ClientLoginSettingsView`                     | `Not started` | Not started        |
-| `loginSettingEmployeeNumber`             | focused employee number login view            | `Not started` | Not started        |
-| `loginSettingThirdParty`                 | focused third-party login view                | `Not started` | Not started        |
-| `loginSettingThirdPartyDetail`           | focused third-party login detail view         | `Not started` | Not started        |
-| `loginSettingThirdPartyAssociateSetting` | focused third-party associate setting view    | `Not started` | Not started        |
-| `loginSettingThirdPartyMealplanSetting`  | focused third-party meal plan setting view    | `Not started` | Not started        |
-| `passwordSetting`                        | `ClientPasswordSettingsView`                  | `Not started` | Not started        |
-| `passwordComplexitySetting`              | focused password complexity view              | `Not started` | Not started        |
-| `passwordPeriodSetting`                  | focused password period view                  | `Not started` | Not started        |
+| Route mode                               | Target                                        | Old source / reachability | Status        | Evidence / blocker |
+| ---------------------------------------- | --------------------------------------------- | ------------------------- | ------------- | ------------------ |
+| `plan`                                   | `ClientMealPlansView`                         | Confirm from old source   | `Not started` | Not started        |
+| `setting`                                | `ClientSettingsView`                          | Confirm from old source   | `Not started` | Not started        |
+| `nameAndRemark`                          | `ClientNameAndRemarkView`                     | Confirm from old source   | `Not started` | Not started        |
+| `nameAndRemarkEdit`                      | `ClientDetailEditView` or a focused edit view | Confirm from old source   | `Not started` | Not started        |
+| `notification`                           | `ClientNotificationSettingsView`              | Confirm from old source   | `Not started` | Not started        |
+| `paymentMethod`                          | `features/payment-method` capability          | Confirm from old source   | `Not started` | Not started        |
+| `mealType`                               | `ClientMealSettingsView`                      | Confirm from old source   | `Not started` | Not started        |
+| `mealTypeSetting`                        | focused meal type edit view                   | Confirm from old source   | `Not started` | Not started        |
+| `mealGroup`                              | `ClientMealSettingsView`                      | Confirm from old source   | `Not started` | Not started        |
+| `manager`                                | `ClientManagerSettingsView`                   | Confirm from old source   | `Not started` | Not started        |
+| `support`                                | `ClientSupportSettingsView`                   | Confirm from old source   | `Not started` | Not started        |
+| `supportEdit`                            | focused support edit view                     | Confirm from old source   | `Not started` | Not started        |
+| `department`                             | `ClientDepartmentSettingsView`                | Confirm from old source   | `Not started` | Not started        |
+| `departmentEdit`                         | focused department edit view                  | Confirm from old source   | `Not started` | Not started        |
+| `costCenter`                             | `ClientCostCenterSettingsView`                | Confirm from old source   | `Not started` | Not started        |
+| `costCenterEdit`                         | focused cost center edit view                 | Confirm from old source   | `Not started` | Not started        |
+| `appVersion`                             | `ClientAppVersionSettingsView`                | Confirm from old source   | `Not started` | Not started        |
+| `meicanCard`                             | `features/card-setting` capability            | Confirm from old source   | `Not started` | Not started        |
+| `externalCard`                           | `features/card-setting` capability            | Confirm from old source   | `Not started` | Not started        |
+| `mealPoint`                              | `ClientMealSettingsView`                      | Confirm from old source   | `Not started` | Not started        |
+| `fieldSetting`                           | `ClientFieldSettingsView`                     | Confirm from old source   | `Not started` | Not started        |
+| `fieldSettingDetail`                     | focused field setting detail view             | Confirm from old source   | `Not started` | Not started        |
+| `loginSetting`                           | `ClientLoginSettingsView`                     | Confirm from old source   | `Not started` | Not started        |
+| `loginSettingEmployeeNumber`             | focused employee number login view            | Confirm from old source   | `Not started` | Not started        |
+| `loginSettingThirdParty`                 | focused third-party login view                | Confirm from old source   | `Not started` | Not started        |
+| `loginSettingThirdPartyDetail`           | focused third-party login detail view         | Confirm from old source   | `Not started` | Not started        |
+| `loginSettingThirdPartyAssociateSetting` | focused third-party associate setting view    | Confirm from old source   | `Not started` | Not started        |
+| `loginSettingThirdPartyMealplanSetting`  | focused third-party meal plan setting view    | Confirm from old source   | `Not started` | Not started        |
+| `passwordSetting`                        | `ClientPasswordSettingsView`                  | Confirm from old source   | `Not started` | Not started        |
+| `passwordComplexitySetting`              | focused password complexity view              | Confirm from old source   | `Not started` | Not started        |
+| `passwordPeriodSetting`                  | focused password period view                  | Confirm from old source   | `Not started` | Not started        |
 
 Validation:
 
@@ -286,7 +296,8 @@ Target files:
 Tasks:
 
 - Preserve the public route as `/ops/client/$clientId/plan/$planId`.
-- Keep old client list and plan detail empty page-type enums as default pages unless old source adds reachable page types before migration.
+- Treat the old plan detail default or empty page-type enum as the default page unless old source
+  inspection finds additional reachable non-default page types before migration.
 - Translate old plan display mappings and constants into domain, application, or feature files by responsibility.
 - Keep any route navigation to settings on `/ops/client/$clientId/plan/$planId/setting`.
 
@@ -323,38 +334,38 @@ Tasks:
 
 Plan settings route modes to plan under this route:
 
-| Route mode                  | Target                                        | Status        | Evidence / blocker |
-| --------------------------- | --------------------------------------------- | ------------- | ------------------ |
-| `baseInfo`                  | focused plan base info view                   | `Not started` | Not started        |
-| `baseInfoEdit`              | focused plan base info edit view              | `Not started` | Not started        |
-| `operationDay`              | focused operation day view                    | `Not started` | Not started        |
-| `restriction`               | focused merchant restriction view             | `Not started` | Not started        |
-| `memberCount`               | focused member count view, if still reachable | `Not started` | Not started        |
-| `clientMemberList`          | `features/client-member` capability           | `Not started` | Not started        |
-| `clientMemberDetail`        | `features/client-member` capability           | `Not started` | Not started        |
-| `openTimesDinnerIn`         | focused dinner-in open times view             | `Not started` | Not started        |
-| `openTimesGroupDelivery`    | focused group delivery open times view        | `Not started` | Not started        |
-| `maximumOrderAmount`        | focused maximum order amount view             | `Not started` | Not started        |
-| `hidePrice`                 | focused hide price view                       | `Not started` | Not started        |
-| `hidePriceAndMealPoint`     | focused hide price and meal point view        | `Not started` | Not started        |
-| `disableAppendDish`         | focused disable append dish view              | `Not started` | Not started        |
-| `hiddenAccountTypes`        | focused hidden account types view             | `Not started` | Not started        |
-| `dishRemark`                | focused dish remark view                      | `Not started` | Not started        |
-| `deliveryRemark`            | focused delivery remark view                  | `Not started` | Not started        |
-| `orderRule`                 | focused order rule view                       | `Not started` | Not started        |
-| `paymentMethod`             | `features/payment-method` capability          | `Not started` | Not started        |
-| `paymentMethodSelectConfig` | `features/payment-method` capability          | `Not started` | Not started        |
-| `manuallyConfirmOrder`      | focused manually confirm order view           | `Not started` | Not started        |
-| `occupationTime`            | focused occupation time view                  | `Not started` | Not started        |
-| `orderTransfer`             | focused order transfer view                   | `Not started` | Not started        |
-| `merchantOrderVerification` | focused merchant verification view            | `Not started` | Not started        |
-| `pickupSetting`             | focused pickup setting view                   | `Not started` | Not started        |
-| `pickUpMealCodeRule`        | focused pickup meal code view                 | `Not started` | Not started        |
-| `menuStyle`                 | focused menu style view                       | `Not started` | Not started        |
-| `financeConfig`             | focused finance config view                   | `Not started` | Not started        |
-| `financeConfigAmount`       | focused finance amount view                   | `Not started` | Not started        |
-| `financeConfigMealType`     | focused finance meal type view                | `Not started` | Not started        |
-| `location`                  | focused location setting view                 | `Not started` | Not started        |
+| Route mode                  | Target                                        | Old source / reachability | Status        | Evidence / blocker |
+| --------------------------- | --------------------------------------------- | ------------------------- | ------------- | ------------------ |
+| `baseInfo`                  | focused plan base info view                   | Confirm from old source   | `Not started` | Not started        |
+| `baseInfoEdit`              | focused plan base info edit view              | Confirm from old source   | `Not started` | Not started        |
+| `operationDay`              | focused operation day view                    | Confirm from old source   | `Not started` | Not started        |
+| `restriction`               | focused merchant restriction view             | Confirm from old source   | `Not started` | Not started        |
+| `memberCount`               | focused member count view, if still reachable | Confirm reachability      | `Not started` | Not started        |
+| `clientMemberList`          | `features/client-member` capability           | Confirm from old source   | `Not started` | Not started        |
+| `clientMemberDetail`        | `features/client-member` capability           | Confirm from old source   | `Not started` | Not started        |
+| `openTimesDinnerIn`         | focused dinner-in open times view             | Confirm from old source   | `Not started` | Not started        |
+| `openTimesGroupDelivery`    | focused group delivery open times view        | Confirm from old source   | `Not started` | Not started        |
+| `maximumOrderAmount`        | focused maximum order amount view             | Confirm from old source   | `Not started` | Not started        |
+| `hidePrice`                 | focused hide price view                       | Confirm from old source   | `Not started` | Not started        |
+| `hidePriceAndMealPoint`     | focused hide price and meal point view        | Confirm from old source   | `Not started` | Not started        |
+| `disableAppendDish`         | focused disable append dish view              | Confirm from old source   | `Not started` | Not started        |
+| `hiddenAccountTypes`        | focused hidden account types view             | Confirm from old source   | `Not started` | Not started        |
+| `dishRemark`                | focused dish remark view                      | Confirm from old source   | `Not started` | Not started        |
+| `deliveryRemark`            | focused delivery remark view                  | Confirm from old source   | `Not started` | Not started        |
+| `orderRule`                 | focused order rule view                       | Confirm from old source   | `Not started` | Not started        |
+| `paymentMethod`             | `features/payment-method` capability          | Confirm from old source   | `Not started` | Not started        |
+| `paymentMethodSelectConfig` | `features/payment-method` capability          | Confirm from old source   | `Not started` | Not started        |
+| `manuallyConfirmOrder`      | focused manually confirm order view           | Confirm from old source   | `Not started` | Not started        |
+| `occupationTime`            | focused occupation time view                  | Confirm from old source   | `Not started` | Not started        |
+| `orderTransfer`             | focused order transfer view                   | Confirm from old source   | `Not started` | Not started        |
+| `merchantOrderVerification` | focused merchant verification view            | Confirm from old source   | `Not started` | Not started        |
+| `pickupSetting`             | focused pickup setting view                   | Confirm from old source   | `Not started` | Not started        |
+| `pickUpMealCodeRule`        | focused pickup meal code view                 | Confirm from old source   | `Not started` | Not started        |
+| `menuStyle`                 | focused menu style view                       | Confirm from old source   | `Not started` | Not started        |
+| `financeConfig`             | focused finance config view                   | Confirm from old source   | `Not started` | Not started        |
+| `financeConfigAmount`       | focused finance amount view                   | Confirm from old source   | `Not started` | Not started        |
+| `financeConfigMealType`     | focused finance meal type view                | Confirm from old source   | `Not started` | Not started        |
+| `location`                  | focused location setting view                 | Confirm from old source   | `Not started` | Not started        |
 
 Validation:
 
@@ -391,7 +402,9 @@ Tasks:
 - Render the route through `RouteModeSwitch`.
 - Use the default page for order detail.
 - Convert old `clientMemberOrderList` page type into the `clientMemberOrderList` route mode.
-- Keep route code limited to reading the raw `orderParams` path param and passing it down. Put parsing, validation, and display rules in application or domain helpers, not in route components or view-only string handling.
+- Keep route code limited to reading the raw `orderParams` path param, invoking domain or
+  application helpers for guard-level parsing, and passing parsed domain values down. Do not hand-roll
+  string parsing, validation, or display rules inside route components or views.
 - Migrate merchant schedule info used by the order detail page.
 - Migrate price summary display rules, including multiple price summary cases in deterministic mock
   data.
@@ -414,6 +427,9 @@ Objective: migrate reusable business-aware capabilities only when a migrated pag
 Capabilities that are required by earlier client, plan, or order slices must be migrated inside those
 owning slices. This phase is only for capability work that remains after the owning slices have been
 implemented.
+
+Do not defer a capability to this phase when an earlier route mode depends on it. In that case, track
+the capability work in the owning route mode row and record Phase 7 as already covered by that slice.
 
 Candidate modules:
 
@@ -486,6 +502,9 @@ export { clientRepositoryMock as clientRepository } from "./clientRepository.moc
 - Use an in-memory mock store only when a mutation result must be read back by queries.
 - Do not use `localStorage`, `sessionStorage`, IndexedDB, cookies, or remote services for mock state.
 - If a mutation is intentionally no-op because no migrated page reads the changed value afterward, document that choice in a mock repository test.
+- During a migration slice, delete replaced HTTP repository implementations, tests, or facades for
+  the migrated server-backed behavior unless a separate approved task keeps them. Repository facades
+  for migrated behavior must export the mock implementation only.
 
 ## Query Key Rules
 

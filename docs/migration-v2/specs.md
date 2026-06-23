@@ -27,9 +27,9 @@ Out of scope:
 
 All migrated data must use mock repositories. Do not call old APIs because the old API surface is no longer reliable.
 
-Existing placeholder or partially migrated code in this project is not a compatibility target. During
-migration, replace or delete existing placeholder implementations when they conflict with this
-spec. The old `planet-h5` source and this document define the migration target.
+During migration, delete existing placeholder or partially migrated implementations when a slice
+replaces them. Do not keep old implementations as parallel code paths or compatibility fallbacks,
+because they add noise and make the migration target harder to verify.
 
 ## UI Migration Policy
 
