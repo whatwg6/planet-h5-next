@@ -19,6 +19,7 @@ Track task status, pending work, route-mode coverage, and implementation evidenc
 Use this checklist while executing each task.
 
 - Work in small TDD loops: failing test, run and confirm failure, minimal implementation, run and confirm pass.
+- For client-owned migration slices, delete the current-project implementation for that slice before rebuilding from the legacy source inventory. Keep only non-business shared primitives or infrastructure, and record any exception in `tracker.md`.
 - For every task, update the status summary in `docs/migration-v2/tracker.md` when status changes, and append evidence when work is completed.
 - Commit after each task when the tree is coherent. Suggested commit messages are included; adjust them when the actual scope differs.
 

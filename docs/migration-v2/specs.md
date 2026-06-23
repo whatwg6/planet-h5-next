@@ -86,6 +86,21 @@ old src/assets/imgs
 
 Do not copy old folders into the new project wholesale. Classify every migrated file by responsibility first.
 
+## Current Project Client Baseline Policy
+
+When migrating client-owned flows, treat existing client, plan, and order business code in this
+project as disposable baseline code, not as a source of truth.
+
+Before implementing a migrated client slice, remove the current-project implementation for the
+same slice from the affected `pages`, `features`, `application`, `domain`, `infrastructure/mock`,
+`infrastructure/repositories`, and query-key files, then rebuild the slice from the legacy source
+inventory into the v2 architecture.
+
+Keep only project-level primitives and infrastructure that are not client-business-specific, such
+as router helpers, shared UI primitives, app providers, test setup, and generic utilities. If a
+current client file is intentionally kept because it is already a non-business primitive or shared
+infrastructure, record that exception in `docs/migration-v2/tracker.md`.
+
 ## Data Policy
 
 All migrated server-backed behavior must use deterministic mock data.
