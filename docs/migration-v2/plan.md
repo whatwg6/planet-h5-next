@@ -2,15 +2,10 @@
 
 **Goal:** Migrate the client, plan, and client-order H5 business flows from `/Users/yxc/code/planet-h5` into this project on the `/ops/client...` route contract, backed only by deterministic mock repositories.
 
-**Architecture:** Follow `docs/architecture-design.md`: route entries stay thin, page composition lives in `features`, business orchestration goes through `application`, domain rules stay framework-free, and repository implementations live in `infrastructure`. Same-resource old `pageType` states become TanStack Router history-state `routeMode` values rendered through `RouteModeSwitch`.
-
-**Tech Stack:** React 19, TypeScript, TanStack Router, TanStack Query, Zustand, React Hook Form, Zod, Vitest, React Testing Library, Playwright, pnpm.
-
 ---
 
 ## Required Reading Before Any Task
 
-- `README.md`
 - `docs/architecture-design.md`
 - `docs/migration-v2/specs.md`
 - This plan

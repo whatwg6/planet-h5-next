@@ -1,8 +1,10 @@
 # Business Migration Specs V2
 
-This document defines how to migrate business pages from `/Users/yxc/code/planet-h5` into this project.
+This document defines how old business concepts from `/Users/yxc/code/planet-h5` map into this project.
 
-It is a migration guide, not a general architecture guide. Architectural boundaries remain defined by `../architecture-design.md`.
+It is a mapping guide, not an implementation plan or general architecture guide. Architectural
+boundaries remain defined by `../architecture-design.md`; task order and verification steps remain
+defined by `plan.md`.
 
 ## Scope
 
@@ -24,12 +26,6 @@ Out of scope:
 - SSO, login callback, auth bootstrap, unauthorized handling, token injection, and native navigation.
 - S3 upload, deployment scripts, environment-specific build publishing, and old monitoring/logging wiring.
 - Development demo pages under old `src/apps/dev`.
-
-All migrated data must use mock repositories. Do not call old APIs because the old API surface is no longer reliable.
-
-During migration, delete existing placeholder or partially migrated implementations when a slice
-replaces them. Do not keep old implementations as parallel code paths or compatibility fallbacks,
-because they add noise and make the migration target harder to verify.
 
 ## UI Migration Policy
 
@@ -94,49 +90,6 @@ Do not copy old folders into the new project wholesale. Classify every migrated 
 
 All migrated server-backed behavior must use deterministic mock data.
 
-Runtime data flow:
-
-```txt
-features/<module>/queries or mutations
-  -> application/<module>/<useCase>.ts
-    -> domain/<module>/<Repository>.ts
-      -> infrastructure/repositories/<module>/<module>Repository.mock.ts
-        -> infrastructure/mock/<module>MockData.ts
-```
-
-This diagram describes call flow, not import direction. The dependency boundary remains:
-
-```txt
-pages -> features -> application -> domain
-infrastructure -> domain
-```
-
-`domain` defines repository contracts. `infrastructure` implements those contracts. Feature query and
-mutation hooks import the application use case and the selected repository facade, then pass the
-repository into the use case. Application and domain code must not import infrastructure.
-
-Repository facades must export the mock implementation:
-
-```ts
-export { clientRepositoryMock as clientRepository } from "./clientRepository.mock";
-```
-
-Do not add HTTP implementations for migrated business unless a later task explicitly changes this policy.
-
-Mock mutations must be deterministic:
-
-- Prefer returning the updated domain entity or command result directly from the mock repository.
-- If the surrounding flow needs query invalidation to show the update, keep an in-memory mock store
-  inside the repository or mock module. The update only needs to persist for the current browser/test
-  process.
-- Do not persist mock mutation state to `localStorage`, `sessionStorage`, IndexedDB, cookies, or a
-  remote service.
-- Do not use `Date.now()`, random IDs, random ordering, timers, or environment-dependent values in
-  mock data or mock mutation results.
-- Use stable fixture IDs and explicit fixture timestamps when an entity needs an ID or time field.
-- A no-op mutation is allowed only when the migrated page does not read the changed value afterward;
-  document that choice in the mock repository test.
-
 Do not import these from pages, features, views, or hooks:
 
 ```txt
@@ -152,7 +105,7 @@ Old API files may be read only as reference for field names or business meaning.
 
 ## Route Migration
 
-Old `react-router-dom` routes migrate to TanStack Router route definitions in:
+Old `react-router-dom` routes migrate to the new route tree and metadata files:
 
 ```txt
 src/app/router/routeTree.tsx
@@ -203,17 +156,6 @@ Do not migrate old system or development routes:
 /_dev
 ```
 
-Route entry components must stay thin. They may:
-
-- Read route params.
-- Create route-state navigation callbacks.
-- Render `RouteModeSwitch`.
-
-Route entry components must not call server-backed query or mutation hooks unless a later task
-explicitly documents a route-level preload exception. Loading, empty, error, and mutation states
-belong in feature views or feature hooks. Route entry components must not contain large page layouts
-or business rendering.
-
 ## Page Mode Migration
 
 The old project uses:
@@ -229,29 +171,6 @@ The new project uses:
 location.state.routeMode
 routeModeState(mode)
 RouteModeSwitch
-```
-
-Old pattern:
-
-```tsx
-usePageTypeDispatcher({
-  pageType,
-  defaultPage: <Detail />,
-  pages: {
-    setting: () => <Setting />,
-  },
-});
-```
-
-New pattern:
-
-```tsx
-<RouteModeSwitch
-  defaultPage={<ClientDetailView />}
-  modes={{
-    setting: <ClientSettingsView />,
-  }}
-/>
 ```
 
 Do not create extra URL paths for same-resource modes. For example, edit, settings, nested selectors, and detail subpanels that were old `pageType` states should become `routeMode` states unless they are truly shareable standalone resources.
@@ -276,38 +195,13 @@ old usePageContext params
   -> routeParams from RouteStackPageProps, with useParams fallback
 ```
 
-Route components that need params should follow this shape:
-
-```tsx
-export function SomeRoute({ routeParams }: RouteStackPageProps) {
-  const params = useParams({ strict: false, shouldThrow: false });
-  const clientId = routeParams?.clientId ?? params?.clientId ?? "";
-  const planId = routeParams?.planId ?? params?.planId ?? "";
-  const orderParams = routeParams?.orderParams ?? params?.orderParams ?? "";
-}
-```
-
 Do not introduce direct `window.history` handling.
 
 ## Business Component Migration
 
-Old `src/comps` components can move to `shared/ui` only when they are business-agnostic.
-
-Examples:
-
-```txt
-Button
-NavBar
-Loading
-EmptyState
-ErrorState
-InfoRow
-Field
-```
-
-Old `src/biz/features` and `src/biz/comps` stay business-aware and must not move to `shared/ui`.
-
-Examples:
+Old `src/biz/features` and `src/biz/comps` are business-aware. Move them to focused feature
+capability modules under `src/features/<capability>` or to the owning feature when the component is
+only used by one migrated flow.
 
 ```txt
 payment-method
@@ -317,119 +211,5 @@ select-meican-staff
 card-setting
 ```
 
-Move these to focused feature capability modules under `src/features/<capability>`. Owning pages pass
-context through props, and saving remains in the owning page's mutation flow. Migrate a capability
-with the first owning slice that needs it; do not wait for a later catch-all capability phase when a
-client, plan, or order route mode depends on it.
-
-## Form and Validation Migration
-
-Old form state and imperative page-local validation should be migrated to:
-
-```txt
-React Hook Form
-Zod
-features/<module>/views
-features/<module>/mutations
-application/<module>
-domain/<module>
-```
-
-Use Zod for validation-bearing forms. Put pure business validation in `domain` when it is not tied to React form rendering.
-
-## Assets Migration
-
-Reusable icon SVG files go to:
-
-```txt
-src/shared/assets/icons
-```
-
-Export reusable SVG icons from:
-
-```txt
-src/shared/assets/icons/index.ts
-```
-
-Use the `?react` import suffix for icon components. Keep SVG filenames in kebab-case and preserve `viewBox`.
-
-Illustration or image SVG files go to:
-
-```txt
-src/shared/assets/images
-```
-
-## Migration Order
-
-Migrate by page flow, not by old directory.
-
-Recommended order:
-
-1. Client list.
-2. Client detail default page.
-3. Client detail route modes such as meal plans, settings, name and remark, support, login settings, password settings, and notification settings.
-4. Plan detail.
-5. Plan settings.
-6. Client order detail and member order list.
-7. Shared business capability modules required by the migrated flows.
-8. Shared UI and assets discovered during those migrations.
-
-Each migrated flow should include:
-
-- Route registration.
-- Route metadata.
-- Page route component.
-- Feature view.
-- Query or mutation hook.
-- Application use case.
-- Domain entity and repository contract.
-- Mock repository and deterministic mock data.
-- Focused tests for the migrated behavior.
-
-## Testing
-
-Use the narrowest useful test for each migration:
-
-- Domain rules: colocated `*.test.ts`.
-- Use cases: `src/application/<module>/*UseCases.test.ts`.
-- Mock repositories: `src/infrastructure/repositories/<module>`.
-- Query hooks and views: tests under the relevant feature folder.
-- Route metadata: `src/app/router/routeMeta.test.ts`.
-- Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
-- Browser route, route mode, cross-page navigation, shared UI, and browser-interaction behavior:
-  Playwright e2e tests under the configured e2e test folder.
-
-Before handing back migrated code, run:
-
-```bash
-pnpm lint
-pnpm format:check
-pnpm test
-```
-
-For route, route mode, cross-page navigation, shared UI, or browser-interaction changes, also run:
-
-```bash
-pnpm e2e
-```
-
-For broad route, build, or shared UI changes, also run:
-
-```bash
-pnpm build
-```
-
-## Prohibited Shortcuts
-
-Do not:
-
-- Copy old `src/apps`, `src/biz`, or `src/comps` folders directly into the new project.
-- Import old API clients from new pages or features.
-- Call real APIs.
-- Recreate old hybrid navigation, SSO, login callback, or deployment behavior.
-- Put business components in `shared/ui`.
-- Put large layouts inside `pages`.
-- Let views know backend response shapes.
-- Add same-resource URL paths just to replace old `pageType`.
-- Duplicate server state in Zustand.
-- Add a second route table or manual pathname matcher for stack rendering.
+Old `src/comps` components can move to `shared/ui` only when they are business-agnostic. Shared UI
+and asset placement follow `../architecture-design.md`.
