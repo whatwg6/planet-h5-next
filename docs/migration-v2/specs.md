@@ -396,6 +396,8 @@ Use the narrowest useful test for each migration:
 - Query hooks and views: tests under the relevant feature folder.
 - Route metadata: `src/app/router/routeMeta.test.ts`.
 - Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
+- Browser route, route mode, cross-page navigation, shared UI, and browser-interaction behavior:
+  Playwright e2e tests under the configured e2e test folder.
 
 Before handing back migrated code, run:
 
@@ -403,6 +405,12 @@ Before handing back migrated code, run:
 pnpm lint
 pnpm format:check
 pnpm test
+```
+
+For route, route mode, cross-page navigation, shared UI, or browser-interaction changes, also run:
+
+```bash
+pnpm e2e
 ```
 
 For broad route, build, or shared UI changes, also run:

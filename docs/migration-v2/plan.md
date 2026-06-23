@@ -96,6 +96,48 @@ Target file lists identify the expected primary files for a phase. They are not 
 update tests, query keys, route metadata, and nearby support files whenever the phase validation or
 architecture rules require them.
 
+## Validation Evidence Standard
+
+Validation must produce reviewable evidence, not only a statement that testing was considered.
+
+For every completed slice, record the following in `execution.md`:
+
+- Old source inspected, including file paths or symbols.
+- Tests added or updated, including exact test file paths.
+- Behavior covered by those tests, stated as concrete cases.
+- Commands run, with pass/fail result.
+- Playwright checks run when required, with route, route mode, viewport, and interaction exercised.
+- Any skipped checklist item as `N/A`, with the reason it is not reachable or not applicable.
+
+Do not mark a slice or phase `Done` with generic notes such as "tested", "covered", or "not
+needed". If a validation item cannot be proven with an automated test, record the manual check or the
+reason a test would not add useful coverage.
+
+## Playwright Validation Standard
+
+Use Playwright to constrain real H5 route, stack, and interaction behavior. React Testing Library and
+Vitest prove component and logic contracts; Playwright proves the migrated flow works in a browser.
+
+Phase 0 must introduce the Playwright harness if it is not already present:
+
+- Add a `pnpm e2e` script.
+- Add Playwright configuration with a mobile H5 viewport.
+- Configure the test web server to run the Vite app.
+- Add a smoke test that can open the app and verify the `/ops/client` entry route.
+
+For every route, route mode, cross-page navigation, high-use shared UI, or browser-only interaction
+slice, add or update Playwright tests that prove the relevant user-visible flow. At minimum, cover:
+
+- Direct route open with required params.
+- Forward navigation from the owning page.
+- Same-URL `routeMode` navigation when the slice implements a route mode.
+- Browser back navigation restoring the previous stack entry.
+- Replace navigation not leaving stale stack entries when replace behavior is part of the slice.
+- Mobile viewport layout sanity for the migrated page or mode.
+
+Manual browser checks are allowed only when Playwright cannot reasonably automate the case. Record the
+reason, route, viewport, and observed result in `execution.md`.
+
 ## Legacy Source Inventory
 
 Inspect the listed old source before implementing a slice. If a file is missing or old source behavior
@@ -132,11 +174,21 @@ Tasks:
 - Remove legacy `/client...` development routes.
 - Ensure route entry components that read params accept `RouteStackPageProps` and fall back to `useParams({ strict: false, shouldThrow: false })`.
 - Keep `RouteStack` as the only page-stack renderer. Do not add a second route table or pathname matcher.
+- Introduce the Playwright e2e harness described in the Playwright Validation Standard when it is not
+  already present.
 
 Validation:
 
-- Add or update `src/app/router/routeMeta.test.ts`.
-- Add route registration coverage in existing router tests if route shape behavior changes.
+- `src/app/router/routeMeta.test.ts` proves metadata exists for each required `/ops/client...` route.
+- Router coverage proves all five `/ops/client...` paths are registered and legacy `/client...`
+  development routes are absent.
+- Route stack coverage proves the root route still renders `RouteStack` and no second route table or
+  pathname matcher was introduced.
+- For each route component that reads params, tests or focused code review evidence prove
+  `RouteStackPageProps` params are used with the `useParams({ strict: false, shouldThrow: false })`
+  fallback.
+- Playwright smoke coverage proves the app opens in a mobile viewport and `/ops/client` renders
+  through the configured Vite web server.
 
 ## Phase 1: Client List
 
@@ -169,9 +221,13 @@ Tasks:
 
 Validation:
 
-- Query hook test for list params and deterministic mock results.
-- View test for loading, empty, error, and populated list states when behavior is migrated.
-- Route metadata test.
+- Query hook tests prove committed list params are included in `queryKeys`, draft local state is not
+  used as a query key, and deterministic mock results are returned.
+- Use case and mock repository tests prove filtering, ordering, empty results, and missing or invalid
+  params behave deterministically.
+- View tests prove loading, empty, error, and populated list states, plus navigation to
+  `/ops/client/$clientId`.
+- Route metadata and route contract tests prove `/ops/client` is registered and titled.
 
 ## Phase 2: Client Detail Default Read Page
 
@@ -239,9 +295,15 @@ Client detail route modes to plan under this route:
 
 Validation:
 
-- Route mode dispatch tests for every implemented mode.
-- Use case tests for detail and update behavior.
-- Mock repository tests for deterministic reads and in-memory updates.
+- Query hook tests prove the detail query key includes `clientId` and returns deterministic mock
+  detail data.
+- Use case tests prove detail read behavior and every migrated update command, including invalid input
+  when applicable.
+- Mock repository tests prove deterministic detail reads, missing-client behavior, and in-memory
+  update readback when the migrated page reads the changed value afterward.
+- View tests prove default detail loading, error, and success states.
+- Route tests prove default page rendering, unknown route mode fallback, and dispatch for every
+  implemented route mode.
 
 ## Phase 3: Client Detail Settings And Focused Modes
 
@@ -271,11 +333,14 @@ Tasks:
 
 Validation:
 
-- Domain rule tests for pure validation.
-- Form tests for each migrated validation-bearing mode must cover valid submit, at least one invalid
-  input, and cancel or back behavior when the form has unsaved local state.
-- Mutation tests must cover mutation readback when the page reads the changed value afterward.
-- Route dispatch tests for newly implemented modes.
+- Domain rule tests prove each pure validation rule with valid and invalid examples.
+- Form tests for each migrated validation-bearing mode prove default values, valid submit, at least
+  one invalid input message, save failure handling, and cancel or back behavior when unsaved local
+  state exists.
+- Mutation tests prove the exact command payload, deterministic mock result, query invalidation or
+  cache update keys, and mutation readback when the page reads the changed value afterward.
+- Route dispatch tests prove default page fallback, each newly implemented mode, and unknown mode
+  fallback.
 
 ## Phase 4: Plan Detail
 
@@ -303,9 +368,14 @@ Tasks:
 
 Validation:
 
-- Query hook test for plan detail key and mock result.
-- Use case and mock repository tests.
-- Route metadata test.
+- Query hook tests prove the plan detail key includes `clientId` and `planId`, and returns
+  deterministic mock detail data.
+- Use case and mock repository tests prove success, missing plan, and deterministic display-mapping
+  inputs.
+- View tests prove loading, error, and success states for the default plan detail page.
+- Route tests prove params are passed to the view, the default page renders, and navigation to
+  `/ops/client/$clientId/plan/$planId/setting` uses the production route shape.
+- Route metadata test proves the plan detail route is titled and assigned to the `plan` module.
 
 ## Phase 5: Plan Settings
 
@@ -369,12 +439,15 @@ Plan settings route modes to plan under this route:
 
 Validation:
 
-- Route mode dispatch tests for every implemented mode.
-- Domain and schema tests for validation-bearing settings.
-- Mock repository tests for deterministic save behavior.
-- Mutation hook tests for the exact query keys invalidated or cache entries updated after saves.
-- View tests for each implemented setting editor must cover loading, success, validation error, and
-  save failure states when those states are reachable.
+- Route mode dispatch tests prove default page rendering, every implemented setting mode, unknown
+  mode fallback, and back navigation behavior.
+- Domain and schema tests prove valid and invalid examples for every validation-bearing setting.
+- Mock repository tests prove deterministic save behavior, missing plan behavior, no random values,
+  and in-memory readback when the saved value is shown afterward.
+- Mutation hook tests prove the exact command payload and the exact query keys invalidated or cache
+  entries updated after saves.
+- View tests for each implemented setting editor prove loading, success, validation error, save
+  failure, and cancel/back behavior when those states are reachable.
 
 ## Phase 6: Client Order
 
@@ -413,11 +486,16 @@ Tasks:
 
 Validation:
 
-- Query hook tests for order detail and member order list, including status and schedule variants.
-- Route mode dispatch test for `clientMemberOrderList`.
-- Domain tests for valid and invalid `orderParams`, order status display, schedule display, and price
-  summary rules.
-- Mock repository tests for multiple order statuses, merchant schedule info, and price summary cases.
+- Domain tests prove valid and invalid `orderParams`, order status display, schedule display, default
+  time schedule behavior, and price summary rules.
+- Query hook tests prove detail and member-order-list query keys, including status and schedule
+  variants.
+- Mock repository tests prove multiple order statuses, merchant schedule info, price summary cases,
+  missing order behavior, and deterministic ordering.
+- Route tests prove invalid `orderParams` guard rendering, default order detail rendering, unknown
+  mode fallback, and `clientMemberOrderList` dispatch.
+- View tests prove order detail loading, error, and success states, plus member order list loading,
+  empty, error, and success states.
 
 ## Phase 7: Shared Business Capability Modules
 
@@ -450,8 +528,11 @@ Tasks:
 
 Validation:
 
-- Component or hook tests for reusable capability behavior.
-- Owning page tests for integration paths that save or invalidate data.
+- Component or hook tests prove required props, local state behavior, validation schema, and cancel or
+  back behavior for reusable capability behavior.
+- Save handoff tests or owning-page integration tests prove the capability does not persist by itself
+  and instead calls the owning page's save flow with the expected command payload.
+- Owning page tests prove integration paths that save, invalidate, or update the relevant query data.
 
 ## Phase 8: Shared UI And Assets
 
@@ -481,8 +562,12 @@ Asset rules:
 
 Validation:
 
-- UI primitive tests only where behavior is non-trivial.
-- Visual or interaction verification for high-use primitives.
+- UI primitive tests prove non-trivial behavior such as controlled state, disabled/loading states,
+  accessibility labels, callbacks, or keyboard/touch interaction.
+- For high-use primitives, record visual or interaction verification in `execution.md`, including the
+  screen or route where the primitive was checked.
+- Asset validation proves icon SVGs keep `viewBox`, use kebab-case filenames, and are exported with
+  `?react` only from `src/shared/assets/icons/index.ts`.
 
 ## Mock Data And Repository Rules
 
@@ -534,8 +619,12 @@ Run the narrowest useful test for each migrated slice:
 | Route metadata      | `src/app/router/routeMeta.test.ts`              |
 | Route mode dispatch | relevant route file under `src/pages/<module>`  |
 | Shared UI behavior  | relevant `src/shared/ui` folder                 |
+| Playwright e2e      | `e2e` or `tests/e2e` folder                     |
 
 Minimum test checklist by slice type:
+
+Apply only the rows that match the slice. If a listed case is not reachable for that slice, record it
+as `N/A` in `execution.md` with a concrete reason.
 
 | Slice type              | Minimum test cases                                                                                       |
 | ----------------------- | -------------------------------------------------------------------------------------------------------- |
@@ -546,8 +635,9 @@ Minimum test checklist by slice type:
 | Validation-bearing form | default values, valid submit, invalid input messages, cancel/back behavior, and save failure state       |
 | Mock repository         | success fixture, empty or missing result, deterministic ordering, in-memory update, and no random values |
 | Shared capability       | required props, local state behavior, validation schema, save handoff, and owning-page integration       |
+| Playwright flow         | direct route open, forward navigation, route mode navigation, browser back, and mobile viewport sanity   |
 
-Manual H5 stack checks are required for route, route mode, and cross-page navigation slices:
+Playwright H5 stack checks are required for route, route mode, and cross-page navigation slices:
 
 - Open the route directly with required params.
 - Navigate forward from the owning list or detail page.
@@ -555,12 +645,21 @@ Manual H5 stack checks are required for route, route mode, and cross-page naviga
 - Use browser or H5 back navigation and verify the previous stack entry is restored.
 - Verify replace navigation does not leave stale stack entries.
 
+Record Playwright H5 stack check results in the slice entry in `execution.md`. If a check falls back
+to manual verification, record the reason and observed result.
+
 Before handing back migrated code, run:
 
 ```bash
 pnpm lint
 pnpm format:check
 pnpm test
+```
+
+For route, route mode, cross-page navigation, shared UI, or browser-interaction changes, also run:
+
+```bash
+pnpm e2e
 ```
 
 For broad route, build, or shared UI changes, also run:
@@ -587,3 +686,5 @@ A migrated slice is done when:
 - Tests cover the applicable minimum test checklist for the slice type, or the skipped cases are
   documented as not reachable.
 - `pnpm lint`, `pnpm format:check`, and `pnpm test` pass for completed code changes.
+- `pnpm e2e` passes when the slice changes route, route mode, cross-page navigation, shared UI, or
+  browser interaction behavior.

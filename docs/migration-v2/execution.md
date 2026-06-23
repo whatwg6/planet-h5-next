@@ -135,6 +135,12 @@ pnpm format:check
 pnpm test
 ```
 
+For route, route mode, cross-page navigation, shared UI, or browser-interaction changes, also run:
+
+```bash
+pnpm e2e
+```
+
 Also run this for broad route, shared UI, build, or cross-module changes:
 
 ```bash
@@ -218,6 +224,8 @@ A slice is complete only when:
   `plan.md` task, route mode, or capability row.
 - Applicable tests were added or explicitly deemed unnecessary.
 - Required validation ran or skipped commands are documented.
+- Required Playwright checks ran for route, route mode, cross-page navigation, shared UI, or
+  browser-interaction changes, or the manual fallback reason is documented.
 - Subagent handoffs, if any, were reviewed by the main agent.
 - The owning task, route mode, or capability row in `plan.md` is updated with the current status and evidence.
 - The execution log records the result.
