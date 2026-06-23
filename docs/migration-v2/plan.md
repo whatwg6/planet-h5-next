@@ -69,7 +69,6 @@ Inspect the listed old files before implementing the owning task. If a path is m
 **Files:**
 
 - Create or modify: `docs/migration-v2/tracker.md`
-- Modify: `docs/migration-v2/plan.md` only if task status or scope changes
 
 **Step 1: Write the tracker skeleton**
 
