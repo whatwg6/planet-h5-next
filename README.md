@@ -21,6 +21,7 @@ Planet H5 Next is a mobile H5 business frontend. The current business scope cove
 - Vitest
 - React Testing Library
 - MSW
+- Playwright
 
 See `docs/architecture-design.md` for the full technology selection and architecture details.
 
@@ -31,15 +32,21 @@ pnpm dev
 pnpm build
 pnpm test
 pnpm test:watch
+pnpm e2e
 pnpm lint
 pnpm format
 pnpm format:check
 ```
 
 - `pnpm dev` — starts the Vite H5 development server.
+- `pnpm e2e` — runs Playwright end-to-end tests against a Vite dev server.
 - `pnpm lint` — runs a TypeScript no-emit check.
 - `pnpm format` — formats project files with Prettier.
 - `pnpm format:check` — verifies formatting without writing changes.
+
+Playwright e2e tests run against the local Google Chrome channel to avoid browser binary
+downloads in restricted or slow networks. Install Google Chrome on the machine before
+running `pnpm e2e`.
 
 The GitHub Pages workflow is defined in `.github/workflows/deploy-github-pages.yml`.
 It runs `pnpm lint`, `pnpm format:check`, and `pnpm test` before building static assets with `VITE_BASE_PATH=/planet-h5-next/` so they work under the repository subpath.

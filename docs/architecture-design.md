@@ -25,6 +25,7 @@ The application is H5 only. It may contain operationally complex business workfl
 - Vitest
 - React Testing Library
 - MSW
+- Playwright
 
 ## Architecture Style
 
