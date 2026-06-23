@@ -105,11 +105,10 @@ Old API files may be read only as reference for field names or business meaning.
 
 ## Route Migration
 
-Old `react-router-dom` routes migrate to the new route tree and metadata files:
+Old `react-router-dom` routes migrate to the new route tree and page entry files:
 
 ```txt
 src/app/router/routeTree.tsx
-src/app/router/routeMeta.ts
 src/pages/<module>/<Route>.tsx
 ```
 

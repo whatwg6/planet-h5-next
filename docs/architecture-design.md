@@ -4,8 +4,6 @@
 
 This document defines the frontend architecture intent, boundaries, and conventions for `planet-h5`, a mobile H5 business application.
 
-Concrete route registrations live in `src/app/router/routeTree.tsx`. Route metadata lives in `src/app/router/routeMeta.ts`. Route entry components live under `src/pages`. Feature modules live under `src/features`.
-
 The application is H5 only. It may contain operationally complex business workflows, but it is not a PC admin system.
 
 ## Technology Stack
@@ -85,21 +83,17 @@ Create module folders only when the feature needs that layer.
 
 ## Route Design
 
-`src/app/router/routeTree.tsx` is the source of truth for registered routes. `src/app/router/routeMeta.ts` is the source of truth for route metadata such as title and module.
+Keep route ownership explicit:
 
-Same-resource page modes are represented with TanStack Router history state, not separate URL paths. For example, an edit, preview, or workflow state should push the same route with `location.state.routeMode`, built through `routeModeState(mode)` from `src/app/router/historyState.ts`.
+- `src/app/router/routeTree.tsx` is the only route registration table.
 
-Route entry components render through `src/app/router/RouteModeSwitch.tsx`: the normal page is passed as `defaultPage`, and additional states are passed through `modes`. Feature views must not read `location.state`; they receive ordinary props and callbacks from the route component.
+The route layer has three central mechanisms:
 
-There must not be routes such as `/client/$clientId/edit` only to represent a same-resource UI mode.
+- `RouteStack`: the root route renders `src/app/router/RouteStack.tsx` instead of a plain `Outlet`. It uses TanStack Router state as its source of truth for H5 page-stack transitions, including forward, back, and replace.
+- `routeMode`: same-resource page modes, such as edit, preview, or workflow states, use TanStack Router history state instead of extra paths. Push the same route with `location.state.routeMode` built by `routeModeState(mode)` from `src/app/router/historyState.ts`; do not add paths like `/client/$clientId/edit` only to express a UI mode.
+- `RouteModeSwitch`: route entry components dispatch modes through `src/app/router/RouteModeSwitch.tsx`. Put the normal page in `defaultPage` and same-URL modes in `modes`.
 
-Each business route should have route metadata. Root, index, redirect-only, or framework-only routes may omit metadata when they do not represent a business page.
-
-Route metadata includes a `title` and a business `module`. It is used for page titles, analytics, future permission hooks, and H5 navigation behavior. `src/app/router/routeMeta.ts` owns the canonical metadata type.
-
-The root route renders `RouteStack` instead of a plain `Outlet`. `RouteStack` uses TanStack Router state as its source of truth and handles forward, back, and replace navigation as page-stack transitions.
-
-`RouteStack` must not maintain a second route table or manually match pathnames. `routeTree.tsx` remains the source of route registration. Route entry components that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for normal direct rendering.
+Keep these mechanisms in the route layer. `RouteStack` must not keep a second route table or manually match pathnames. Route entries that need params should accept optional `routeParams` from the stack and fall back to `useParams({ strict: false, shouldThrow: false })` for direct rendering. Feature views must not read `location.state`; they receive ordinary props and callbacks.
 
 ## Feature Mapping Pattern
 
@@ -152,7 +146,6 @@ TanStack Router owns:
 - Path params
 - Search params
 - History-state page modes such as `location.state.routeMode`
-- Route metadata
 - Link generation
 - Route-level preloading where useful
 
@@ -296,7 +289,7 @@ Use the narrowest useful test for the change:
 - Use cases: `src/application/<module>/*UseCases.test.ts`.
 - Repository implementations: tests under `src/infrastructure/repositories/<module>`.
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
-- Route metadata: `src/app/router/routeMeta.test.ts`.
+- Route registration: tests under `src/app/router`.
 - Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
 - End-to-end route flows: Playwright tests under `e2e/`.
 

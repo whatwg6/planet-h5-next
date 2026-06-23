@@ -46,7 +46,7 @@ For client detail same-resource pages, keep using `routeModeState(...)` and `Rou
 For each remaining business slice:
 
 1. Read the relevant legacy files under `/Users/yxc/code/planet-h5`.
-2. Confirm the target `/ops` route and route metadata when the slice changes routing.
+2. Confirm the target `/ops` route when the slice changes routing.
 3. Extend domain entities and repository contracts only for real business concepts.
 4. Add deterministic mock data and mock repository behavior.
 5. Add or update application use cases.

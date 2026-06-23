@@ -98,7 +98,6 @@ src/features/client/components/ClientCard.tsx
 src/features/client/components/ClientStatusTag.tsx
 src/features/client/views/ClientListView.tsx
 src/pages/client/ClientListRoute.tsx
-src/app/router/routeMeta.ts
 src/app/router/routeTree.tsx
 ```
 
@@ -148,7 +147,6 @@ The legacy production route is:
 For the migrated production route, add or confirm:
 
 ```txt
-src/app/router/routeMeta.ts
 src/app/router/routeTree.tsx
 src/pages/client/ClientListRoute.tsx
 ```
@@ -376,12 +374,6 @@ Test cases:
 - Returns an empty list for an unmatched keyword.
 - Preserves `isDeveloperTest` in list summaries.
 
-If route metadata changes, add or update:
-
-```txt
-src/app/router/routeMeta.test.ts
-```
-
 ### Step 10: Verify The Slice
 
 Run:
@@ -518,7 +510,6 @@ src/features/client/queries/useClientDetailQuery.ts
 src/features/client/views/ClientDetailView.tsx
 src/features/client/views/ClientDetailReadView.tsx
 src/pages/client/ClientDetailRoute.tsx
-src/app/router/routeMeta.ts
 src/app/router/routeTree.tsx
 ```
 
@@ -548,7 +539,6 @@ The migrated TanStack Router route should use:
 Update or confirm:
 
 ```txt
-src/app/router/routeMeta.ts
 src/app/router/routeTree.tsx
 src/pages/client/ClientDetailRoute.tsx
 ```
@@ -771,19 +761,13 @@ src/infrastructure/repositories/client/clientRepository.mock.test.ts
 src/features/client/queries/useClientDetailQuery.test.tsx
 ```
 
-Add route metadata tests if route metadata changes:
-
-```txt
-src/app/router/routeMeta.test.ts
-```
-
 Test cases:
 
 - Returns client detail by id.
 - Throws for an unknown client id.
 - Preserves `isDeveloperTest` on detail.
 - Query hook returns client detail for a valid id.
-- Detail route metadata includes `/ops/client/$clientId`.
+- Detail route passes route params to the view.
 
 Add view tests if meaningful:
 
@@ -989,7 +973,6 @@ src/infrastructure/mock/planMockData.ts
 src/features/client/views/ClientMealPlansView.tsx
 src/pages/client/ClientDetailRoute.tsx
 src/app/router/routeTree.tsx
-src/app/router/routeMeta.ts
 ```
 
 ### Execution Steps
@@ -1004,7 +987,7 @@ src/app/router/routeMeta.ts
 /ops/client/$clientId/plan/$planId
 ```
 
-6. Add route metadata and route tests when adding the production-shaped route.
+6. Add route tests when adding the production-shaped route.
 
 ### Completion Criteria
 
@@ -1064,7 +1047,6 @@ src/features/plan/queries/usePlanDetailQuery.ts
 src/features/plan/views/PlanDetailView.tsx
 src/pages/plan/PlanDetailRoute.tsx
 src/app/router/routeTree.tsx
-src/app/router/routeMeta.ts
 ```
 
 ### Execution Steps
@@ -1080,7 +1062,7 @@ src/app/router/routeMeta.ts
 4. Add deterministic plan mock data linked to client mock data.
 5. Implement `getPlanDetail` through `planRepositoryMock`.
 6. Render settings entry and wire it to the production-shaped settings route.
-7. Add use case, repository, query hook, and route metadata tests.
+7. Add use case, repository, query hook, and route tests.
 
 ### Completion Criteria
 
@@ -1131,7 +1113,6 @@ src/infrastructure/query/queryKeys.ts
 src/features/plan/views/PlanSettingsView.tsx
 src/pages/plan/PlanSettingsRoute.tsx
 src/app/router/routeTree.tsx
-src/app/router/routeMeta.ts
 ```
 
 ### Execution Steps
@@ -1145,7 +1126,7 @@ src/app/router/routeMeta.ts
 2. Map legacy setting entries to stable plan setting summary ids.
 3. Add only summary values needed by the list.
 4. Keep entry click behavior explicit for unmigrated editors.
-5. Add route metadata tests and focused view tests.
+5. Add route tests and focused view tests.
 
 ### Completion Criteria
 
@@ -1424,7 +1405,6 @@ Also update:
 ```txt
 src/infrastructure/query/queryKeys.ts
 src/app/router/routeTree.tsx
-src/app/router/routeMeta.ts
 ```
 
 ### Execution Steps
@@ -1440,7 +1420,7 @@ src/app/router/routeMeta.ts
 4. Add mock records for multiple order statuses and price summary cases.
 5. Add list and detail use cases.
 6. Add query hooks and feature views.
-7. Add repository, use-case, query hook, route metadata, and route-param parsing tests.
+7. Add repository, use-case, query hook, route registration, and route-param parsing tests.
 
 ### Completion Criteria
 

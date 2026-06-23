@@ -115,8 +115,6 @@ The new project may keep development-friendly routes such as `/client`, but migr
 /ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
-Route metadata belongs in `src/app/router/routeMeta.ts`.
-
 Route definitions belong in `src/app/router/routeTree.tsx`.
 
 Route entry components belong in `src/pages/<module>`.
@@ -286,7 +284,7 @@ Use the narrowest useful test for each migration step:
 - Use cases: `src/application/<module>/*UseCases.test.ts`.
 - Mock repositories: tests under `src/infrastructure/repositories/<module>`.
 - Query hooks and views: React Testing Library tests under the relevant feature folder.
-- Route metadata: `src/app/router/routeMeta.test.ts`.
+- Route registration: tests under `src/app/router`.
 - Route mode dispatch: tests under the relevant route file in `src/pages/<module>`.
 
 Before handing back a migrated business slice, run:
@@ -308,7 +306,7 @@ pnpm build
 Use this checklist for each migrated business slice:
 
 - Source legacy files identified.
-- Target route and route metadata added or confirmed.
+- Target route added or confirmed.
 - Domain entity and repository contract added or extended.
 - Mock data added with success, empty, and edge cases.
 - Mock repository implemented.

@@ -2,7 +2,7 @@
 
 Planet H5 Next is a mobile H5 business frontend. The current business scope covers client, merchant, plan detail, plan setting, and order pages. The codebase uses a lightweight Clean Architecture adapted for React H5 applications.
 
-- `docs/architecture-design.md` — source of truth for architectural intent, layer boundaries, data flow, state management, shared UI, SVG assets, and change rules.
+`docs/architecture-design.md` for the full technology selection and architecture details.
 
 ## Tech Stack
 
@@ -22,8 +22,6 @@ Planet H5 Next is a mobile H5 business frontend. The current business scope cove
 - React Testing Library
 - MSW
 - Playwright
-
-See `docs/architecture-design.md` for the full technology selection and architecture details.
 
 ## Commands
 
@@ -49,7 +47,6 @@ downloads in restricted or slow networks. Install Google Chrome on the machine b
 running `pnpm e2e`.
 
 The GitHub Pages workflow is defined in `.github/workflows/deploy-github-pages.yml`.
-It runs `pnpm lint`, `pnpm format:check`, `pnpm test`, and `pnpm e2e` before building static assets with `VITE_BASE_PATH=/planet-h5-next/` so they work under the repository subpath.
 
 ## Project Map
 
@@ -86,5 +83,4 @@ infrastructure -> domain
 /merchant/$merchantId
 ```
 
-- Route metadata — `src/app/router/routeMeta.ts`
 - Route definitions — `src/app/router/routeTree.tsx`

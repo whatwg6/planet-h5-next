@@ -126,10 +126,8 @@ git commit -m "docs: prepare migration v2 execution log"
 
 **Files:**
 
-- Modify: `src/app/router/routeMeta.test.ts`
 - Modify: `src/app/router/router.test.ts`
 - Modify: `src/app/router/RouteStack.test.tsx`
-- Modify: `src/app/router/routeMeta.ts`
 - Modify: `src/app/router/routeTree.tsx`
 - Modify: `src/pages/client/ClientListRoute.tsx`
 - Modify: `src/pages/client/ClientDetailRoute.tsx`
@@ -139,27 +137,27 @@ git commit -m "docs: prepare migration v2 execution log"
 - Modify or create: `e2e/client-list.spec.ts`
 - Modify: `docs/migration-v2/execution.md`
 
-**Step 1: Write failing metadata tests**
+**Step 1: Write failing router registration tests**
 
-Add expectations that these paths exist in `routeMeta.ts` with business modules:
+In `src/app/router/router.test.ts`, prove these paths match:
 
 ```txt
-/ops/client -> client
-/ops/client/$clientId -> client
-/ops/client/$clientId/plan/$planId -> plan
-/ops/client/$clientId/plan/$planId/setting -> plan
-/ops/client/$clientId/plan/$planId/order/$orderParams -> order
+/ops/client
+/ops/client/$clientId
+/ops/client/$clientId/plan/$planId
+/ops/client/$clientId/plan/$planId/setting
+/ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
 Run:
 
 ```bash
-pnpm test src/app/router/routeMeta.test.ts
+pnpm test src/app/router/router.test.ts
 ```
 
-Expected: FAIL for any missing metadata.
+Expected: FAIL for any missing route registration.
 
-**Step 2: Write failing router registration tests**
+**Step 2: Write route compatibility tests**
 
 In `src/app/router/router.test.ts`, prove all five `/ops/client...` routes match and that no migrated client, plan, or order compatibility routes exist outside `/ops/client...`.
 
@@ -207,8 +205,6 @@ Register or confirm these TanStack Router paths in `src/app/router/routeTree.tsx
 /ops/client/$clientId/plan/$planId/order/$orderParams
 ```
 
-Add matching metadata in `src/app/router/routeMeta.ts`.
-
 Ensure each route entry renders through:
 
 ```tsx
@@ -231,7 +227,7 @@ const params = routeParams ?? useParams({ strict: false, shouldThrow: false });
 **Step 6: Run focused tests**
 
 ```bash
-pnpm test src/app/router/routeMeta.test.ts src/app/router/router.test.ts src/app/router/RouteStack.test.tsx
+pnpm test src/app/router/router.test.ts src/app/router/RouteStack.test.tsx
 pnpm e2e e2e/client-list.spec.ts
 pnpm build
 ```
@@ -528,7 +524,6 @@ Repeat Task 5 until every reachable client detail route mode is Done or recorded
 - Modify: `src/infrastructure/repositories/plan/index.ts`
 - Modify: `src/infrastructure/mock/planMockData.ts`
 - Modify: `src/infrastructure/query/queryKeys.ts`
-- Modify: `src/app/router/routeMeta.test.ts`
 - Modify: `docs/migration-v2/execution.md`
 
 **Step 1: Inspect legacy plan detail**
@@ -546,12 +541,12 @@ Cover:
 - View loading, error, and success.
 - Route passes params to the view.
 - Navigation to `/ops/client/$clientId/plan/$planId/setting`.
-- Route metadata title and `plan` module.
+- Plan detail route registration.
 
 Run:
 
 ```bash
-pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/routeMeta.test.ts
+pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/router.test.ts
 ```
 
 Expected: FAIL until plan detail is implemented.
@@ -563,8 +558,8 @@ Keep plan detail on `/ops/client/$clientId/plan/$planId`. Keep any settings navi
 **Step 4: Verify and commit**
 
 ```bash
-pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/routeMeta.test.ts
-git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts src/app/router/routeMeta.test.ts docs/migration-v2/execution.md
+pnpm test src/features/plan/queries src/application/plan/planUseCases.test.ts src/domain/plan/planRules.test.ts src/infrastructure/repositories/plan src/pages/plan/PlanDetailRoute.test.tsx src/app/router/router.test.ts
+git add src/pages/plan src/features/plan src/application/plan src/domain/plan src/infrastructure/repositories/plan src/infrastructure/mock/planMockData.ts src/infrastructure/query/queryKeys.ts docs/migration-v2/execution.md
 git commit -m "feat: migrate plan detail"
 ```
 
@@ -899,7 +894,7 @@ Only stage docs that actually changed.
 A slice is Done only when:
 
 - Public route shape matches `/ops/client...` where applicable.
-- Route metadata exists.
+- Route registration exists.
 - Route component is thin and renders through `RouteModeSwitch`.
 - Feature view owns page composition.
 - Server state uses TanStack Query.
