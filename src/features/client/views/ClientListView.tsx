@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-
 import { ClientCard } from "@/features/client/components/ClientCard";
 import { useClientListQuery } from "@/features/client/queries/useClientListQuery";
 import { useClientListStore } from "@/features/client/store/clientListStore";
@@ -7,7 +5,11 @@ import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Button, Field } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
-export function ClientListView() {
+export function ClientListView({
+  onOpenClient = () => undefined,
+}: {
+  onOpenClient?: (clientId: string) => void;
+}) {
   const { draftKeyword, committedKeyword, setDraftKeyword, commitKeyword } = useClientListStore();
   const query = useClientListQuery({ keyword: committedKeyword });
 
@@ -24,6 +26,7 @@ export function ClientListView() {
           <div className="min-w-0 flex-1">
             <Field
               label="搜索"
+              aria-label="搜索客户"
               value={draftKeyword}
               onChange={(event) => setDraftKeyword(event.target.value)}
               placeholder="输入名称或电话"
@@ -38,18 +41,7 @@ export function ClientListView() {
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}
         <div className="space-y-3">
           {query.data?.map((client) => (
-            <Link
-              key={client.id}
-              to="/ops/client/$clientId"
-              params={{ clientId: client.id }}
-              className="block text-text-primary"
-            >
-              <ClientCard
-                name={client.name}
-                phone={client.phone}
-                isDeveloperTest={client.isDeveloperTest}
-              />
-            </Link>
+            <ClientCard key={client.id} client={client} onClick={() => onOpenClient(client.id)} />
           ))}
         </div>
       </div>

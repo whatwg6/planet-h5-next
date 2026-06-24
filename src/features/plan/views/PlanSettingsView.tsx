@@ -9,6 +9,7 @@ import { useSavePlanSettingsMutation } from "@/features/plan/mutations/useSavePl
 import { usePlanDetailQuery } from "@/features/plan/queries/usePlanDetailQuery";
 import { SettingRuleEditor } from "@/features/setting-rule/components/SettingRuleEditor";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
+import { ListRow, ListSection } from "@/shared/ui/List";
 import { Button, Field } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 
@@ -74,7 +75,36 @@ function createDefaultValues(fields: Record<string, string> = {}, name = ""): Pl
   };
 }
 
-export function PlanSettingsView({ clientId, planId }: { clientId: string; planId: string }) {
+const settingModeById: Record<string, string> = {
+  "base-info": "baseInfo",
+  "open-times": "openTimes",
+  "operation-day": "operationDay",
+  "occupation-time": "occupationTime",
+  restriction: "restriction",
+  "order-rule": "orderRule",
+  "order-transfer": "orderTransfer",
+  "manual-confirm-order": "manualConfirmOrder",
+  "pickup-setting": "pickupSetting",
+  "location-setting": "locationSetting",
+  "menu-style": "menuStyle",
+  "finance-config": "financeConfig",
+  "maximum-order-amount": "maximumOrderAmount",
+  "merchant-order-verification": "merchantOrderVerification",
+  "hidden-account-types": "hiddenAccountTypes",
+  "disable-append-dish": "disableAppendDish",
+};
+
+export function PlanSettingsView({
+  clientId,
+  planId,
+  onBack,
+  onOpenMode,
+}: {
+  clientId: string;
+  planId: string;
+  onBack?: () => void;
+  onOpenMode?: (mode: string) => void;
+}) {
   const router = useRouter();
   const query = usePlanDetailQuery(clientId, planId);
   const mutation = useSavePlanSettingsMutation();
@@ -83,7 +113,7 @@ export function PlanSettingsView({ clientId, planId }: { clientId: string; planI
     resolver: zodResolver(planSettingsSchema),
     defaultValues: createDefaultValues(),
   });
-  const back = () => router.history.back();
+  const back = onBack ?? (() => router.history.back());
 
   useEffect(() => {
     if (!query.data) return;
@@ -229,16 +259,11 @@ export function PlanSettingsView({ clientId, planId }: { clientId: string; planI
             if (settings.length === 0) return null;
 
             return (
-              <section key={group} className="space-y-2">
-                <h2 className="px-1 text-xs font-medium text-text-tertiary">
-                  {settingGroupTitle[group]}
-                </h2>
-                <div className="overflow-hidden rounded-md border border-border-solid-line-2 bg-background-primary-container shadow-card">
-                  {settings.map((setting) => (
-                    <SettingRow key={setting.id} setting={setting} />
-                  ))}
-                </div>
-              </section>
+              <ListSection key={group} title={settingGroupTitle[group]}>
+                {settings.map((setting) => (
+                  <SettingRow key={setting.id} setting={setting} onOpenMode={onOpenMode} />
+                ))}
+              </ListSection>
             );
           })}
         </div>
@@ -247,24 +272,23 @@ export function PlanSettingsView({ clientId, planId }: { clientId: string; planI
   );
 }
 
-function SettingRow({ setting }: { setting: PlanSettingSummary }) {
+function SettingRow({
+  setting,
+  onOpenMode,
+}: {
+  setting: PlanSettingSummary;
+  onOpenMode?: (mode: string) => void;
+}) {
+  const mode = settingModeById[setting.id];
+  const disabled = setting.disabled || !mode;
+
   return (
-    <button
-      type="button"
-      disabled={setting.disabled || setting.editable === "placeholder"}
-      className="flex w-full items-center justify-between gap-3 border-b border-border-solid-line-2 px-3 py-4 text-left last:border-b-0 disabled:opacity-100"
-    >
-      <span className="min-w-0">
-        <span className="block text-sm font-medium text-text-primary">{setting.title}</span>
-        {setting.description ? (
-          <span className="mt-1 block text-xs text-text-secondary">{setting.description}</span>
-        ) : null}
-      </span>
-      <span className="shrink-0 text-sm text-text-secondary">
-        {setting.disabled || setting.editable === "placeholder"
-          ? "待迁移"
-          : (setting.value ?? "未设置")}
-      </span>
-    </button>
+    <ListRow
+      title={setting.title}
+      description={setting.description}
+      value={disabled ? "暂不可编辑" : (setting.value ?? "未设置")}
+      disabled={disabled}
+      onClick={!disabled && onOpenMode ? () => onOpenMode(mode) : undefined}
+    />
   );
 }

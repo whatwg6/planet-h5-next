@@ -14,11 +14,22 @@ export function PlanDetailRoute() {
       params: { clientId, planId },
     });
   };
+  const openOrder = (orderParams: string) => {
+    void navigate({
+      to: "/ops/client/$clientId/plan/$planId/order/$orderParams",
+      params: { clientId, planId, orderParams },
+    });
+  };
 
   return (
     <RouteModeSwitch
       defaultPage={
-        <PlanDetailView clientId={clientId} planId={planId} onOpenSettings={openSettings} />
+        <PlanDetailView
+          clientId={clientId}
+          planId={planId}
+          onOpenSettings={openSettings}
+          onOpenOrder={openOrder}
+        />
       }
     />
   );

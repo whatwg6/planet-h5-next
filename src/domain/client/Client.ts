@@ -1,9 +1,14 @@
+export type ClientStatus = "enabled" | "disabled" | "archived";
+
 export type ClientSummary = {
   id: string;
   name: string;
   phone?: string;
   updatedAt?: string;
   isDeveloperTest?: boolean;
+  status?: ClientStatus;
+  ownerName?: string;
+  settingCompletionText?: string;
 };
 
 export type ClientMealPlanSummary = {
@@ -150,6 +155,7 @@ export type ClientDetail = ClientSummary & {
 
 export type ClientListParams = {
   keyword?: string;
+  status?: ClientStatus | "all";
 };
 
 export type UpdateClientInput = {

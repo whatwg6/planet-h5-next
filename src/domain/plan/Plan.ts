@@ -20,7 +20,7 @@ export type PlanSettingSummary = {
   value?: string;
   description?: string;
   disabled?: boolean;
-  editable: "simple" | "structured" | "placeholder";
+  editable: "simple" | "structured";
 };
 
 export type PlanDetail = {

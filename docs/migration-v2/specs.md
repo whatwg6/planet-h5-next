@@ -237,7 +237,7 @@ only used by one migrated flow.
 payment-method
 client-member
 select-merchant
-select-meican-staff
+select-mc-staff
 card-setting
 ```
 

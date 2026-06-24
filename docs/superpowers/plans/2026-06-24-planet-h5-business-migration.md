@@ -85,7 +85,7 @@ This plan keeps the current architectural layout. Files listed here are the plan
 
 ### Shared Business Capabilities
 
-- `src/domain/mc-staff/McStaff.ts`: Meican staff entity and search params.
+- `src/domain/mc-staff/McStaff.ts`: MC staff entity and search params.
 - `src/domain/mc-staff/McStaffRepository.ts`: staff search contract.
 - `src/application/mc-staff/searchMcStaffs.ts`: staff search use case.
 - `src/infrastructure/mock/mcStaffMockData.ts`: staff mock data.
@@ -184,11 +184,11 @@ import { ListRow } from "./ListRow";
 describe("ListRow", () => {
   it("renders title, description, value, and calls onClick", async () => {
     const onClick = vi.fn();
-    render(<ListRow title="客户名称" description="基础信息" value="美餐" onClick={onClick} />);
+    render(<ListRow title="客户名称" description="基础信息" value="MC" onClick={onClick} />);
 
     expect(screen.getByText("客户名称")).toBeInTheDocument();
     expect(screen.getByText("基础信息")).toBeInTheDocument();
-    expect(screen.getByText("美餐")).toBeInTheDocument();
+    expect(screen.getByText("MC")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: /客户名称/ }));
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -552,7 +552,7 @@ import type { ClientSummary } from "./Client";
 
 const client: ClientSummary = {
   id: "client-1",
-  name: "美餐测试客户",
+  name: "MC测试客户",
   phone: "13800000000",
   status: "enabled",
   ownerName: "张三",
@@ -567,7 +567,7 @@ describe("clientRules", () => {
   });
 
   it("matches keyword by name, phone, and owner", () => {
-    expect(matchesClientKeyword(client, "美餐")).toBe(true);
+    expect(matchesClientKeyword(client, "MC")).toBe(true);
     expect(matchesClientKeyword(client, "138")).toBe(true);
     expect(matchesClientKeyword(client, "张三")).toBe(true);
     expect(matchesClientKeyword(client, "不存在")).toBe(false);
@@ -584,11 +584,11 @@ import { clientRepositoryMock } from "./clientRepository.mock";
 
 describe("clientRepositoryMock.listClients", () => {
   it("filters clients by keyword and status", async () => {
-    const clients = await clientRepositoryMock.listClients({ keyword: "美餐", status: "enabled" });
+    const clients = await clientRepositoryMock.listClients({ keyword: "MC", status: "enabled" });
 
     expect(clients.length).toBeGreaterThan(0);
     expect(clients.every((client) => client.status === "enabled")).toBe(true);
-    expect(clients.some((client) => client.name.includes("美餐"))).toBe(true);
+    expect(clients.some((client) => client.name.includes("MC"))).toBe(true);
   });
 });
 ```
@@ -659,8 +659,8 @@ Update `src/infrastructure/mock/clientMockData.ts` so each `ClientSummary` has `
 ```ts
 export const clientMockData = [
   {
-    id: "client-meican",
-    name: "美餐科技",
+    id: "client-mc",
+    name: "MC科技",
     phone: "13800000000",
     updatedAt: "2026-06-01 10:00",
     isDeveloperTest: false,
@@ -752,10 +752,10 @@ it("opens a client from the filtered list", async () => {
   const onOpenClient = vi.fn();
   renderWithProviders(<ClientListView onOpenClient={onOpenClient} />);
 
-  await userEvent.type(screen.getByLabelText("搜索客户"), "美餐");
-  await userEvent.click(await screen.findByRole("button", { name: /美餐科技/ }));
+  await userEvent.type(screen.getByLabelText("搜索客户"), "MC");
+  await userEvent.click(await screen.findByRole("button", { name: /MC科技/ }));
 
-  expect(onOpenClient).toHaveBeenCalledWith("client-meican");
+  expect(onOpenClient).toHaveBeenCalledWith("client-mc");
 });
 ```
 
@@ -838,14 +838,14 @@ Update `src/pages/client/ClientDetailRoute.test.tsx`:
 
 ```tsx
 it("dispatches customer settings route modes without adding paths", async () => {
-  renderRoute("/ops/client/client-meican");
+  renderRoute("/ops/client/client-mc");
 
   await userEvent.click(await screen.findByRole("button", { name: "客户设置" }));
   expect(await screen.findByRole("heading", { name: "客户设置" })).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole("button", { name: /名称与备注/ }));
   expect(await screen.findByRole("heading", { name: "名称与备注" })).toBeInTheDocument();
-  expect(window.location.pathname).toBe("/ops/client/client-meican");
+  expect(window.location.pathname).toBe("/ops/client/client-mc");
 });
 ```
 
@@ -856,7 +856,7 @@ Extend `src/infrastructure/repositories/client/clientRepository.mock.test.ts`:
 ```ts
 it("updates client support settings and returns the updated detail", async () => {
   const updated = await clientRepositoryMock.updateClient({
-    clientId: "client-meican",
+    clientId: "client-mc",
     values: {
       support: {
         contactName: "赵六",
@@ -1087,7 +1087,7 @@ import { planRepositoryMock } from "./planRepository.mock";
 
 describe("planRepositoryMock.getPlanDetail", () => {
   it("returns a mock plan detail with displayable rules", async () => {
-    const plan = await planRepositoryMock.getPlanDetail("client-meican", "plan-delivery");
+    const plan = await planRepositoryMock.getPlanDetail("client-mc", "plan-delivery");
 
     expect(plan?.name).toBe("工作日午餐");
     expect(plan?.rules.some((rule) => rule.id === "open-times")).toBe(true);
@@ -1148,7 +1148,7 @@ Update `src/infrastructure/mock/planMockData.ts` with at least two plans:
 export const planMockData = [
   {
     id: "plan-delivery",
-    clientId: "client-meican",
+    clientId: "client-mc",
     name: "工作日午餐",
     fields: {
       owner: "张三",
@@ -1278,12 +1278,12 @@ Create `src/pages/plan/PlanSettingsRoute.test.tsx`:
 
 ```tsx
 it("opens a plan setting mode on the same URL", async () => {
-  renderRoute("/ops/client/client-meican/plan/plan-delivery/setting");
+  renderRoute("/ops/client/client-mc/plan/plan-delivery/setting");
 
   await userEvent.click(await screen.findByRole("button", { name: /基础信息/ }));
 
   expect(await screen.findByRole("heading", { name: "基础信息" })).toBeInTheDocument();
-  expect(window.location.pathname).toBe("/ops/client/client-meican/plan/plan-delivery/setting");
+  expect(window.location.pathname).toBe("/ops/client/client-mc/plan/plan-delivery/setting");
 });
 ```
 
@@ -1292,7 +1292,7 @@ Extend `src/infrastructure/repositories/plan/planRepository.mock.test.ts`:
 ```ts
 it("saves plan settings and returns the updated plan", async () => {
   const updated = await planRepositoryMock.savePlanSettings({
-    clientId: "client-meican",
+    clientId: "client-mc",
     planId: "plan-delivery",
     name: "工作日午餐更新",
     fields: { owner: "李四", businessType: "团餐配送" },
@@ -1593,7 +1593,7 @@ Update `src/infrastructure/mock/orderMockData.ts` with at least:
 export const orderDetailMockData = [
   {
     id: "order-1",
-    clientId: "client-meican",
+    clientId: "client-mc",
     planId: "plan-delivery",
     orderNo: "ORDER-1",
     orderDate: "2026-06-24",
@@ -1603,7 +1603,7 @@ export const orderDetailMockData = [
         id: "lunch",
         orderDeadline: "10:30",
         mealTime: "12:00",
-        merchants: [{ id: "merchant-1", name: "美餐餐厅" }],
+        merchants: [{ id: "merchant-1", name: "MC餐厅" }],
       },
     ],
     defaultScheduleNodes: [],
@@ -1616,7 +1616,7 @@ export const orderDetailMockData = [
     merchantSummaries: [
       {
         merchantId: "merchant-1",
-        merchantName: "美餐餐厅",
+        merchantName: "MC餐厅",
         status: "delivering",
         productCount: 120,
         amountCents: 123400,
@@ -1710,7 +1710,7 @@ Expected: one commit for order detail and member order list.
   - Existing merchant and staff repositories.
   - Shared `ListRow`, `ListSection`, `Field`.
 - Produces:
-  - `PaymentMethod`: `{ id: string; name: string; type: "meican" | "external"; enabled: boolean; description?: string }`.
+  - `PaymentMethod`: `{ id: string; name: string; type: "mc" | "external"; enabled: boolean; description?: string }`.
   - `paymentRepository.listPaymentMethods(clientId: string): Promise<PaymentMethod[]>`.
   - `usePaymentMethodsQuery(clientId: string)`.
   - `PaymentMethodList(props: { clientId: string; selectedIds: string[]; onChange: (ids: string[]) => void })`.
@@ -1728,9 +1728,9 @@ import { paymentRepositoryMock } from "./paymentRepository.mock";
 
 describe("paymentRepositoryMock", () => {
   it("lists enabled and disabled payment methods for a client", async () => {
-    const methods = await paymentRepositoryMock.listPaymentMethods("client-meican");
+    const methods = await paymentRepositoryMock.listPaymentMethods("client-mc");
 
-    expect(methods.map((method) => method.id)).toEqual(["meican-card", "external-card"]);
+    expect(methods.map((method) => method.id)).toEqual(["mc-card", "external-card"]);
     expect(methods.some((method) => method.enabled)).toBe(true);
     expect(methods.some((method) => !method.enabled)).toBe(true);
   });
@@ -1755,7 +1755,7 @@ Create `src/domain/payment/Payment.ts`:
 export type PaymentMethod = {
   id: string;
   name: string;
-  type: "meican" | "external";
+  type: "mc" | "external";
   enabled: boolean;
   description?: string;
 };
@@ -1787,11 +1787,11 @@ Create `src/infrastructure/mock/paymentMockData.ts`:
 import type { PaymentMethod } from "@/domain/payment/Payment";
 
 export const paymentMockData: Record<string, PaymentMethod[]> = {
-  "client-meican": [
+  "client-mc": [
     {
-      id: "meican-card",
-      name: "美餐卡",
-      type: "meican",
+      id: "mc-card",
+      name: "MC卡",
+      type: "mc",
       enabled: true,
       description: "企业默认支付方式",
     },

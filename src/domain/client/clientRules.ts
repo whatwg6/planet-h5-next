@@ -6,6 +6,7 @@ import type {
   ClientListParams,
   ClientNotificationSetting,
   ClientPasswordSetting,
+  ClientStatus,
   ClientSummary,
 } from "@/domain/client/Client";
 
@@ -15,7 +16,27 @@ export function hasClientIdentity(client: { id: string }) {
 
 export function normalizeClientListParams(params: ClientListParams = {}): ClientListParams {
   const keyword = params.keyword?.trim();
-  return keyword ? { keyword } : {};
+  const status = params.status && params.status !== "all" ? params.status : params.status;
+  return { ...(keyword ? { keyword } : {}), ...(status ? { status } : {}) };
+}
+
+const clientStatusLabel: Record<ClientStatus, string> = {
+  enabled: "启用",
+  disabled: "停用",
+  archived: "归档",
+};
+
+export function formatClientStatus(status: ClientStatus) {
+  return clientStatusLabel[status];
+}
+
+export function matchesClientKeyword(client: ClientSummary, keyword = "") {
+  const normalizedKeyword = keyword.trim().toLowerCase();
+  if (!normalizedKeyword) return true;
+
+  return [client.name, client.phone, client.ownerName]
+    .filter((value): value is string => Boolean(value))
+    .some((value) => value.toLowerCase().includes(normalizedKeyword));
 }
 
 export function compareClientSummaryByUpdatedAtDesc(left: ClientSummary, right: ClientSummary) {

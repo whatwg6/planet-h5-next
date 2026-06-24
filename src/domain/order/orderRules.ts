@@ -26,6 +26,20 @@ const merchantOrderStatusText: Record<MerchantOrderStatus, string> = {
 export function parseOrderParams(orderParams?: string): OrderParamsParseResult {
   if (!orderParams?.trim()) return { ok: false, error: "订单参数不能为空" };
 
+  if (/^\d+(:.+)?$/.test(orderParams)) {
+    const [timeText, orderNo] = orderParams.split(":");
+    const time = Number(timeText);
+    if (!Number.isFinite(time) || time <= 0) return { ok: false, error: "订单时间无效" };
+    return {
+      ok: true,
+      value: {
+        raw: orderParams,
+        time,
+        ...(orderNo ? { orderNo } : {}),
+      },
+    };
+  }
+
   const parts = orderParams.split("-");
   const timePart = parts.length === 1 ? parts[0] : parts.at(-1);
 
@@ -56,6 +70,8 @@ export function formatMerchantOrderStatus(status: MerchantOrderStatus) {
 export function formatOrderMoney(cents: number) {
   return `¥${(cents / 100).toFixed(2)}`;
 }
+
+export const formatMoneyFromCents = formatOrderMoney;
 
 export function formatOrderDateTime(value: string | number | Date) {
   const date = new Date(value);
