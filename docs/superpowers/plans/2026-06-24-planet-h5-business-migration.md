@@ -145,6 +145,7 @@ This plan keeps the current architectural layout. Files listed here are the plan
 ### Task 1: Foundation Shared UI, Icon Boundary, And Route Baseline
 
 **Files:**
+
 - Create: `src/shared/ui/List/ListRow.tsx`
 - Create: `src/shared/ui/List/ListSection.tsx`
 - Create: `src/shared/ui/List/index.ts`
@@ -160,6 +161,7 @@ This plan keeps the current architectural layout. Files listed here are the plan
 - Test: `src/app/router/router.test.ts`
 
 **Interfaces:**
+
 - Consumes: existing `cn(className)` from `src/shared/utils/cn.ts`, existing `Button`, `Field`, `Page`, `RouteStack`, `RouteModeSwitch`.
 - Produces:
   - `ListRow(props: { title: ReactNode; description?: ReactNode; value?: ReactNode; icon?: ReactNode; disabled?: boolean; onClick?: () => void; className?: string }): JSX.Element`
@@ -408,7 +410,13 @@ const toneClassName = {
   info: "bg-background-components text-text-secondary",
 };
 
-export function Toast({ tone = "info", children }: { tone?: keyof typeof toneClassName; children: ReactNode }) {
+export function Toast({
+  tone = "info",
+  children,
+}: {
+  tone?: keyof typeof toneClassName;
+  children: ReactNode;
+}) {
   return (
     <div role="status" className={cn("rounded-md px-3 py-2 text-sm", toneClassName[tone])}>
       {children}
@@ -499,6 +507,7 @@ Expected: one commit containing only foundation shared UI and route baseline cha
 ### Task 2: Client List Vertical Slice
 
 **Files:**
+
 - Modify: `src/domain/client/Client.ts`
 - Modify: `src/domain/client/ClientRepository.ts`
 - Modify: `src/domain/client/clientRules.ts`
@@ -519,6 +528,7 @@ Expected: one commit containing only foundation shared UI and route baseline cha
 - Test: `e2e/client-list.spec.ts`
 
 **Interfaces:**
+
 - Consumes:
   - `ListRow` and `ListSection` from `@/shared/ui/List`.
   - `Page`, `Button`, `Field`, `EmptyState`, `ErrorState`, `LoadingState`.
@@ -688,7 +698,8 @@ import { matchesClientKeyword } from "@/domain/client/clientRules";
 
 async function listClients(params: ClientListParams) {
   return clientMockData.filter((client) => {
-    const statusMatched = !params.status || params.status === "all" || client.status === params.status;
+    const statusMatched =
+      !params.status || params.status === "all" || client.status === params.status;
     return statusMatched && matchesClientKeyword(client, params.keyword);
   });
 }
@@ -721,7 +732,9 @@ export function ClientCard({ client, onClick }: { client: ClientSummary; onClick
       <div className="mt-3 space-y-1 text-xs text-text-secondary">
         {client.phone ? <p>电话：{client.phone}</p> : null}
         <p>{client.settingCompletionText}</p>
-        {client.isDeveloperTest ? <p className="text-functional-warning-foreground">测试客户</p> : null}
+        {client.isDeveloperTest ? (
+          <p className="text-functional-warning-foreground">测试客户</p>
+        ) : null}
       </div>
     </button>
   );
@@ -775,6 +788,7 @@ Expected: one commit for the client list vertical slice.
 ### Task 3: Client Detail And Settings Route Modes
 
 **Files:**
+
 - Modify: `src/domain/client/Client.ts`
 - Modify: `src/domain/client/ClientRepository.ts`
 - Modify: `src/domain/client/clientRules.ts`
@@ -806,6 +820,7 @@ Expected: one commit for the client list vertical slice.
 - Test: `e2e/client-settings.spec.ts`
 
 **Interfaces:**
+
 - Consumes:
   - `routeModeState(mode)` and `RouteModeSwitch`.
   - `useUpdateClientMutation`.
@@ -923,7 +938,13 @@ return (
     modes={{
       plan: <ClientMealPlansView client={query.data} onBack={back} onOpenPlan={openPlan} />,
       setting: <ClientSettingsView client={query.data} onBack={back} onOpenMode={enterMode} />,
-      nameAndRemark: <ClientNameAndRemarkView client={query.data} onBack={back} onEdit={() => enterMode("nameAndRemarkEdit")} />,
+      nameAndRemark: (
+        <ClientNameAndRemarkView
+          client={query.data}
+          onBack={back}
+          onEdit={() => enterMode("nameAndRemarkEdit")}
+        />
+      ),
       nameAndRemarkEdit: <ClientDetailEditView client={query.data} onClose={back} />,
       support: <ClientSupportSettingsView client={query.data} onBack={back} />,
       loginSetting: <ClientLoginSettingsView client={query.data} onBack={back} />,
@@ -1000,6 +1021,7 @@ Expected: one commit for client detail and settings route modes.
 ### Task 4: Plan List And Plan Detail Vertical Slice
 
 **Files:**
+
 - Modify: `src/domain/client/Client.ts`
 - Modify: `src/domain/plan/Plan.ts`
 - Modify: `src/domain/plan/PlanRepository.ts`
@@ -1018,6 +1040,7 @@ Expected: one commit for client detail and settings route modes.
 - Test: `src/features/plan/views/PlanDetailView.test.tsx`
 
 **Interfaces:**
+
 - Consumes:
   - `ClientDetail.mealPlans`.
   - `usePlanDetailQuery(clientId, planId)`.
@@ -1133,8 +1156,20 @@ export const planMockData = [
       menuStyle: "图文菜单",
     },
     settings: [
-      { id: "base-info", title: "基础信息", group: "basic", value: "工作日午餐", editable: "structured" },
-      { id: "open-times", title: "开放时间", group: "order", value: "午餐 11:00-13:00", editable: "structured" },
+      {
+        id: "base-info",
+        title: "基础信息",
+        group: "basic",
+        value: "工作日午餐",
+        editable: "structured",
+      },
+      {
+        id: "open-times",
+        title: "开放时间",
+        group: "order",
+        value: "午餐 11:00-13:00",
+        editable: "structured",
+      },
       { id: "hide-price", title: "隐藏价格", group: "menu", value: "否", editable: "simple" },
     ],
     rules: [
@@ -1154,7 +1189,11 @@ Update `src/features/plan/views/PlanDetailView.tsx` to render:
 <Page
   title={query.data.name}
   onBack={onBack}
-  navigationRight={<Button variant="ghost" onClick={onOpenSettings}>设置</Button>}
+  navigationRight={
+    <Button variant="ghost" onClick={onOpenSettings}>
+      设置
+    </Button>
+  }
 >
   <div className="space-y-4">
     <ListSection title="基础信息">
@@ -1202,6 +1241,7 @@ Expected: one commit for plan list and detail.
 ### Task 5: Plan Settings Route Modes And Save Flow
 
 **Files:**
+
 - Modify: `src/domain/plan/Plan.ts`
 - Modify: `src/domain/plan/PlanRepository.ts`
 - Modify: `src/domain/plan/planRules.ts`
@@ -1223,6 +1263,7 @@ Expected: one commit for plan list and detail.
 - Test: `e2e/plan-settings.spec.ts`
 
 **Interfaces:**
+
 - Consumes:
   - `PlanDetail.settings`.
   - `SavePlanSettingsInput`.
@@ -1323,12 +1364,32 @@ export function PlanSettingsRoute() {
 
   return (
     <RouteModeSwitch
-      defaultPage={<PlanSettingsView clientId={clientId} planId={planId} onBack={back} onOpenMode={enterMode} />}
+      defaultPage={
+        <PlanSettingsView
+          clientId={clientId}
+          planId={planId}
+          onBack={back}
+          onOpenMode={enterMode}
+        />
+      }
       modes={{
-        baseInfo: <PlanSettingModeView clientId={clientId} planId={planId} mode="baseInfo" onBack={back} />,
-        openTimes: <PlanSettingModeView clientId={clientId} planId={planId} mode="openTimes" onBack={back} />,
-        menuStyle: <PlanSettingModeView clientId={clientId} planId={planId} mode="menuStyle" onBack={back} />,
-        financeConfig: <PlanSettingModeView clientId={clientId} planId={planId} mode="financeConfig" onBack={back} />,
+        baseInfo: (
+          <PlanSettingModeView clientId={clientId} planId={planId} mode="baseInfo" onBack={back} />
+        ),
+        openTimes: (
+          <PlanSettingModeView clientId={clientId} planId={planId} mode="openTimes" onBack={back} />
+        ),
+        menuStyle: (
+          <PlanSettingModeView clientId={clientId} planId={planId} mode="menuStyle" onBack={back} />
+        ),
+        financeConfig: (
+          <PlanSettingModeView
+            clientId={clientId}
+            planId={planId}
+            mode="financeConfig"
+            onBack={back}
+          />
+        ),
       }}
     />
   );
@@ -1363,8 +1424,18 @@ export function PlanSettingModeView({
 }) {
   const query = usePlanDetailQuery(clientId, planId);
 
-  if (query.isLoading) return <Page title="方案设置" onBack={onBack}><LoadingState /></Page>;
-  if (query.isError || !query.data) return <Page title="方案设置" onBack={onBack}><ErrorState title="加载失败" onRetry={() => query.refetch()} /></Page>;
+  if (query.isLoading)
+    return (
+      <Page title="方案设置" onBack={onBack}>
+        <LoadingState />
+      </Page>
+    );
+  if (query.isError || !query.data)
+    return (
+      <Page title="方案设置" onBack={onBack}>
+        <ErrorState title="加载失败" onRetry={() => query.refetch()} />
+      </Page>
+    );
 
   if (mode === "baseInfo") return <PlanBaseInfoEditor plan={query.data} onBack={onBack} />;
   if (mode === "openTimes") return <PlanOpenTimesEditor plan={query.data} onBack={onBack} />;
@@ -1402,6 +1473,7 @@ Expected: one commit for plan settings route modes and save.
 ### Task 6: Client Order Detail And Member Order List
 
 **Files:**
+
 - Modify: `src/domain/order/Order.ts`
 - Modify: `src/domain/order/OrderRepository.ts`
 - Modify: `src/domain/order/orderRules.ts`
@@ -1422,6 +1494,7 @@ Expected: one commit for plan settings route modes and save.
 - Test: `e2e/client-order.spec.ts`
 
 **Interfaces:**
+
 - Consumes:
   - `parseOrderParams(raw: string): OrderParamsParseResult`.
   - `formatOrderStatus(status: OrderStatus): string`.
@@ -1609,6 +1682,7 @@ Expected: one commit for order detail and member order list.
 ### Task 7: Shared Business Capabilities Used By Migrated Pages
 
 **Files:**
+
 - Create: `src/domain/payment/Payment.ts`
 - Create: `src/domain/payment/PaymentRepository.ts`
 - Create: `src/application/payment/listPaymentMethods.ts`
@@ -1631,6 +1705,7 @@ Expected: one commit for order detail and member order list.
 - Test: `src/features/merchant/components/SelectMerchant.test.tsx`
 
 **Interfaces:**
+
 - Consumes:
   - Existing merchant and staff repositories.
   - Shared `ListRow`, `ListSection`, `Field`.
@@ -1713,8 +1788,20 @@ import type { PaymentMethod } from "@/domain/payment/Payment";
 
 export const paymentMockData: Record<string, PaymentMethod[]> = {
   "client-meican": [
-    { id: "meican-card", name: "美餐卡", type: "meican", enabled: true, description: "企业默认支付方式" },
-    { id: "external-card", name: "外部支付", type: "external", enabled: false, description: "需开通后使用" },
+    {
+      id: "meican-card",
+      name: "美餐卡",
+      type: "meican",
+      enabled: true,
+      description: "企业默认支付方式",
+    },
+    {
+      id: "external-card",
+      name: "外部支付",
+      type: "external",
+      enabled: false,
+      description: "需开通后使用",
+    },
   ],
 };
 ```
@@ -1839,6 +1926,7 @@ Expected: one commit for shared business capabilities used by migrated pages.
 ### Task 8: Final Migration Sweep And Regression Verification
 
 **Files:**
+
 - Modify: `README.md`
 - Modify: `docs/architecture-design.md`
 - Modify: `src/shared/assets/icons/index.ts`
@@ -1848,6 +1936,7 @@ Expected: one commit for shared business capabilities used by migrated pages.
 - Test: `e2e/client-order.spec.ts`
 
 **Interfaces:**
+
 - Consumes: all migrated slices from Tasks 1-7.
 - Produces: final verification that migration scope is complete and excluded runtime areas remain excluded.
 

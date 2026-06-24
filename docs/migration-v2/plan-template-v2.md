@@ -120,70 +120,70 @@ Out of scope:
 
 10. Migrate assets.
 
-   - Trace image and icon imports from the old page, old feature components, style files, and helper components.
-   - Classify each asset as reusable UI icon, brand asset, illustration or content image, page-only business image, or removable decorative asset.
-   - Do not copy the old asset folder wholesale.
-   - Put reusable SVG icon files in `src/shared/assets/icons`.
-   - Use kebab-case filenames for icons.
-   - Preserve each icon SVG `viewBox`.
-   - Export reusable icons from `src/shared/assets/icons/index.ts` with the `?react` suffix.
-   - Import reusable icons as React components from the icon index.
-   - Put brand SVGs in `src/shared/assets/brand` and import them as static URLs.
-   - Put reusable image or illustration assets in `src/shared/assets/images` and import them as static URLs.
-   - Put page-only business images near the owning feature unless at least two feature areas need the same business-agnostic image.
-   - Replace old asset import paths with new asset-boundary imports.
-   - Verify SVG icons inherit color through `currentColor` where expected.
-   - Verify static images render with correct dimensions, alt text, and loading behavior.
+- Trace image and icon imports from the old page, old feature components, style files, and helper components.
+- Classify each asset as reusable UI icon, brand asset, illustration or content image, page-only business image, or removable decorative asset.
+- Do not copy the old asset folder wholesale.
+- Put reusable SVG icon files in `src/shared/assets/icons`.
+- Use kebab-case filenames for icons.
+- Preserve each icon SVG `viewBox`.
+- Export reusable icons from `src/shared/assets/icons/index.ts` with the `?react` suffix.
+- Import reusable icons as React components from the icon index.
+- Put brand SVGs in `src/shared/assets/brand` and import them as static URLs.
+- Put reusable image or illustration assets in `src/shared/assets/images` and import them as static URLs.
+- Put page-only business images near the owning feature unless at least two feature areas need the same business-agnostic image.
+- Replace old asset import paths with new asset-boundary imports.
+- Verify SVG icons inherit color through `currentColor` where expected.
+- Verify static images render with correct dimensions, alt text, and loading behavior.
 
 11. Build feature view.
 
-   - Create or update `src/features/<module>/views/<View>.tsx`.
-   - Compose the page with existing `src/shared/ui` primitives where suitable.
-   - Put business components under `src/features/<module>/components` or a focused capability module under `src/features/<capability>`.
-   - Preserve old information architecture, field visibility, display mappings, primary sections, primary interactions, and validation feedback.
-   - Implement loading, empty, error, success, and saved states where applicable.
-   - Receive navigation, route params, and page-mode callbacks through props where possible.
-   - Do not read `location.state` in feature views.
+- Create or update `src/features/<module>/views/<View>.tsx`.
+- Compose the page with existing `src/shared/ui` primitives where suitable.
+- Put business components under `src/features/<module>/components` or a focused capability module under `src/features/<capability>`.
+- Preserve old information architecture, field visibility, display mappings, primary sections, primary interactions, and validation feedback.
+- Implement loading, empty, error, success, and saved states where applicable.
+- Receive navigation, route params, and page-mode callbacks through props where possible.
+- Do not read `location.state` in feature views.
 
 12. Add route entry.
 
-   - Create or update `src/pages/<module>/<Route>.tsx`.
-   - Keep the route component thin.
-   - If the route reads path params, call `useParams({ strict: false, shouldThrow: false })`.
-   - Render route entry content through `RouteModeSwitch` from `src/app/router/RouteModeSwitch.tsx`.
-   - Put the normal page in `defaultPage`.
-   - Add only non-default same-URL page modes to `modes`.
-   - Map old `location.state.pageType` behavior to new `location.state.routeMode` behavior with `routeModeState(mode)`.
-   - Do not create extra URL paths for same-resource page modes.
+- Create or update `src/pages/<module>/<Route>.tsx`.
+- Keep the route component thin.
+- If the route reads path params, call `useParams({ strict: false, shouldThrow: false })`.
+- Render route entry content through `RouteModeSwitch` from `src/app/router/RouteModeSwitch.tsx`.
+- Put the normal page in `defaultPage`.
+- Add only non-default same-URL page modes to `modes`.
+- Map old `location.state.pageType` behavior to new `location.state.routeMode` behavior with `routeModeState(mode)`.
+- Do not create extra URL paths for same-resource page modes.
 
 13. Register route.
 
-   - Update `src/app/router/routeTree.tsx`.
-   - Keep `routeTree.tsx` as the only route registration table.
-   - Preserve the `/ops/client...` public route contract for migrated client-owned routes.
-   - Convert old `:id` style params to TanStack Router `$clientId`, `$planId`, or other explicit parameter names.
-   - Do not add a separate route list or manual pathname matcher.
-   - Do not migrate old system or development routes such as `/login/callback`, `/not-found`, or `/_dev`.
+- Update `src/app/router/routeTree.tsx`.
+- Keep `routeTree.tsx` as the only route registration table.
+- Preserve the `/ops/client...` public route contract for migrated client-owned routes.
+- Convert old `:id` style params to TanStack Router `$clientId`, `$planId`, or other explicit parameter names.
+- Do not add a separate route list or manual pathname matcher.
+- Do not migrate old system or development routes such as `/login/callback`, `/not-found`, or `/_dev`.
 
 14. Add tests.
 
-   - Add colocated domain tests for pure rules.
-   - Add use case tests under `src/application/<module>`.
-   - Add repository implementation tests under `src/infrastructure/repositories/<module>`.
-   - Add query hook and view tests under the relevant feature folder.
-   - Add route registration tests under `src/app/router` when registration changes.
-   - Add route mode dispatch tests under the relevant route file when page modes are migrated.
-   - Add Playwright tests under `e2e/` for browser-level route flows, navigation, or user-flow changes.
+- Add colocated domain tests for pure rules.
+- Add use case tests under `src/application/<module>`.
+- Add repository implementation tests under `src/infrastructure/repositories/<module>`.
+- Add query hook and view tests under the relevant feature folder.
+- Add route registration tests under `src/app/router` when registration changes.
+- Add route mode dispatch tests under the relevant route file when page modes are migrated.
+- Add Playwright tests under `e2e/` for browser-level route flows, navigation, or user-flow changes.
 
 15. Verify.
 
-   - Run `pnpm lint`.
-   - Run `pnpm format:check`.
-   - Run `pnpm test`.
-   - Run `pnpm e2e` for route, navigation, or browser-level user-flow changes.
-   - Run `pnpm build` for broad, risky, shared-type, route-tree, or infrastructure changes.
-   - Fix failures within the migrated slice.
-   - Do not reformat or rewrite unrelated files.
+- Run `pnpm lint`.
+- Run `pnpm format:check`.
+- Run `pnpm test`.
+- Run `pnpm e2e` for route, navigation, or browser-level user-flow changes.
+- Run `pnpm build` for broad, risky, shared-type, route-tree, or infrastructure changes.
+- Fix failures within the migrated slice.
+- Do not reformat or rewrite unrelated files.
 
 ### Acceptance Criteria
 
@@ -324,58 +324,58 @@ Out of scope:
 
 10. Migrate client list assets.
 
-   - Trace old client list image and icon imports from page, component, style, and helper files.
-   - Classify each asset as reusable icon, brand asset, illustration/image, page-only business image, or removable decoration.
-   - Put reusable SVG icons in `src/shared/assets/icons`, use kebab-case filenames, preserve `viewBox`, and export them from `src/shared/assets/icons/index.ts` with `?react`.
-   - Put reusable static images in `src/shared/assets/images`.
-   - Put page-only client business images near the owning client feature.
-   - Replace old asset import paths.
-   - Verify icons inherit color and static images render correctly.
+- Trace old client list image and icon imports from page, component, style, and helper files.
+- Classify each asset as reusable icon, brand asset, illustration/image, page-only business image, or removable decoration.
+- Put reusable SVG icons in `src/shared/assets/icons`, use kebab-case filenames, preserve `viewBox`, and export them from `src/shared/assets/icons/index.ts` with `?react`.
+- Put reusable static images in `src/shared/assets/images`.
+- Put page-only client business images near the owning client feature.
+- Replace old asset import paths.
+- Verify icons inherit color and static images render correctly.
 
 11. Build client list view.
 
-   - Create or update `src/features/client/views/ClientListView.tsx`.
-   - Compose the page with existing `src/shared/ui` primitives where suitable.
-   - Render migrated list item fields and display mappings from the old page inventory.
-   - Implement search, filters, pagination, or infinite-scroll controls if they exist in the old page.
-   - Render loading, empty, error, and loaded states.
-   - Receive client item navigation as a callback prop.
-   - Do not read `location.state` in the feature view.
+- Create or update `src/features/client/views/ClientListView.tsx`.
+- Compose the page with existing `src/shared/ui` primitives where suitable.
+- Render migrated list item fields and display mappings from the old page inventory.
+- Implement search, filters, pagination, or infinite-scroll controls if they exist in the old page.
+- Render loading, empty, error, and loaded states.
+- Receive client item navigation as a callback prop.
+- Do not read `location.state` in the feature view.
 
 12. Add client list route entry.
 
-   - Create or update `src/pages/client/ClientListRoute.tsx`.
-   - Keep the route component thin.
-   - Render the page through `RouteModeSwitch`.
-   - Put the normal client list page in `defaultPage`.
-   - Add only non-default same-URL page modes to `modes` if the old client list used `pageType`.
-   - Wire client item navigation to `/ops/client/$clientId`.
-   - Do not create extra URL paths for same-resource UI modes.
+- Create or update `src/pages/client/ClientListRoute.tsx`.
+- Keep the route component thin.
+- Render the page through `RouteModeSwitch`.
+- Put the normal client list page in `defaultPage`.
+- Add only non-default same-URL page modes to `modes` if the old client list used `pageType`.
+- Wire client item navigation to `/ops/client/$clientId`.
+- Do not create extra URL paths for same-resource UI modes.
 
 13. Register `/ops/client`.
 
-   - Update `src/app/router/routeTree.tsx`.
-   - Register the public route as `/ops/client`.
-   - Keep `routeTree.tsx` as the only route registration source.
-   - Do not add a manual pathname matcher or a second route list.
+- Update `src/app/router/routeTree.tsx`.
+- Register the public route as `/ops/client`.
+- Keep `routeTree.tsx` as the only route registration source.
+- Do not add a manual pathname matcher or a second route list.
 
 14. Add client list tests.
 
-   - Add route registration tests under `src/app/router` if registration changes.
-   - Add view tests under `src/features/client` for successful list rendering, loading state, empty state, error state, search/filter behavior if present, and client item navigation callback.
-   - Add query hook tests if the hook maps query state.
-   - Add use case tests if business defaults or transformations are applied.
-   - Add repository tests for filtering, searching, sorting, or pagination behavior.
-   - Add e2e coverage if this task changes browser-level navigation or route flow.
+- Add route registration tests under `src/app/router` if registration changes.
+- Add view tests under `src/features/client` for successful list rendering, loading state, empty state, error state, search/filter behavior if present, and client item navigation callback.
+- Add query hook tests if the hook maps query state.
+- Add use case tests if business defaults or transformations are applied.
+- Add repository tests for filtering, searching, sorting, or pagination behavior.
+- Add e2e coverage if this task changes browser-level navigation or route flow.
 
 15. Verify the client list slice.
 
-   - Run `pnpm lint`.
-   - Run `pnpm format:check`.
-   - Run `pnpm test`.
-   - Run `pnpm e2e` if route navigation or browser-level flow changed.
-   - Run `pnpm build` if the slice touches shared types, routing, or broad infrastructure.
-   - Fix failures within the migrated slice only.
+- Run `pnpm lint`.
+- Run `pnpm format:check`.
+- Run `pnpm test`.
+- Run `pnpm e2e` if route navigation or browser-level flow changed.
+- Run `pnpm build` if the slice touches shared types, routing, or broad infrastructure.
+- Fix failures within the migrated slice only.
 
 ### Acceptance Criteria
 
