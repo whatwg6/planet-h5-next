@@ -309,3 +309,5 @@ and user-flow coverage rather than replacing narrower unit or React Testing Libr
 - Reusable business components belong in focused feature capability modules, not in `shared/ui`.
 - TanStack Query handles server state; Zustand handles local interaction state and drafts.
 - Playwright e2e tests use the local Google Chrome channel.
+- Migrated business flows are mock-backed until a separate real API integration design is approved.
+- Old `planet-h5` hybrid, SSO, interceptors, Orval generation, system pages, and dev pages are outside the migration boundary.

@@ -1,4 +1,32 @@
-import type { SavePlanSettingsInput } from "./Plan";
+import type { ClientMealPlanSummary } from "@/domain/client/Client";
+
+import type { PlanRule, SavePlanSettingsInput } from "./Plan";
+
+const businessTypeLabel: Record<ClientMealPlanSummary["businessType"], string> = {
+  groupDelivery: "团餐配送",
+  dineIn: "到店用餐",
+};
+
+const mealLabel: Record<string, string> = {
+  breakfast: "早餐",
+  lunch: "午餐",
+  dinner: "晚餐",
+};
+
+export function formatBusinessType(type: ClientMealPlanSummary["businessType"]) {
+  return businessTypeLabel[type];
+}
+
+export function formatPlanRuleValue(rule: PlanRule) {
+  if (rule.id === "open-times") {
+    if (rule.values.value) return rule.values.value;
+    return Object.entries(rule.values)
+      .map(([key, value]) => `${mealLabel[key] ?? key} ${value}`)
+      .join("；");
+  }
+
+  return Object.values(rule.values).filter(Boolean).join("；");
+}
 
 export function hasPlanIdentity(plan: { id: string }) {
   return plan.id.trim().length > 0;

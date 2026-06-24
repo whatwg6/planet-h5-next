@@ -5,13 +5,21 @@ import { isSameMcStaff } from "@/domain/mc-staff/mcStaffRules";
 import { useMcStaffSearchQuery } from "@/features/mc-staff/queries/useMcStaffSearchQuery";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Button, Field } from "@/shared/ui/Form";
+import { ListRow, ListSection } from "@/shared/ui/List";
 
 type SelectMcStaffProps = {
-  defaultSelected: McStaff[];
-  onSelect: (selected: McStaff[]) => void;
+  defaultSelected?: McStaff[];
+  onSelect?: (selected: McStaff[]) => void;
+  selectedIds?: string[];
+  onChange?: (ids: string[]) => void;
 };
 
-export function SelectMcStaff({ defaultSelected, onSelect }: SelectMcStaffProps) {
+export function SelectMcStaff({
+  defaultSelected = [],
+  onSelect,
+  selectedIds,
+  onChange,
+}: SelectMcStaffProps) {
   const [keyword, setKeyword] = useState("");
   const [selected, setSelected] = useState<McStaff[]>([]);
   const query = useMcStaffSearchQuery(keyword);
@@ -31,11 +39,46 @@ export function SelectMcStaff({ defaultSelected, onSelect }: SelectMcStaffProps)
   };
 
   const confirm = () => {
-    if (selected.length === 0) return;
+    if (selected.length === 0 || !onSelect) return;
     onSelect(selected);
     setSelected([]);
     setKeyword("");
   };
+
+  if (selectedIds && onChange) {
+    return (
+      <section className="space-y-3">
+        <Field
+          label="搜索员工"
+          placeholder="输入姓名、邮箱或部门"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+        />
+        {query.isLoading ? <LoadingState /> : null}
+        {query.isError ? <ErrorState title="员工搜索失败" onRetry={() => query.refetch()} /> : null}
+        {query.isSuccess && query.data.length === 0 ? <EmptyState title="暂无员工结果" /> : null}
+        {query.isSuccess && query.data.length > 0 ? (
+          <ListSection title="员工">
+            {query.data.map((staff) => (
+              <ListRow
+                key={staff.id}
+                title={staff.displayName}
+                description={staff.department ?? staff.email}
+                value={selectedIds.includes(staff.id) ? "已选择" : "可选"}
+                onClick={() =>
+                  onChange(
+                    selectedIds.includes(staff.id)
+                      ? selectedIds.filter((id) => id !== staff.id)
+                      : [...selectedIds, staff.id],
+                  )
+                }
+              />
+            ))}
+          </ListSection>
+        ) : null}
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-3 rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 shadow-card">

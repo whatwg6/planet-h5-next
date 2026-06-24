@@ -1,19 +1,22 @@
 import { useRouter } from "@tanstack/react-router";
 
 import { usePlanDetailQuery } from "@/features/plan/queries/usePlanDetailQuery";
-import { InfoRow } from "@/shared/ui/DataDisplay";
+import { formatPlanRuleValue } from "@/domain/plan/planRules";
 import { ErrorState, LoadingState } from "@/shared/ui/Feedback";
 import { Button } from "@/shared/ui/Form";
+import { ListRow, ListSection } from "@/shared/ui/List";
 import { Page } from "@/shared/ui/Page";
 
 export function PlanDetailView({
   clientId,
   planId,
   onOpenSettings,
+  onOpenOrder,
 }: {
   clientId: string;
   planId: string;
   onOpenSettings: () => void;
+  onOpenOrder: (orderParams: string) => void;
 }) {
   const router = useRouter();
   const query = usePlanDetailQuery(clientId, planId);
@@ -32,27 +35,29 @@ export function PlanDetailView({
     );
 
   return (
-    <Page title="方案详情" onBack={() => router.history.back()}>
-      <div className="space-y-4">
-        <div className="rounded-md border border-border-solid-line-2 bg-background-primary-container px-3 shadow-card">
-          <InfoRow label="名称" value={query.data.name} />
-          {Object.entries(query.data.fields).map(([key, value]) => (
-            <InfoRow key={key} label={key} value={value} />
-          ))}
-        </div>
-        <Button className="w-full" variant="secondary" onClick={onOpenSettings}>
-          方案设置
+    <Page
+      title={query.data.name}
+      onBack={() => router.history.back()}
+      navigationRight={
+        <Button variant="ghost" onClick={onOpenSettings}>
+          设置
         </Button>
-        <div className="space-y-2">
-          {query.data.rules.map((rule) => (
-            <div
-              key={rule.id}
-              className="rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 text-sm shadow-card"
-            >
-              {rule.label}
-            </div>
+      }
+    >
+      <div className="space-y-4">
+        <ListSection title="基础信息">
+          {Object.entries(query.data.fields).map(([key, value]) => (
+            <ListRow key={key} title={key} value={value} />
           ))}
-        </div>
+        </ListSection>
+        <ListSection title="规则">
+          {query.data.rules.map((rule) => (
+            <ListRow key={rule.id} title={rule.label} value={formatPlanRuleValue(rule)} />
+          ))}
+        </ListSection>
+        <Button className="w-full" onClick={() => onOpenOrder("CO20260621001-t1781971200000")}>
+          查看订单
+        </Button>
       </div>
     </Page>
   );

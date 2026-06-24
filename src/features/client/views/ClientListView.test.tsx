@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ClientSummary } from "@/domain/client/Client";
@@ -9,12 +8,6 @@ import { useClientListStore } from "@/features/client/store/clientListStore";
 import { ClientListView } from "./ClientListView";
 
 const useClientListQueryMock = vi.hoisted(() => vi.fn());
-
-vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, params }: { children: ReactNode; params: { clientId: string } }) => (
-    <a href={`/ops/client/${params.clientId}`}>{children}</a>
-  ),
-}));
 
 vi.mock("@/features/client/queries/useClientListQuery", () => ({
   useClientListQuery: useClientListQueryMock,
@@ -64,7 +57,8 @@ describe("ClientListView", () => {
     expect(screen.getByRole("button", { name: "重试" })).toBeInTheDocument();
   });
 
-  it("renders client cards with developer-test tags and detail links", () => {
+  it("renders client cards and opens the selected client", async () => {
+    const onOpenClient = vi.fn();
     mockClientListQuery({
       data: [
         {
@@ -72,16 +66,20 @@ describe("ClientListView", () => {
           name: "客户 A",
           phone: "13800000000",
           isDeveloperTest: true,
+          status: "enabled",
+          ownerName: "负责人 A",
+          settingCompletionText: "配置完整",
         },
       ],
     });
 
-    render(<ClientListView />);
+    render(<ClientListView onOpenClient={onOpenClient} />);
 
     expect(screen.getByText("客户 A")).toBeInTheDocument();
-    expect(screen.getByText("13800000000")).toBeInTheDocument();
-    expect(screen.getByText("测试")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /客户 A/ })).toHaveAttribute("href", "/ops/client/c1");
+    expect(screen.getByText(/13800000000/)).toBeInTheDocument();
+    expect(screen.getByText("测试客户")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /客户 A/ }));
+    expect(onOpenClient).toHaveBeenCalledWith("c1");
   });
 
   it("keeps draft input out of the query until search is submitted", async () => {

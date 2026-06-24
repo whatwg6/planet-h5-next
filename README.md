@@ -1,6 +1,6 @@
 # Planet H5 Next
 
-Planet H5 Next is a mobile H5 business frontend. The current business scope covers client, merchant, plan detail, plan setting, and order pages. The codebase uses a lightweight Clean Architecture adapted for React H5 applications.
+Planet H5 Next is a mobile H5 business frontend. The current business scope covers mock-backed migrated client business flows: client list, client detail and settings, plan detail, plan setting, and client order pages. The codebase uses a lightweight Clean Architecture adapted for React H5 applications.
 
 `docs/architecture-design.md` for the full technology selection and architecture details.
 
@@ -79,8 +79,6 @@ infrastructure -> domain
 /ops/client/$clientId/plan/$planId
 /ops/client/$clientId/plan/$planId/setting
 /ops/client/$clientId/plan/$planId/order/$orderParams
-/merchant
-/merchant/$merchantId
 ```
 
 - Route definitions — `src/app/router/routeTree.tsx`

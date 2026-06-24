@@ -17,6 +17,10 @@ export const queryKeys = {
     all: ["mcStaffs"] as const,
     search: (keyword: McStaffSearchParams["keyword"]) => ["mcStaffs", "search", keyword] as const,
   },
+  payment: {
+    all: ["payment"] as const,
+    methods: (clientId: string) => ["payment", "methods", clientId] as const,
+  },
   plans: {
     all: ["plans"] as const,
     detail: (clientId: string, planId: string) => ["plans", "detail", clientId, planId] as const,

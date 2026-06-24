@@ -1,6 +1,7 @@
 import type { ClientRepository } from "@/domain/client/ClientRepository";
 import {
   compareClientSummaryByUpdatedAtDesc,
+  matchesClientKeyword,
   normalizeClientListParams,
 } from "@/domain/client/clientRules";
 import {
@@ -27,12 +28,16 @@ export const clientRepositoryMock: ClientRepository = {
         phone: client.phone,
         updatedAt: client.updatedAt,
         isDeveloperTest: client.isDeveloperTest,
+        status: client.status ?? "enabled",
+        ownerName: client.ownerName ?? client.fields.owner ?? "未分配",
+        settingCompletionText: client.settingCompletionText ?? "配置完整",
       }))
       .filter(
         (client) =>
-          !normalizedParams.keyword ||
-          client.name.includes(normalizedParams.keyword) ||
-          client.phone?.includes(normalizedParams.keyword),
+          (!normalizedParams.status ||
+            normalizedParams.status === "all" ||
+            client.status === normalizedParams.status) &&
+          matchesClientKeyword(client, normalizedParams.keyword),
       )
       .sort(compareClientSummaryByUpdatedAtDesc);
   },

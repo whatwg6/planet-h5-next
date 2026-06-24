@@ -1,5 +1,3 @@
-import { Link } from "@tanstack/react-router";
-
 import { useMerchantListQuery } from "@/features/merchant/queries/useMerchantListQuery";
 import { useMerchantListStore } from "@/features/merchant/store/merchantListStore";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/Feedback";
@@ -25,15 +23,14 @@ export function MerchantListView() {
         {query.data?.length === 0 ? <EmptyState title="暂无数据" /> : null}
         <div className="space-y-2">
           {query.data?.map((merchant) => (
-            <Link
+            <a
               key={merchant.id}
-              to="/merchant/$merchantId"
-              params={{ merchantId: merchant.id }}
+              href={`#/merchant/${merchant.id}`}
               className="block rounded-md border border-border-solid-line-2 bg-background-primary-container p-3 shadow-card transition active:bg-background-primary-container--active"
             >
               <div className="font-medium">{merchant.name}</div>
               <div className="mt-1 text-sm text-text-secondary">{merchant.city}</div>
-            </Link>
+            </a>
           ))}
         </div>
       </div>
