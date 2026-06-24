@@ -54,8 +54,10 @@ for broad, risky, shared-type, route-tree, or infrastructure changes.
 
 ### Goal
 
-Create the working inventory and cleanup rules needed before migrating business slices from the old
-project into this project.
+Create a reviewable migration inventory before runtime migration begins. This task should make the
+agent's understanding explicit: which old files matter, how each legacy behavior maps into the new
+architecture, which current files are disposable baseline, which assets need classification, and
+which decisions need review before implementation.
 
 ### Scope
 
@@ -79,35 +81,90 @@ Out of scope:
 
 ### Steps
 
-1. Inventory old source.
+1. Create or update the tracker structure.
 
-   - Read old route entries and page folders for client list, client detail, plan detail, plan
-     settings, and client order.
-   - Read old hooks and classify each as query, mutation, local UI state, or application logic.
-   - Read old constants, helpers, types, display mappings, validation rules, style references, and
-     directly used assets.
-   - Read old API files only when needed to understand field names or business meaning.
-   - Record visible sections, fields, visibility rules, status labels, empty/loading/error/saved
-     states, validation feedback, interactions, and navigation targets.
+   - Create `docs/migration-v2/tracker.md` if it does not exist.
+   - Add enough structure to track task status, route-mode status, legacy files inspected,
+     baseline cleanup decisions, asset/icon decisions, commands run, and skipped items.
+   - Note that the tracker follows `docs/migration-v2/plan-v2.md`, not the stale V1 or old V2 plan.
 
-2. Inventory current baseline.
+2. Produce a compact slice inventory.
 
-   - Inspect matching current-project client, plan, and order files.
-   - Identify current placeholder or disposable baseline code for each future migration slice.
-   - Identify project-level primitives and infrastructure that should be kept.
-   - Record any kept client-specific exception in `docs/migration-v2/tracker.md`.
+   - For client list, client detail default, plan detail, plan settings, and client order, record
+     the public route, legacy entry/page files, important legacy hooks/helpers/types, expected new
+     route file, expected feature view, likely domain/application/repository areas, query/mutation
+     needs, and test categories.
+   - Keep this inventory short. It should be enough for a reviewer to challenge file placement and
+     scope before runtime migration starts, not a full implementation design for every page.
 
-3. Prepare tracker evidence.
+3. Produce a route mode inventory.
 
-   - Update `docs/migration-v2/tracker.md` so future entries reference this V2 plan.
-   - Keep task status, route-mode coverage, inspected legacy files, tests, commands, and skipped
-     items explicit.
+   - Read the old client detail files that define, render, or dispatch `location.state.pageType`.
+   - For each mode, record the old `pageType`, proposed new `routeMode`, parent route, legacy
+     files, target view or capability, whether it can migrate alone, coupled child modes if any,
+     and acceptance focus.
+   - Use this inventory to drive `Repeat Task 5.x`.
+
+4. Produce a baseline cleanup inventory.
+
+   - Inspect current-project files for each future migration slice.
+   - Record files or exports that should be removed, replaced, or kept.
+   - For kept client-specific files, record whether the reason is project infrastructure, shared
+     primitive, or already migrated behavior.
+     Treat existing client, plan, and order business code as disposable unless it is clearly generic
+     project infrastructure.
+
+5. Produce an asset and icon inventory.
+
+   - Trace image/icon imports and old `<Icons.XXX />` usages from the inventoried slices.
+   - For each meaningful asset, record usage site, old reference, old registry/SVG source if it is
+     an `Icons` usage, classification, planned destination, and import style.
+   - Reusable, business-agnostic SVG icons should map to `src/shared/assets/icons` with kebab-case
+     filenames, preserved `viewBox`, `?react` exports, and direct named imports.
+   - Do not plan a global `Icons` namespace or compatibility wrapper.
+
+6. Produce a business capability inventory.
+
+   - Read old `src/biz/features` and `src/biz/comps` usages discovered by the slices.
+   - Record each capability's legacy files, slices that use it, target module, whether it owns save
+     flow, domain/application needs, and expected tests.
+   - If a capability is used by only one migrated flow, record whether it should stay under the
+     owning feature instead of becoming a focused `src/features/<capability>` module.
+
+7. Write implementation sketches for review.
+
+   For each top-level slice, add a short sketch that states:
+
+   - Which domain types and repository methods are expected.
+   - Which use case functions are expected.
+   - Which deterministic mock fixtures are needed.
+   - Which query keys and feature hooks are expected.
+   - Which route file and feature view will own composition.
+   - Which old behaviors are explicitly out of scope.
+
+   The sketch should be specific enough for a reviewer to challenge file placement, route-mode
+   choices, icon classification, and test scope before code is written.
+
+8. Add a review gate.
+
+   - Mark Task 1 complete only after the tracker has enough filled inventory to execute Task 2,
+     Task 3, Task 4, and at least the first `Repeat Task 5.x` without rediscovering the whole
+     legacy project.
+   - Record open questions explicitly instead of hiding them in `TBD`.
+   - Do not start runtime migration from this task unless a small documentation-only adjustment is
+     needed to keep the tracker coherent.
 
 ### Acceptance Criteria
 
-- Each migration slice has a known legacy source inventory and a known current baseline cleanup
-  target.
-- Kept current client-specific files are justified in `docs/migration-v2/tracker.md`.
+- `docs/migration-v2/tracker.md` exists and references this V2 plan.
+- Slice, route mode, baseline cleanup, asset/icon, and capability inventories are filled with
+  concrete legacy files, target destinations, and reviewable decisions at the level needed to start
+  the next migration tasks.
+- Every old `<Icons.XXX />` usage found during inventory has a planned classification and
+  destination; none plans to preserve a global `Icons` namespace.
+- Kept current client-specific files are justified as project infrastructure, shared primitives, or
+  already migrated behavior.
+- At least the first executable route-mode repeat task has a selected mode or mode group.
 - No runtime behavior is changed by this task unless needed for tracker/documentation hygiene.
 
 ## Task 2: Lock `/ops/client...` Route Contract
@@ -131,6 +188,24 @@ Out of scope:
 - Old `/login/callback`, `/not-found`, and `/_dev` routes.
 - Old page stack implementation and direct `window.history` handling.
 - Business page implementation beyond temporary thin wiring needed for the contract.
+
+### Deliverables
+
+- Updated `src/app/router/routeTree.tsx` with the five `/ops/client...` business routes.
+- Thin route entry files for client list, client detail, plan detail, plan settings, and client
+  order if they do not already exist.
+- Route registration tests proving the public route contract and excluding old system/dev routes.
+- E2E smoke coverage for route availability when browser-level route behavior changes.
+
+### Implementation Sketch
+
+- Convert old `:id` params to TanStack Router params with explicit business names:
+  `$clientId`, `$planId`, and `$orderParams`.
+- Route entries read params with `useParams({ strict: false, shouldThrow: false })` only when they
+  need path params.
+- Every route entry renders through `RouteModeSwitch`; default page content goes in `defaultPage`,
+  and only non-default same-URL states go in `modes`.
+- Do not add page-stack logic here. `RouteStack` remains the only stack rendering mechanism.
 
 ### Steps
 
@@ -192,6 +267,33 @@ Out of scope:
 - Real API integration.
 - Auth, login redirect, token injection, native bridge behavior, and native navigation.
 - Pixel-perfect visual parity unless explicit visual acceptance criteria are provided.
+
+### Deliverables
+
+- `src/pages/client/ClientListRoute.tsx`.
+- `src/features/client/views/ClientListView.tsx`.
+- Client list query hook under `src/features/client/queries`.
+- Client list use case under `src/application/client`.
+- Client list domain types and repository contract under `src/domain/client`.
+- Deterministic client list fixtures under `src/infrastructure/mock`.
+- Client repository implementation and `clientRepository` facade under
+  `src/infrastructure/repositories/client`.
+- Client list query key in `src/infrastructure/query/queryKeys.ts`.
+- Tests for list repository behavior, use case defaults when applicable, query hook behavior, view
+  states, route wiring, and list-to-detail navigation.
+
+### Implementation Sketch
+
+- The route owns URL/search/route concerns and passes navigation callbacks into the view.
+- The feature view owns list composition, search/filter controls, and loading/empty/error/success
+  states.
+- The query hook imports the use case, `clientRepository`, and centralized query keys.
+- The use case normalizes list input such as keyword, filters, page, cursor, or page size if the
+  old page did so.
+- The repository implementation applies deterministic mock filtering, searching, sorting, or
+  pagination matching old user-visible behavior.
+- Any old `<Icons.XXX />` is resolved during this task, not deferred to Task 10 except for final
+  audit.
 
 ### Steps
 
@@ -271,6 +373,31 @@ Out of scope:
 
 - Full migration of every client detail `pageType` mode; those are covered by route-mode tasks.
 - Native destination navigation and hybrid bridge behavior.
+
+### Deliverables
+
+- `src/pages/client/ClientDetailRoute.tsx`.
+- Client detail default feature view under `src/features/client/views`.
+- Client detail query hook under `src/features/client/queries`.
+- Client detail use case under `src/application/client`.
+- Client detail domain model and repository contract additions under `src/domain/client`.
+- Deterministic client detail fixtures and missing-client edge cases.
+- Client repository detail lookup implementation and facade export.
+- Detail query key in `src/infrastructure/query/queryKeys.ts`.
+- Tests for detail lookup, query hook behavior, view states, route-mode dispatch from default
+  actions, and navigation to plan detail.
+
+### Implementation Sketch
+
+- The default route is not a `routeMode`; it is passed as `RouteModeSwitch.defaultPage`.
+- Old default-page actions that used `pageType` become `routeModeState(mode)` transitions on
+  `/ops/client/$clientId`.
+- Plan detail navigation remains a real route:
+  `/ops/client/$clientId/plan/$planId`.
+- The feature view receives ordinary props for data and callbacks; it does not read
+  `location.state`, TanStack params, repositories, mocks, or old API shapes.
+- Keep the full migration of detail subpages for `Repeat Task 5.x`; this task only wires reachable
+  mode dispatch where needed from the default page.
 
 ### Steps
 
@@ -352,6 +479,30 @@ Out of scope:
 - New production paths for same-resource modes.
 - Old page stack implementation.
 - Native app bridge behavior.
+
+### Deliverables
+
+- One selected `routeMode` entry, or one explicitly justified coupled mode group, in the client
+  detail route's `RouteModeSwitch`.
+- Focused view/component code for the selected mode under the owning client feature or a focused
+  business capability module.
+- Domain, application, repository, mock, query key, query hook, and mutation hook changes only when
+  the selected mode needs them.
+- Tests covering route-mode dispatch, mode rendering, validation, save behavior, and cache
+  invalidation where applicable.
+- Updated `docs/migration-v2/tracker.md` status for the selected mode.
+
+### Implementation Sketch
+
+- Pick the smallest mode that can preserve one old user flow end to end.
+- Translate old `pageType` to a route-mode name that describes the same resource state, not a new
+  path segment.
+- If the mode is primarily a selector or editor reused by other pages, migrate it as a focused
+  capability module and keep save ownership in the client page.
+- If the mode saves data, model a typed command, route it through a use case and repository method,
+  and invalidate or update centralized query keys.
+- Resolve mode-local `<Icons.XXX />` usages during the repeat task and let Task 10 only audit
+  leftovers and duplication.
 
 ### Steps
 
@@ -471,6 +622,28 @@ Out of scope:
 - Full plan settings editors.
 - Real API integration and native bridge behavior.
 
+### Deliverables
+
+- Plan detail route entry for `/ops/client/$clientId/plan/$planId`.
+- Plan detail feature view.
+- Plan domain entities and repository contract.
+- Plan detail use case.
+- Deterministic plan detail fixtures and repository implementation.
+- Plan detail query key and feature query hook.
+- Tests for repository lookup, use case behavior where applicable, query hook behavior, view
+  states, route wiring, and navigation to settings/order flows.
+
+### Implementation Sketch
+
+- Keep plan detail as a real route because it represents a shareable plan resource.
+- The route reads `clientId` and `planId`, then passes them and navigation callbacks into the
+  feature view.
+- The view renders plan summary, status/display mappings, settings entry points, order entry
+  points, and loading/empty/error states from domain-shaped data.
+- Plan settings navigation targets `/ops/client/$clientId/plan/$planId/setting`.
+- Order entry points target `/ops/client/$clientId/plan/$planId/order/$orderParams` using the old
+  route parameter semantics translated into a typed order param model.
+
 ### Steps
 
 1. Inventory legacy plan detail source.
@@ -535,6 +708,30 @@ Out of scope:
 - Real save API integration.
 - Old native navigation and hybrid bridge behavior.
 - Reusable business capability migration beyond what the settings flow needs.
+
+### Deliverables
+
+- Plan settings route entry for `/ops/client/$clientId/plan/$planId/setting`.
+- Plan settings feature view and editor components.
+- Validation schemas and typed settings command models where forms require validation.
+- Plan settings query and mutation hooks.
+- Plan settings use cases, repository contract methods, deterministic mock fixtures, and mock save
+  behavior.
+- Query keys and invalidation/cache update behavior for settings loads and saves.
+- Tests for validation rules, command preparation, repository save behavior, mutation invalidation,
+  view states, and primary edit/save flows.
+
+### Implementation Sketch
+
+- Use React Hook Form and Zod for validation-bearing editors.
+- Keep settings-specific editors under the plan feature unless the old source proves the editor is
+  a reusable business capability.
+- Reusable business-aware selectors such as payment method, client member, merchant selection,
+  Meican staff selection, or card setting move to focused capability modules only when needed by
+  this flow or multiple flows.
+- Mutations call application use cases, use repository contracts, and invalidate/update centralized
+  query keys.
+- Same-resource nested settings panels use `routeMode`; do not add extra settings subpaths.
 
 ### Steps
 
@@ -605,6 +802,29 @@ Out of scope:
 
 - Real ordering API integration.
 - Native payment, app bridge, and native navigation behavior.
+
+### Deliverables
+
+- Client order route entry for `/ops/client/$clientId/plan/$planId/order/$orderParams`.
+- Order feature view and any selected order route-mode views.
+- Explicit order route-param parser/model.
+- Order domain entities, command types, repository contract, use cases, deterministic mock
+  fixtures, and repository implementation.
+- Order query and mutation hooks with centralized query keys.
+- Tests for route param parsing, repository behavior, use cases, mutations, view states,
+  route-mode dispatch, and primary order flows.
+
+### Implementation Sketch
+
+- Treat `orderParams` as an input boundary: parse it in route/application code into a typed model
+  before the view consumes it.
+- The default order page is route content; member lists or same-resource order subflows become
+  route modes.
+- Quantity/options/member interactions become typed commands when they mutate server-backed order
+  state.
+- Mock save/submit behavior should be deterministic and cover validation-relevant edge cases.
+- Native payment and bridge flows stay out of scope; preserve web-visible fallback behavior if the
+  old page had one.
 
 ### Steps
 
