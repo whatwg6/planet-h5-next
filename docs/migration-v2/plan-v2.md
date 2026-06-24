@@ -701,7 +701,7 @@ In scope:
 - Plan settings route entry, feature view, editor components, query/mutation hooks, domain rules,
   use cases, repository methods, deterministic mock data, query keys, assets, and tests.
 - Business UI capabilities used by settings editors, including payment method, client member,
-  merchant selection, Meican staff selection, and card setting when the settings flow requires them.
+  merchant selection, MC staff selection, and card setting when the settings flow requires them.
 
 Out of scope:
 
@@ -727,7 +727,7 @@ Out of scope:
 - Keep settings-specific editors under the plan feature unless the old source proves the editor is
   a reusable business capability.
 - Reusable business-aware selectors such as payment method, client member, merchant selection,
-  Meican staff selection, or card setting move to focused capability modules only when needed by
+  MC staff selection, or card setting move to focused capability modules only when needed by
   this flow or multiple flows.
 - Mutations call application use cases, use repository contracts, and invalidate/update centralized
   query keys.
@@ -887,7 +887,7 @@ In scope:
 - `payment-method`.
 - `client-member`.
 - `select-merchant`.
-- `select-meican-staff`.
+- `select-mc-staff`.
 - `card-setting`.
 - Other old `src/biz/features` or `src/biz/comps` capabilities discovered during page migration.
 

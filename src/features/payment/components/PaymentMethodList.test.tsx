@@ -15,7 +15,7 @@ describe("PaymentMethodList", () => {
     const onChange = vi.fn();
     usePaymentMethodsQueryMock.mockReturnValue({
       data: [
-        { id: "meican-card", name: "美餐卡", type: "meican", enabled: true },
+        { id: "mc-card", name: "MC卡", type: "mc", enabled: true },
         { id: "external-card", name: "外部支付", type: "external", enabled: false },
       ],
       isLoading: false,
@@ -23,10 +23,10 @@ describe("PaymentMethodList", () => {
       refetch: vi.fn(),
     });
 
-    render(<PaymentMethodList clientId="client-meican" selectedIds={[]} onChange={onChange} />);
+    render(<PaymentMethodList clientId="client-mc" selectedIds={[]} onChange={onChange} />);
 
-    await userEvent.click(screen.getByRole("button", { name: /美餐卡/ }));
-    expect(onChange).toHaveBeenCalledWith(["meican-card"]);
+    await userEvent.click(screen.getByRole("button", { name: /MC卡/ }));
+    expect(onChange).toHaveBeenCalledWith(["mc-card"]);
     expect(screen.getByRole("button", { name: /外部支付/ })).toBeDisabled();
   });
 });

@@ -1,11 +1,11 @@
 import type { PaymentMethod } from "@/domain/payment/Payment";
 
 export const paymentMockData: Record<string, PaymentMethod[]> = {
-  "client-meican": [
+  "client-mc": [
     {
-      id: "meican-card",
-      name: "美餐卡",
-      type: "meican",
+      id: "mc-card",
+      name: "MC卡",
+      type: "mc",
       enabled: true,
       description: "企业默认支付方式",
     },
@@ -19,9 +19,9 @@ export const paymentMockData: Record<string, PaymentMethod[]> = {
   ],
   c1: [
     {
-      id: "meican-card",
-      name: "美餐卡",
-      type: "meican",
+      id: "mc-card",
+      name: "MC卡",
+      type: "mc",
       enabled: true,
       description: "企业默认支付方式",
     },

@@ -110,7 +110,7 @@ Mock coverage should include:
 - client detail settings: name and remark, support, login, password, notifications, app version, managers, departments, cost centers, field settings, meal points, meal types, and meal groups;
 - plans: multiple business types, setting groups, open times, order rules, restrictions, pickup settings, and finance settings;
 - orders: order lists, order details, and key delivery, pickup, and dine-in display states;
-- shared business capabilities: payment methods, client members, merchant selection, and Meican staff selection where pages actually depend on them.
+- shared business capabilities: payment methods, client members, merchant selection, and MC staff selection where pages actually depend on them.
 
 Repository mock implementations must return domain entities. Feature views and hooks must not depend on old API response shapes.
 
@@ -140,7 +140,7 @@ Business-specific examples include:
 - payment method UI;
 - client member UI;
 - merchant selection;
-- Meican staff selection;
+- MC staff selection;
 - meal period, meal point, and meal rule editors;
 - plan setting editors.
 
@@ -176,7 +176,7 @@ Move in runnable vertical slices:
    - Migrate client order list and order detail with major order states.
 
 7. Shared business capability completion
-   - Complete payment methods, client members, merchant selection, and Meican staff selection only where migrated pages need them.
+   - Complete payment methods, client members, merchant selection, and MC staff selection only where migrated pages need them.
 
 ## Testing And Verification
 

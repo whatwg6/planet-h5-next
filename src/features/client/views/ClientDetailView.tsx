@@ -1,4 +1,5 @@
 import type { ClientDetail } from "@/domain/client/Client";
+import { SettingIcon } from "@/shared/assets/icons";
 import { Button } from "@/shared/ui/Form";
 import { Page } from "@/shared/ui/Page";
 import { cn } from "@/shared/utils/cn";
@@ -28,7 +29,7 @@ export function ClientDetailView({
           aria-label="客户设置"
           onClick={onOpenSettings}
         >
-          设置
+          <SettingIcon className="h-5 w-5" aria-hidden="true" />
         </Button>
       }
     >

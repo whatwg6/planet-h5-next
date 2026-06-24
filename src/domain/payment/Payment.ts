@@ -1,7 +1,7 @@
 export type PaymentMethod = {
   id: string;
   name: string;
-  type: "meican" | "external";
+  type: "mc" | "external";
   enabled: boolean;
   description?: string;
 };
