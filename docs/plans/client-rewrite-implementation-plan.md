@@ -30,7 +30,7 @@ Use this plan as the local checklist for `/tdd` sessions. Each slice should be i
 
 ## Slice 1: Minimal H5 Settings UI Base
 
-Status: Not started
+Status: Complete
 
 ### Goal
 
