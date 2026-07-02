@@ -3,6 +3,9 @@ import type { McStaffSearchParams } from "@/domain/mc-staff/McStaff";
 import type { MerchantListParams } from "@/domain/merchant/Merchant";
 
 export const queryKeys = {
+  auth: {
+    session: ["auth", "session"] as const,
+  },
   clients: {
     all: ["clients"] as const,
     list: (params: ClientListParams) => ["clients", "list", params] as const,
