@@ -28,7 +28,40 @@ Use this plan as the local checklist for `/tdd` sessions. Each slice should be i
 - Prefer one complete vertical slice over broad partial scaffolding.
 - Do not add screenshot baseline tests.
 
-## Slice 1: Client Department Settings Vertical Slice
+## Slice 1: Minimal H5 Settings UI Base
+
+Status: Not started
+
+### Goal
+
+Add or refine only the H5 base components needed by the first settings slices, without building a broad component library upfront and without adding business semantics to `shared/ui`.
+
+### Scope
+
+- Navigation and edit navigation behavior needed by settings edit pages.
+- List sections and rows needed by settings pages.
+- Tree base component for department display and parent selection.
+- Dialog confirmation behavior.
+- Toast behavior.
+- Popup or sheet behavior if needed for department create or parent selection.
+- Basic input and form field behavior.
+- Loading, error, and empty states where current primitives are insufficient.
+
+### Acceptance Criteria
+
+- Shared UI components remain business-agnostic.
+- The Tree component can render nested data and support expand/collapse.
+- Dialog confirm/cancel behavior is reusable.
+- Toast can be triggered from mutation failure paths.
+- Base components do not know about client, plan, order, department, or payment semantics.
+- The slice only introduces the minimum base components needed for the department slice and near-term settings pages.
+
+### Suggested Tests
+
+- Narrow shared UI tests only for components with standalone behavior, such as Tree expand/collapse or Dialog confirm/cancel.
+- Prefer feature tests over shared UI implementation tests when behavior is business-specific.
+
+## Slice 2: Client Department Settings Vertical Slice
 
 Status: Not started
 
@@ -68,39 +101,6 @@ Fully rewrite `客户设置 > 部门` with legacy behavior parity.
 - Repository tests for create, update, delete, and refetch persistence.
 - Feature view tests for tree rendering, parent selection, save failure, and unsaved-change confirmation.
 - Route mode test for opening department and department edit modes from the client detail route.
-
-## Slice 2: H5 Settings UI Base
-
-Status: Not started
-
-### Goal
-
-Add or refine the H5 base components needed by client settings flows without adding business semantics to `shared/ui`.
-
-### Scope
-
-- Navigation and edit navigation behavior.
-- List sections and rows.
-- Tree base component if Slice 1 needs extraction.
-- Dialog and confirmation behavior.
-- Toast behavior.
-- Popup or sheet behavior.
-- Switch row foundation.
-- Input and form field behavior.
-- Loading, error, and empty states where current primitives are insufficient.
-
-### Acceptance Criteria
-
-- Shared UI components remain business-agnostic.
-- Settings feature components can compose action rows, switch rows, readonly rows, and grouped sections.
-- Dialog confirm/cancel behavior is reusable.
-- Toast can be triggered from mutation failure paths.
-- Base components do not know about client, plan, order, department, or payment semantics.
-
-### Suggested Tests
-
-- Narrow shared UI tests only for components with standalone behavior, such as Tree expand/collapse or Dialog confirm/cancel.
-- Prefer feature tests over shared UI implementation tests when behavior is business-specific.
 
 ## Slice 3: Mutable Client Mock Repository Foundation
 
@@ -387,6 +387,6 @@ After each slice:
 Start Slice 1 with `/tdd`:
 
 ```txt
-Implement Client Department Settings Vertical Slice from docs/plans/client-rewrite-implementation-plan.md.
+Implement Minimal H5 Settings UI Base from docs/plans/client-rewrite-implementation-plan.md.
 Use docs/prd/client-rewrite-prd.md and the accepted ADRs as the spec.
 ```
