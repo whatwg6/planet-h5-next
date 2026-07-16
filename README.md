@@ -48,8 +48,8 @@ Navigation timing diagnostics are enabled by default and emit one structured `[m
 entry for each completed document load. Set `VITE_NAVIGATION_TIMING_ENABLED=false` to disable them.
 They do not measure in-app SPA route changes.
 
-Document-level performance metrics are also enabled by default. The browser's native Performance
-Timeline and `PerformanceObserver` APIs collect FCP, LCP, CLS, INP, and TTFB and temporarily report
+Document-level performance metrics are also enabled by default. `web-vitals` collects FCP, LCP,
+CLS, INP, and TTFB from the browser Performance Timeline and temporarily reports
 each finalized metric as a structured `[metrics]` console entry. Set
 `VITE_PERFORMANCE_METRICS_ENABLED=false` to disable collection, or set
 `VITE_PERFORMANCE_METRICS_SAMPLE_RATE` to a value from `0` through `1` to sample whole document
