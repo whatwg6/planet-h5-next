@@ -46,6 +46,8 @@ Rules:
 - `domain` contains business entities, repository contracts, and pure business rules.
 - `application` contains use cases and coordinates business actions.
 - `infrastructure` contains Axios, mock data, query keys under `infrastructure/query/`, and repository implementations.
+- `infrastructure/observability` contains browser metric collectors and reporter adapters. Collectors
+  stay independent from React, routing libraries, business features, and transport vendors.
 - `features` contains React views, feature queries, mutations, stores, and business components.
 - `pages` contains thin TanStack Router route entry components.
 - `shared/ui` contains H5 base components without client, merchant, plan, or order business meaning.
@@ -86,6 +88,8 @@ Create module folders only when the feature needs that layer.
 Keep route ownership explicit:
 
 - `src/app/router/routeTree.tsx` is the only route registration table.
+- Route-attributed observability reads registered templates from router match metadata. It must not
+  reconstruct templates from concrete paths, hashes, or a second route table.
 
 The route layer has three central mechanisms:
 

@@ -42,6 +42,12 @@ pnpm format:check
 - `pnpm format` — formats project files with Prettier.
 - `pnpm format:check` — verifies formatting without writing changes.
 
+## Navigation timing diagnostics
+
+Navigation timing diagnostics are enabled by default and emit one structured `[metrics]` console
+entry for each completed document load. Set `VITE_NAVIGATION_TIMING_ENABLED=false` to disable them.
+They do not measure in-app SPA route changes.
+
 Playwright e2e tests run against the local Google Chrome channel to avoid browser binary
 downloads in restricted or slow networks. Install Google Chrome on the machine before
 running `pnpm e2e`.
