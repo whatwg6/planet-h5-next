@@ -42,11 +42,22 @@ pnpm format:check
 - `pnpm format` — formats project files with Prettier.
 - `pnpm format:check` — verifies formatting without writing changes.
 
-## Navigation timing diagnostics
+## Performance diagnostics
 
 Navigation timing diagnostics are enabled by default and emit one structured `[metrics]` console
 entry for each completed document load. Set `VITE_NAVIGATION_TIMING_ENABLED=false` to disable them.
 They do not measure in-app SPA route changes.
+
+Document-level performance metrics are also enabled by default. The browser's native Performance
+Timeline and `PerformanceObserver` APIs collect FCP, LCP, CLS, INP, and TTFB and temporarily report
+each finalized metric as a structured `[metrics]` console entry. Set
+`VITE_PERFORMANCE_METRICS_ENABLED=false` to disable collection, or set
+`VITE_PERFORMANCE_METRICS_SAMPLE_RATE` to a value from `0` through `1` to sample whole document
+metric families (the default is `1`). Invalid sample rates disable this collector.
+
+These metrics describe the initial document lifecycle only. In-app SPA route changes do not start
+new Web Vitals page loads, and console output is a diagnostic reporter rather than a production
+aggregation backend.
 
 Playwright e2e tests run against the local Google Chrome channel to avoid browser binary
 downloads in restricted or slow networks. Install Google Chrome on the machine before
